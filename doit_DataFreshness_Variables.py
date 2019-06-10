@@ -6,4 +6,4 @@ credentials_config_file_path = r"doit_DataFreshness_Credentials/doit_DataFreshne
 
 md_open_data_domain = r"opendata.maryland.gov"
 md_open_data_url = fr"https://{md_open_data_domain}"
-md_socrata_data_json = f"{md_open_data_url}/data.json"
+md_socrata_data_json_url = f"{md_open_data_url}/data.json"
