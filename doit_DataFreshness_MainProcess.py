@@ -21,8 +21,10 @@ def main():
     # TODO:
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     socrata_client = Utility.create_socrata_client(domain=var.md_open_data_domain,
-                                                   app_token=credentials_parser, username=, password=)
-    response_socrata = Utility.request_GET(url=DatasetSocrata.MD_OPEN_DATA_URL)
+                                                   app_token=credentials_parser["app_token"],
+                                                   username=credentials_parser["username"],
+                                                   password=credentials_parser["password"])
+    response_socrata = Utility.request_GET(url=var.md_open_data_url)
     response_socrata_json = response_socrata.json()
 
     for json_obj in response_socrata_json:
