@@ -4,7 +4,15 @@ Main processing script coordinating all functionality for completing data freshn
 
 
 def main():
-    pass
+    # IMPORTS
+    import requests
+    import Utility
+
+    # VARIABLES
+    # CLASSES
+    # FUNCTIONS
+    # FUNCTIONALITY
+
 
 
 if __name__ == "__main__":
