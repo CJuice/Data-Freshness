@@ -3,3 +3,6 @@ File designated for process variables in order to centralize variables, and de-c
 """
 
 credentials_config_file_path = r"DataFreshness/Credentials/Credentials.cfg"
+
+md_open_data_domain = r"opendata.maryland.gov"
+md_open_data_url = fr"https://{md_open_data_domain}"
