@@ -2,7 +2,7 @@
 
 """
 import os
-import DataFreshness.Variables as var
+import DataFreshness.doit_DataFreshness_Variables as var
 
 
 class DatasetSocrata:
