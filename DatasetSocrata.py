@@ -2,6 +2,7 @@
 
 """
 import os
+import DataFreshness.Variables as var
 
 
 class DatasetSocrata:
@@ -9,7 +10,6 @@ class DatasetSocrata:
 
     """
 
-    MD_OPEN_DATA_URL = r"https://opendata.maryland.gov"
 
     def __init__(self, dataset_json: dict):
         """
@@ -58,7 +58,7 @@ class DatasetSocrata:
 
         :return:
         """
-        self.metadata_url = f"{DatasetSocrata.MD_OPEN_DATA_URL}/api/views/{self.four_by_four}.json"
+        self.metadata_url = f"{var.md_open_data_url}/api/views/{self.four_by_four}.json"
         return None
 
     def extract_four_by_four(self):
