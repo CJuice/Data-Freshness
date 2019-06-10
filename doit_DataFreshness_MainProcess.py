@@ -8,9 +8,9 @@ def main():
     # IMPORTS
     import configparser
     import sodapy
-    from DataFreshness.Utility import Utility
-    from DataFreshness.DatasetSocrata import DatasetSocrata
-    import DataFreshness.Variables as var
+    from DataFreshness.doit_DataFreshness_Utility import Utility
+    from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
+    import DataFreshness.doit_DataFreshness_Variables as var
 
     # VARIABLES
     socrata_class_objects_list = []
@@ -20,7 +20,8 @@ def main():
     # FUNCTIONALITY
     # TODO:
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
-    socrata_client = Utility.create_socrata_client(domain=DatasetSocrata, app_token=, username=, password=)
+    socrata_client = Utility.create_socrata_client(domain=var.md_open_data_domain,
+                                                   app_token=credentials_parser, username=, password=)
     response_socrata = Utility.request_GET(url=DatasetSocrata.MD_OPEN_DATA_URL)
     response_socrata_json = response_socrata.json()
 

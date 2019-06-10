@@ -10,7 +10,6 @@ class DatasetSocrata:
 
     """
 
-
     def __init__(self, dataset_json: dict):
         """
 
