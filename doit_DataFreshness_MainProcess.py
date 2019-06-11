@@ -54,17 +54,18 @@ def main():
         dataset_socrata.build_metadata_url()
         dataset_socrata.build_resource_url()
 
-        # TODO: Determine whether want to make a querying request for each dataset uid. If do make a request for each
-        #  dataset uid can I use multi-threading to have many workers making requests?
-        # TODO: Would it be better to get all asset inventory json, make a giant dictionary or even class objects, and
-        #  then query locally to eliminate web transactions?
-        dataset_socrata.build_asset_inventory_url(asset_inventory_fourbyfour=credentials_parser["SOCRATA"]["asset_inventory_fourbyfour"])
-
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
 
     # TODO: Need to check for title="MD iMAP" objects, increment gis counter, and I think delete object
     # TODO: Need to check for title="Dataset Freshness" objects and skip??
     # TODO: Need to check for title="Homepage Categories" objects and skip??
+
+
+    # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
+    # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
+    #  then query locally to eliminate web transactions
+    dataset_socrata.build_resource_url(
+        asset_inventory_fourbyfour=credentials_parser["SOCRATA"]["asset_inventory_fourbyfour"])
 
     # ===================================================
     # ARCGIS ONLINE
