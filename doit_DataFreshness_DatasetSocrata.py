@@ -42,7 +42,6 @@ class DatasetSocrata:
         self.distribution_list = None
         self.four_by_four = None
         self.identifier_url = None
-        # self.issued = None # asset inventory last_update_date data value more detailed
         self.keyword_list = None
         self.landing_page = None
         self.metadata_url = None
@@ -54,25 +53,25 @@ class DatasetSocrata:
         self.type = None
 
         # ASSET INVENTORY SOURCED VALUES
-        self.public = None
-        self.derived_view = None
-        self.domain = None
-        self.visits = None
         self.creation_date = None
-        self.last_update_date_data = None
-        self.downloads = None
-        self.license = None
-        self.publication_stage = None
         self.data_provided_by = None
         self.date_metadata_written = None
-        self.time_period_of_content = None
-        self.place_keywords = None
-        self.update_frequency = None
+        self.derived_view = None
+        self.domain = None
+        self.downloads = None
         self.jurisdiction = None
-        self.source_link = None
-        self.state_agency_performing_updates = None
+        self.last_update_date_data = None
+        self.license = None
         self.owner_u_id = None
+        self.place_keywords = None
         self.provenance = None
+        self.public = None
+        self.publication_stage = None
+        self.source_link = None
+        self.state_agency_performing_data_updates = None
+        self.time_period_of_content = None
+        self.update_frequency = None
+        self.visits = None
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -96,8 +95,8 @@ class DatasetSocrata:
         self.update_frequency = asset_json.get("update_frequency", None)
         self.jurisdiction = asset_json.get("jurisdiction", None)
         self.source_link = asset_json.get("source_link", None)
-        self.state_agency_performing_updates = asset_json.get("state_agency_performing_updates", None)
-        self.owner_u_id = asset_json.get("owner_u_id", None)
+        self.state_agency_performing_data_updates = asset_json.get("state_agency_performing_data_updates", None)
+        self.owner_u_id = asset_json.get("owner_uid", None)
         self.provenance = asset_json.get("provenance", None)
         return None
 
@@ -111,7 +110,6 @@ class DatasetSocrata:
         self.description = dataset_json.get("description", None)
         self.distribution_list = dataset_json.get("distribution", None)
         self.identifier_url = dataset_json.get("identifier", None)
-        # self.issued = dataset_json.get("issued", None)  # asset inventory last_update_date data value more detailed
         self.keyword_list = dataset_json.get("keyword", None)
         self.landing_page = dataset_json.get("landingPage", None)
         self.modified = dataset_json.get("modified", None)
