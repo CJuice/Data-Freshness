@@ -40,7 +40,48 @@ class DatasetSocrata:
         self.type = None
 
         # ASSET INVENTORY SOURCED VALUES
+        self.public = None
+        self.derived_view = None
+        self.domain = None
+        self.visits = None
+        self.creation_date = None
+        self.last_update_date_data = None
+        self.downloads = None
+        self.license = None
+        self.publication_stage = None
+        self.data_provided_by = None
+        self.date_metadata_written = None
+        self.time_period_of_content = None
+        self.place_keywords = None
+        self.update_frequency = None
+        self.jurisdiction = None
+        self.source_link = None
+        self.state_agency_performing_updates = None
+        self.owner_u_id = None
+        self.provenance = None
 
+
+    def assign_asset_inventory_json_to_class_values(self, asset_json):
+        self.public = asset_json.get("public", None)
+        self.derived_view = asset_json.get("derived_view", None)
+        self.domain = asset_json.get("domain", None)
+        self.visits = asset_json.get("visits", -9999)
+        self.creation_date = asset_json.get("creation_date", None)
+        self.last_update_date_data = asset_json.get("last_update_date_data", None)
+        self.downloads = asset_json.get("downloads", -9999)
+        self.license = asset_json.get("license", None)
+        self.publication_stage = asset_json.get("publication_stage", None)
+        self.data_provided_by = asset_json.get("data_provided_by", None)
+        self.date_metadata_written = asset_json.get("date_metadata_written", None)
+        self.time_period_of_content = asset_json.get("time_period_of_content", None)
+        self.place_keywords = asset_json.get("place_keywords", None)
+        self.update_frequency = asset_json.get("update_frequency", None)
+        self.jurisdiction = asset_json.get("jurisdiction", None)
+        self.source_link = asset_json.get("source_link", None)
+        self.state_agency_performing_updates = asset_json.get("state_agency_performing_updates", None)
+        self.owner_u_id = asset_json.get("owner_u_id", None)
+        self.provenance = asset_json.get("provenance", None)
+        return None
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
         """
@@ -122,10 +163,18 @@ class DatasetSocrata:
                                   content_type="json",
                                   limit=limit_max_and_offset,
                                   offset=record_offset_value)
-            master_list_of_dicts.append(response)
+            # print(f"response length: {len(response)}")
+            # print(f"response type: {type(response)}")
+            # print(type(response))
+            master_list_of_dicts.extend(response)
+            # print(f"response length: {len(response)}")
+            # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
+
             number_of_records_returned = len(response)
             request_cycle_record_count += number_of_records_returned
             total_record_count += number_of_records_returned
+            # print(f"number of records return: {number_of_records_returned}")
+            # print(f"total record count: {total_record_count}")
 
             # Any cycle_record_count that equals the max limit indicates another request is needed
             if request_cycle_record_count == limit_max_and_offset:
@@ -135,5 +184,5 @@ class DatasetSocrata:
                 record_offset_value = request_cycle_record_count + record_offset_value
             else:
                 more_records_exist_than_response_limit_allows = False
-
+        # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
         return master_list_of_dicts
