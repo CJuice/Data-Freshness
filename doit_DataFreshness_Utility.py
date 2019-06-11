@@ -32,19 +32,4 @@ class Utility:
         cfg_parser.read(filenames=cfg_file)
         return cfg_parser
 
-    @staticmethod
-    def create_socrata_client( domain: str, app_token: str, username:str, password: str) -> Socrata:
-        """
-        Create and return a Socrata client for use.
 
-        NOTE_1: It seems absolutely essential the the domain be a domain and not a url; 'https://opendata.maryland.gov'
-            will not substitute for 'opendata.maryland.gov'.
-
-        :param domain: domain for maryland open data portal.
-        :param app_token: application token for throttling limitations
-        :param username: account username
-        :param password: password for account
-        :return: Socrata connection client
-        """
-
-        return Socrata(domain=domain, app_token=app_token, username=username, password=password)
