@@ -55,13 +55,11 @@ def main():
 
     # TODO: Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
     for json_obj in socrata_data_json:
-        print(next(socrata_counter))
         dataset_socrata = DatasetSocrata()
         dataset_socrata.assign_data_json_to_class_values(dataset_json=json_obj)
         dataset_socrata.extract_four_by_four()
         dataset_socrata.build_metadata_url()
         dataset_socrata.build_resource_url()
-
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
 
     # TODO: Need to check for title="MD iMAP" objects, increment gis counter, and I think delete object
@@ -72,10 +70,27 @@ def main():
     # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
     #  then query locally to eliminate web transactions
-    asset_inventory_url = f"{var.md_open_data_url}/resource/{credentials_parser['SOCRATA']['asset_inventory_fourbyfour']}.json"
+    # asset_inventory_url = f"{var.md_open_data_url}/resource/{credentials_parser['SOCRATA']['asset_inventory_fourbyfour']}.json"
+    asset_inventory_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
+        client=DatasetSocrata.SOCRATA_CLIENT,
+        fourbyfour=credentials_parser['SOCRATA']['asset_inventory_fourbyfour'])
 
+    for obj in asset_inventory_data_list:
+        u_id = obj.get("u_id", None)
+        if u_id is None:
+            continue
+        else:
+            existing_data_obj = socrata_class_objects_dict.get(u_id, None)
 
+        if existing_data_obj is None:
+            continue
+        else:
+            # print(obj.get("name", None), existing_data_obj.title)
+            existing_data_obj.assign_asset_inventory_json_to_class_values(asset_json=obj)
 
+    # temp_set = set()
+    # for obj in socrata_class_objects_dict.values():
+    #     print(obj.title)
     # ===================================================
     # ARCGIS ONLINE
 
