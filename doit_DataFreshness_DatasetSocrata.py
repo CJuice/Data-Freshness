@@ -5,6 +5,7 @@ import os
 import DataFreshness.doit_DataFreshness_Variables as var
 from sodapy import Socrata
 import time
+import itertools
 
 
 class DatasetSocrata:
@@ -209,14 +210,21 @@ class DatasetSocrata:
         # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
         return master_list_of_dicts
 
-    def passes_filter(self):
+    def passes_filter(self, gis_counter: itertools.count):
+
         if self.title is None:
             print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
             return False
-
-        for item in DatasetSocrata.SOCRATA_DATASET_TITLE_EXCLUSION_FILTERS:
-            if self.title.startswith(item):
-                return False
-            else:
-                continue
-        return True
+        elif self.title.startswith("MD iMAP"):
+            next(gis_counter)
+            return False
+        elif self.title.startswith("Dataset Freshness"):
+            print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
+            print(f"\tTITLE: {self.title}")
+            return False
+        elif self.title.startswith("Homepage Categories"):
+            # This was a filter used in the original design. Have not see any of these but preserving functionality.
+            print("Homepage Categories title encountered during passes_filter(). Skipped")
+            return False
+        else:
+            return True
