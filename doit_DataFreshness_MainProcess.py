@@ -23,7 +23,11 @@ def main():
     asset_inventory_url = None
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     socrata_class_objects_dict = {}
-    socrata_counter = itertools.count()
+    socrata_assetinventory_counter = itertools.count()
+    socrata_assetinventory_non_public_dataset_counter = itertools.count()
+    socrata_assetinventory_public_dataset_counter = itertools.count()
+    socrata_datajson_counter = itertools.count()
+    socrata_datajson_object_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
     boolean_string_replacement_dict = {"true": True, "false": False}
 
@@ -58,11 +62,15 @@ def main():
     # Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
     # Add filtering for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories"
     for json_obj in socrata_data_json:
+        next(socrata_datajson_counter)
 
-        # instantiate object and assign values but before storing obj in dict see that it passes the exclusion filter
+        # instantiate object and assign values
         dataset_socrata = DatasetSocrata()
         dataset_socrata.assign_data_json_to_class_values(dataset_json=json_obj)
-        if not dataset_socrata.passes_filter():
+
+        # Before storing obj in dict see that it passes the exclusion filter
+        # FIXME: Seeing two dataset freshness datasets. Determine if valid or is an issue
+        if not dataset_socrata.passes_filter(gis_counter=socrata_gis_dataset_counter):
             continue
 
         # proceed with processing and store object for use
@@ -70,6 +78,11 @@ def main():
         dataset_socrata.build_metadata_url()
         dataset_socrata.build_resource_url()
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
+        next(socrata_datajson_object_counter)
+
+    print(f"Number of data.json datasets handled: {socrata_datajson_counter}")
+    print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
+    print(f"Number of GIS Datasets encountered: {socrata_gis_dataset_counter}")
 
     # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
@@ -79,6 +92,8 @@ def main():
         fourbyfour=credentials_parser['SOCRATA']['asset_inventory_fourbyfour'])
 
     for obj in asset_inventory_data_list:
+        next(socrata_assetinventory_counter)
+
         public_raw = obj.get("public", None)
         public = boolean_string_replacement_dict.get(public_raw, None)
 
@@ -87,9 +102,11 @@ def main():
             pprint.pprint(f"Issue extracting 'public' from obj json. Skipped: {obj}")
             continue
         elif public is True:
+            next(socrata_assetinventory_public_dataset_counter)
             pass
         elif public is False:
-            pprint.pprint(f"Dataset 'public' status is False. Skipped.")
+            # print(f"Dataset 'public' status is False. Skipped.")
+            next(socrata_assetinventory_non_public_dataset_counter)
             continue
         else:
             print(f"Unexpected 'public' value extracted from asset inventory json: {public}")
@@ -110,6 +127,9 @@ def main():
         else:
             # print(obj.get("name", None), existing_data_obj.title)
             existing_data_obj.assign_asset_inventory_json_to_class_values(asset_json=obj)
+    print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
+    print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
+    print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
 
     # temp_set = set()
     # for obj in socrata_class_objects_dict.values():
