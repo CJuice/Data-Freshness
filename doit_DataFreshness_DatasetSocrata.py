@@ -19,6 +19,20 @@ class DatasetSocrata:
     def __init__(self):
         """
 
+        Values in asset inventory json that were previously sourced from data.json have been ignored. The following
+        listing captures the decisions made while building:
+        template: Asset Inventory key - data.json counterpart
+        dataset_link - landingPage
+        u_id - four by four code extracted from landing page value
+        type - @type
+        name- title
+        description - description
+        last_update_date_data - issued (EXCEPTION, used asset inventory last_update_date data value more detailed)
+        category - theme
+        keywords - keyword
+        owner - contactPoint
+        contactemail - contactPoint
+
         :param dataset_json:
         """
         # DATA.JSON SOURCED VALUES
@@ -28,7 +42,7 @@ class DatasetSocrata:
         self.distribution_list = None
         self.four_by_four = None
         self.identifier_url = None
-        self.issued = None
+        # self.issued = None # asset inventory last_update_date data value more detailed
         self.keyword_list = None
         self.landing_page = None
         self.metadata_url = None
@@ -60,8 +74,12 @@ class DatasetSocrata:
         self.owner_u_id = None
         self.provenance = None
 
-
     def assign_asset_inventory_json_to_class_values(self, asset_json):
+        """
+
+        :param asset_json:
+        :return:
+        """
         self.public = asset_json.get("public", None)
         self.derived_view = asset_json.get("derived_view", None)
         self.domain = asset_json.get("domain", None)
@@ -93,7 +111,7 @@ class DatasetSocrata:
         self.description = dataset_json.get("description", None)
         self.distribution_list = dataset_json.get("distribution", None)
         self.identifier_url = dataset_json.get("identifier", None)
-        self.issued = dataset_json.get("issued", None)
+        # self.issued = dataset_json.get("issued", None)  # asset inventory last_update_date data value more detailed
         self.keyword_list = dataset_json.get("keyword", None)
         self.landing_page = dataset_json.get("landingPage", None)
         self.modified = dataset_json.get("modified", None)
@@ -118,6 +136,9 @@ class DatasetSocrata:
         """
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
         return None
+
+    # def cast_and_convert_class_attributes(self):
+
 
     def extract_four_by_four(self):
         """
