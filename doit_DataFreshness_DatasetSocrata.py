@@ -6,6 +6,7 @@ import DataFreshness.doit_DataFreshness_Variables as var
 from sodapy import Socrata
 import time
 
+
 class DatasetSocrata:
     """
 
@@ -14,6 +15,8 @@ class DatasetSocrata:
     # Class attributes available to all instances
     SOCRATA_CLIENT = None
     LIMIT_MAX_AND_OFFSET = 10000
+    SOCRATA_DATASET_TITLE_EXCLUSION_FILTERS = ("MD iMAP:", "Dataset Freshness", "Homepage Categories")
+
 
     # Methods
     def __init__(self):
@@ -205,3 +208,15 @@ class DatasetSocrata:
                 more_records_exist_than_response_limit_allows = False
         # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
         return master_list_of_dicts
+
+    def passes_filter(self):
+        if self.title is None:
+            print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
+            return False
+
+        for item in DatasetSocrata.SOCRATA_DATASET_TITLE_EXCLUSION_FILTERS:
+            if self.title.startswith(item):
+                return False
+            else:
+                continue
+        return True
