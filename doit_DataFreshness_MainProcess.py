@@ -17,22 +17,23 @@ def main():
     import os
 
     # VARIABLES
-    socrata_class_objects_list = []
+    socrata_class_objects_dict = {}
     socrata_counter = itertools.count()
     arcgisonline_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
-    asset_inventory_fourbyfour = credentials_parser["SOCRATA"]["asset_inventory_fourbyfour"]
 
     # CLASSES
     # FUNCTIONS
     # FUNCTIONALITY
 
+    # ===================================================
+    # SOCRATA
     # TODO: Need a socrata client for making requests for protected information
-    client_socrata = Utility.create_socrata_client(domain=var.md_open_data_domain,
-                                                   app_token=credentials_parser["SOCRATA"]["app_token"],
-                                                   username=credentials_parser["SOCRATA"]["username"],
-                                                   password=credentials_parser["SOCRATA"]["password"])
+    DatasetSocrata.SOCRATA_CLIENT = Utility.create_socrata_client(domain=var.md_open_data_domain,
+                                                                  app_token=credentials_parser["SOCRATA"]["app_token"],
+                                                                  username=credentials_parser["SOCRATA"]["username"],
+                                                                  password=credentials_parser["SOCRATA"]["password"])
 
     # TODO: Get the data.json from Socrata so have an inventory of all public datasets
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
@@ -44,7 +45,7 @@ def main():
     else:
         datasets_json = response_socrata_json.get("dataset", {})
 
-    # TODO: Need to create Socrata Dataset objects from the datasets json, and store objects in list for use.
+    # TODO: Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
     for json_obj in datasets_json:
         print(next(socrata_counter))
         dataset_socrata = DatasetSocrata()
@@ -57,14 +58,18 @@ def main():
         #  dataset uid can I use multi-threading to have many workers making requests?
         # TODO: Would it be better to get all asset inventory json, make a giant dictionary or even class objects, and
         #  then query locally to eliminate web transactions?
-        # dataset_socrata.build_asset_inventory_url(fourbyfour=asset_inventory_fourbyfour)
+        dataset_socrata.build_asset_inventory_url(asset_inventory_fourbyfour=credentials_parser["SOCRATA"]["asset_inventory_fourbyfour"])
 
-        socrata_class_objects_list.append(dataset_socrata)
+        socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
 
     # TODO: Need to check for title="MD iMAP" objects, increment gis counter, and I think delete object
     # TODO: Need to check for title="Dataset Freshness" objects and skip??
     # TODO: Need to check for title="Homepage Categories" objects and skip??
 
+    # ===================================================
+    # ARCGIS ONLINE
+
+    # ===================================================
 
 if __name__ == "__main__":
     main()
