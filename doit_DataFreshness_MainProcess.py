@@ -8,6 +8,7 @@ def main():
     # IMPORTS
     import configparser
     import sodapy
+    import pprint
     import json
     import itertools
 
@@ -24,6 +25,7 @@ def main():
     socrata_class_objects_dict = {}
     socrata_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
+    boolean_string_replacement_dict = {"true": True, "false": False}
 
 
     # CLASSES
@@ -32,7 +34,7 @@ def main():
 
     # ===================================================
     # SOCRATA
-    # TODO: Need a socrata client for making requests for protected information
+    # Need a socrata client for making requests for protected information
     DatasetSocrata.SOCRATA_CLIENT = DatasetSocrata.create_socrata_client(domain=var.md_open_data_domain,
                                                                          app_token=credentials_parser["SOCRATA"][
                                                                              "app_token"],
@@ -41,7 +43,7 @@ def main():
                                                                          password=credentials_parser["SOCRATA"][
                                                                              "password"])
 
-    # TODO: Get the data.json from Socrata so have an inventory of all public datasets
+    # Get the data.json from Socrata so have an inventory of all public datasets
     # TODO: Redesign to handle more records than default limit, even if doesn't need it at this time
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
@@ -53,33 +55,54 @@ def main():
     else:
         socrata_data_json = response_socrata_json.get("dataset", {})
 
-    # TODO: Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
+    # Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
+    # Add filtering for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories"
     for json_obj in socrata_data_json:
+
+        # instantiate object and assign values but before storing obj in dict see that it passes the exclusion filter
         dataset_socrata = DatasetSocrata()
         dataset_socrata.assign_data_json_to_class_values(dataset_json=json_obj)
+        if not dataset_socrata.passes_filter():
+            continue
+
+        # proceed with processing and store object for use
         dataset_socrata.extract_four_by_four()
         dataset_socrata.build_metadata_url()
         dataset_socrata.build_resource_url()
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
 
-    # TODO: Need to check for title="MD iMAP" objects, increment gis counter, and I think delete object
-    # TODO: Need to check for title="Dataset Freshness" objects and skip??
-    # TODO: Need to check for title="Homepage Categories" objects and skip??
-
-
     # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
     #  then query locally to eliminate web transactions
-    # asset_inventory_url = f"{var.md_open_data_url}/resource/{credentials_parser['SOCRATA']['asset_inventory_fourbyfour']}.json"
     asset_inventory_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
         client=DatasetSocrata.SOCRATA_CLIENT,
         fourbyfour=credentials_parser['SOCRATA']['asset_inventory_fourbyfour'])
 
     for obj in asset_inventory_data_list:
-        u_id = obj.get("u_id", None)
-        if u_id is None:
+        public_raw = obj.get("public", None)
+        public = boolean_string_replacement_dict.get(public_raw, None)
+
+        # Filter out datasets where public is not True
+        if public is None:
+            pprint.pprint(f"Issue extracting 'public' from obj json. Skipped: {obj}")
+            continue
+        elif public is True:
+            pass
+        elif public is False:
+            pprint.pprint(f"Dataset 'public' status is False. Skipped.")
             continue
         else:
+            print(f"Unexpected 'public' value extracted from asset inventory json: {public}")
+            exit()
+
+        # For public datasets, extract u_id and use that to get corresponding data.json based Socrata dataset object
+        u_id = obj.get("u_id", None)
+        if u_id is None:
+            pprint.pprint(f"Issue extracting 'u_id'' from obj json. Skipped: {obj}")
+            continue
+        else:
+            # Objects in the data.json are public and visible. If a u_id is not in the dict of objects created from
+            #   the data.json then it is likely not public
             existing_data_obj = socrata_class_objects_dict.get(u_id, None)
 
         if existing_data_obj is None:
