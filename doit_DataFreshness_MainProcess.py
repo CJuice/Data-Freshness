@@ -16,12 +16,15 @@ def main():
     import DataFreshness.doit_DataFreshness_Variables as var
     import os
 
+
     # VARIABLES
+    arcgisonline_counter = itertools.count()
+    asset_inventory_url = None
+    credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     socrata_class_objects_dict = {}
     socrata_counter = itertools.count()
-    arcgisonline_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
-    credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
+
 
     # CLASSES
     # FUNCTIONS
@@ -30,23 +33,28 @@ def main():
     # ===================================================
     # SOCRATA
     # TODO: Need a socrata client for making requests for protected information
-    DatasetSocrata.SOCRATA_CLIENT = Utility.create_socrata_client(domain=var.md_open_data_domain,
-                                                                  app_token=credentials_parser["SOCRATA"]["app_token"],
-                                                                  username=credentials_parser["SOCRATA"]["username"],
-                                                                  password=credentials_parser["SOCRATA"]["password"])
+    DatasetSocrata.SOCRATA_CLIENT = DatasetSocrata.create_socrata_client(domain=var.md_open_data_domain,
+                                                                         app_token=credentials_parser["SOCRATA"][
+                                                                             "app_token"],
+                                                                         username=credentials_parser["SOCRATA"][
+                                                                             "username"],
+                                                                         password=credentials_parser["SOCRATA"][
+                                                                             "password"])
 
     # TODO: Get the data.json from Socrata so have an inventory of all public datasets
+    # TODO: Redesign to handle more records than default limit, even if doesn't need it at this time
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
+
     try:
         response_socrata_json = response_socrata.json()
     except json.decoder.JSONDecodeError as jde:
         print(f"Error decoding socrata response to json: {jde}")
         exit()
     else:
-        datasets_json = response_socrata_json.get("dataset", {})
+        socrata_data_json = response_socrata_json.get("dataset", {})
 
     # TODO: Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
-    for json_obj in datasets_json:
+    for json_obj in socrata_data_json:
         print(next(socrata_counter))
         dataset_socrata = DatasetSocrata()
         dataset_socrata.assign_data_json_to_class_values(dataset_json=json_obj)
@@ -64,8 +72,9 @@ def main():
     # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
     #  then query locally to eliminate web transactions
-    dataset_socrata.build_resource_url(
-        asset_inventory_fourbyfour=credentials_parser["SOCRATA"]["asset_inventory_fourbyfour"])
+    asset_inventory_url = f"{var.md_open_data_url}/resource/{credentials_parser['SOCRATA']['asset_inventory_fourbyfour']}.json"
+
+
 
     # ===================================================
     # ARCGIS ONLINE
