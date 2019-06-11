@@ -10,6 +10,10 @@ class DatasetSocrata:
 
     """
 
+    # Class attributes available to all instances
+    SOCRATA_CLIENT = None
+
+    # Methods
     def __init__(self):
         """
 
@@ -70,12 +74,14 @@ class DatasetSocrata:
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
         return None
 
-    def build_asset_inventory_url(self, fourbyfour):
+    def build_asset_inventory_url(self, asset_inventory_fourbyfour: str):
         """
 
         :return:
         """
-        self.asset_inventory_url = f"{var.md_open_data_url}/resource/{fourbyfour}.json?u_id={cur_identifier}&$$app_token={socrata_app_token}"
+        # If using a socrata client to request urls I don't believe need the app_token on the url
+        # Also, if move away from making web request queries then don't need this url more than first initial requests.
+        self.asset_inventory_url = f"{var.md_open_data_url}/resource/{asset_inventory_fourbyfour}.json" #?u_id={self.four_by_four}" #&$$app_token={socrata_app_token}
         return None
 
     def extract_four_by_four(self):
