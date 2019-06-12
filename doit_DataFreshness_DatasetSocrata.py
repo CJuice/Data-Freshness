@@ -112,7 +112,9 @@ class DatasetSocrata:
         self.visits = None
 
         # METADATA SOURCE VALUES
+        self.approvals = None
         self.average_rating = None
+        self.columns = None
         self.display_type = None
         self.hide_from_catalog = None
         self.hide_from_data_json = None
@@ -128,9 +130,6 @@ class DatasetSocrata:
         self.table_id = None
         self.total_times_rated = None
         self.view_last_modified = None
-        self.approvals = None
-        self.columns = None
-
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -182,11 +181,14 @@ class DatasetSocrata:
         return None
 
     def assign_metadata_json_to_class_values(self, metadata_json: dict):
+        self.approvals = metadata_json.get("approvals", None)
         self.average_rating = metadata_json.get("averageRating", None)
+        self.columns = metadata_json.get("columns", None)
         self.display_type = metadata_json.get("displayType", None)
         self.hide_from_catalog = metadata_json.get("hideFromCatalog", None)
         self.hide_from_data_json = metadata_json.get("hideFromDataJson", None)
         self.number_of_comments = metadata_json.get("numberOfComments", None)
+        self.index_updated_at = metadata_json.get("indexUpdatedAt", None)
         self.oid = metadata_json.get("oid", None)
         self.publication_append_enabled = metadata_json.get("publicationAppendEnabled", None)
         self.publication_date = metadata_json.get("publicationDate", None)
@@ -197,9 +199,6 @@ class DatasetSocrata:
         self.table_id = metadata_json.get("tableId", None)
         self.total_times_rated = metadata_json.get("totalTimesRated", None)
         self.view_last_modified = metadata_json.get("viewLastModified", None)
-        self.approvals = metadata_json.get("approvals", None)
-        self.columns = metadata_json.get("columns", None)
-        self.index_updated_at = metadata_json.get("indexUpdatedAt", None)
         return
 
     def build_metadata_url(self):
