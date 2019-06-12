@@ -48,7 +48,7 @@ def main():
 
     # ===================================================
     # SOCRATA
-    print(f"Beginning Socrata Process...")
+    print(f"\nBeginning Socrata Process...")
     # Need a socrata client for making requests for protected information
     DatasetSocrata.SOCRATA_CLIENT = DatasetSocrata.create_socrata_client(domain=var.md_open_data_domain,
                                                                          app_token=credentials_parser["SOCRATA"][
