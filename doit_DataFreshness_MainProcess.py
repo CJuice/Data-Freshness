@@ -10,18 +10,19 @@ def main():
 
     # IMPORTS
     import configparser
-    import sodapy
-    import pprint
-    import json
-    import itertools
     import datetime
-
-    from DataFreshness.doit_DataFreshness_Utility import Utility
-    from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
-    import DataFreshness.doit_DataFreshness_Variables as var
+    import itertools
+    import json
+    import numpy as np
     import os
-    print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    import pandas as pd
+    import pprint
+    import sodapy
 
+    from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
+    from DataFreshness.doit_DataFreshness_Utility import Utility
+    import DataFreshness.doit_DataFreshness_Variables as var
+    print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
 
@@ -40,8 +41,6 @@ def main():
     boolean_string_replacement_dict = {"true": True, "false": False}
 
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-
-
 
     # CLASSES
     # FUNCTIONS
@@ -164,6 +163,7 @@ def main():
                 next(socrata_displaytype_map_counter)
             else:
                 print(f"Error, object {key} unsuccessfully deleted after detecting metadata displayType = map.")
+
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata datasets handled: {socrata_metadata_counter}")
     print(f"Number of displayType = 'map' objects deleted from dataset invntory: {socrata_displaytype_map_counter}")
@@ -176,7 +176,23 @@ def main():
         display_type_values_set.add(obj.display_type)
         if obj.display_type.lower() == "map":
             print(obj.four_by_four)
-    print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
+    # print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
+
+    # TODO: Need a master pandas dataframe from all remaining Socrata datasets
+    # df_columns = list(DatasetSocrata().__dict__.keys())
+    # print(df_columns)
+    df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
+    # print(list(socrata_class_objects_dict.items()))
+    master_socrata_df = pd.DataFrame(data=df_data,
+                                     # index=list(socrata_class_objects_dict.keys()),
+                                     # columns=df_columns,
+                                     dtype=None,
+                                     copy=False)
+    print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(master_socrata_df.info())
+
+    # TODO: Need to convert field types an process values such as dates
+    # TODO: Need to match existing data freshness output and write json and excel files for all objects
 
 
     # ===================================================

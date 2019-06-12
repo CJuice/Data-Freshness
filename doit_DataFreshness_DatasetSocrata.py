@@ -136,7 +136,7 @@ class DatasetSocrata:
         :param asset_json:
         :return:
         """
-        self.contact_email = asset_json.get("contactEmail", None)
+        self.contact_email = asset_json.get("contactemail", None)
         self.creation_date = asset_json.get("creation_date", None)
         self.data_provided_by = asset_json.get("data_provided_by", None)
         self.date_metadata_written = asset_json.get("date_metadata_written", None)
