@@ -186,18 +186,11 @@ class DatasetSocrata:
                                   content_type="json",
                                   limit=limit_max_and_offset,
                                   offset=record_offset_value)
-            # print(f"response length: {len(response)}")
-            # print(f"response type: {type(response)}")
-            # print(type(response))
             master_list_of_dicts.extend(response)
-            # print(f"response length: {len(response)}")
-            # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
 
             number_of_records_returned = len(response)
             request_cycle_record_count += number_of_records_returned
             total_record_count += number_of_records_returned
-            # print(f"number of records return: {number_of_records_returned}")
-            # print(f"total record count: {total_record_count}")
 
             # Any cycle_record_count that equals the max limit indicates another request is needed
             if request_cycle_record_count == limit_max_and_offset:
@@ -207,7 +200,6 @@ class DatasetSocrata:
                 record_offset_value = request_cycle_record_count + record_offset_value
             else:
                 more_records_exist_than_response_limit_allows = False
-        # print(f"length of master_list_of_dicts: {len(master_list_of_dicts)}")
         return master_list_of_dicts
 
     def passes_filter(self, gis_counter: itertools.count):
