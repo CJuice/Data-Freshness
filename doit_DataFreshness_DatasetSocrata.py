@@ -24,7 +24,7 @@ class DatasetSocrata:
         Values in asset inventory json that were previously sourced from data.json have been ignored. The following
         listing captures the decisions made while building:
 
-        KEY: d = data.json, a = asset inventory, m = metadata
+        d = data.json, a = asset inventory, m = metadata
 
         DATA JSON NOTES:
         contactPoint - dict values covered elsewhere without need for extraction (owner (a), contactEmail (a))
@@ -73,7 +73,6 @@ class DatasetSocrata:
 
         # DATA.JSON SOURCED VALUES
         self.access_level = None
-        # self.contact_point_dict = None
         self.description = None
         self.distribution_list = None
         self.four_by_four = None
@@ -163,17 +162,16 @@ class DatasetSocrata:
     def assign_data_json_to_class_values(self, dataset_json: dict):
         """
 
+        :param dataset_json:
         :return:
         """
         self.access_level = dataset_json.get("accessLevel", None)
-        self.contact_point_dict = dataset_json.get("contactPoint", None)
         self.description = dataset_json.get("description", None)
         self.distribution_list = dataset_json.get("distribution", None)
         self.identifier_url = dataset_json.get("identifier", None)
         self.issued = dataset_json.get("issued", None)
         self.keyword_list = dataset_json.get("keyword", None)
         self.landing_page = dataset_json.get("landingPage", None)
-        self.modified = dataset_json.get("modified", None)
         self.publisher_dict = dataset_json.get("publisher", None)
         self.type = dataset_json.get("@type", None)
         self.theme_list = dataset_json.get("theme", None)
@@ -181,6 +179,11 @@ class DatasetSocrata:
         return None
 
     def assign_metadata_json_to_class_values(self, metadata_json: dict):
+        """
+
+        :param metadata_json:
+        :return:
+        """
         self.approvals = metadata_json.get("approvals", None)
         self.average_rating = metadata_json.get("averageRating", None)
         self.columns = metadata_json.get("columns", None)
@@ -219,6 +222,53 @@ class DatasetSocrata:
 
     # def cast_and_convert_class_attributes(self): # Going to do in pandas dataframe
 
+    def passes_filter_data_json(self, gis_counter: itertools.count):
+        """
+
+        :param gis_counter:
+        :return:
+        """
+
+        if self.title is None:
+            print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
+            return False
+        elif self.title.startswith("MD iMAP"):
+            next(gis_counter)
+            return False
+        elif self.title.startswith("Dataset Freshness"):
+            print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
+            print(f"\tTITLE: {self.title}")
+            return False
+        elif self.title.startswith("Homepage Categories"):
+            # This was a filter used in the original design. Have not see any of these but preserving functionality.
+            print("Homepage Categories title encountered during passes_filter(). Skipped")
+            return False
+        else:
+            return True
+
+    def passes_filter_metadata_json(self, gis_counter: itertools.count):
+        """
+
+        :param gis_counter:
+        :return:
+        """
+
+        if self.title is None:
+            print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
+            return False
+        elif self.title.startswith("MD iMAP"):
+            next(gis_counter)
+            return False
+        elif self.title.startswith("Dataset Freshness"):
+            print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
+            print(f"\tTITLE: {self.title}")
+            return False
+        elif self.title.startswith("Homepage Categories"):
+            # This was a filter used in the original design. Have not see any of these but preserving functionality.
+            print("Homepage Categories title encountered during passes_filter(). Skipped")
+            return False
+        else:
+            return True
 
     def extract_four_by_four(self):
         """
@@ -246,7 +296,8 @@ class DatasetSocrata:
         return Socrata(domain=domain, app_token=app_token, username=username, password=password)
 
     @staticmethod
-    def request_and_aggregate_all_socrata_records(client: Socrata, fourbyfour: str, limit_max_and_offset: int = LIMIT_MAX_AND_OFFSET) -> list:
+    def request_and_aggregate_all_socrata_records(client: Socrata, fourbyfour: str,
+                                                  limit_max_and_offset: int = LIMIT_MAX_AND_OFFSET) -> list:
         """
 
         :param client:
@@ -279,22 +330,3 @@ class DatasetSocrata:
             else:
                 more_records_exist_than_response_limit_allows = False
         return master_list_of_dicts
-
-    def passes_filter(self, gis_counter: itertools.count):
-
-        if self.title is None:
-            print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
-            return False
-        elif self.title.startswith("MD iMAP"):
-            next(gis_counter)
-            return False
-        elif self.title.startswith("Dataset Freshness"):
-            print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
-            print(f"\tTITLE: {self.title}")
-            return False
-        elif self.title.startswith("Homepage Categories"):
-            # This was a filter used in the original design. Have not see any of these but preserving functionality.
-            print("Homepage Categories title encountered during passes_filter(). Skipped")
-            return False
-        else:
-            return True
