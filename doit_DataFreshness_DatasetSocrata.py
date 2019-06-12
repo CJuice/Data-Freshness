@@ -25,17 +25,36 @@ class DatasetSocrata:
 
         Values in asset inventory json that were previously sourced from data.json have been ignored. The following
         listing captures the decisions made while building:
-        template: Asset Inventory key - data.json counterpart
+
+        KEY: d = data.json, a = asset inventory, m = metadata
+        Asset Inventory Notes:
         dataset_link - landingPage
-        u_id - four by four code extracted from landing page value
-        type - @type
-        name- title
-        description - description
-        last_update_date_data - issued (EXCEPTION, used asset inventory last_update_date data value more detailed)
-        category - theme
-        keywords - keyword
-        owner - contactPoint
-        contactemail - contactPoint
+        u_id - four by four code extracted from landing page value (d)
+        type - @type (d)
+        name- title (d)
+        description - description (d)
+        last_update_date_data - publicationDate (m)
+        category - theme (d)
+        keywords - keyword (d)
+        owner - contactPoint (d)
+        contactemail - contactPoint (d)
+
+        Metadata Notes:
+        id - four by four code extracted from landing page value (d)
+        name - title (d)
+        attribution - data provided by (a)
+        attributionLink - sourceLink (a)
+        category - theme (d)
+        createdAt - creation_date (a)
+        description - description (d)
+        downloadCount - downloads (a)
+        iconUrl - Not stored, did not appear to be useful
+        indexUpdatedAt - modified (d)
+        licenseId - license (a)
+        newBackend - Not stored, did not appear to be useful
+        provenance - provenance (a)
+        publicationDate - issued (d)
+        publicationStage - publication_stage (a)
 
         :param dataset_json:
         """
@@ -48,6 +67,7 @@ class DatasetSocrata:
         self.identifier_url = None
         self.keyword_list = None
         self.landing_page = None
+        self.issued = None
         self.metadata_url = None
         self.modified = None
         self.publisher_dict = None
@@ -77,31 +97,44 @@ class DatasetSocrata:
         self.update_frequency = None
         self.visits = None
 
+        # METADATA SOURCE VALUES
+        self.average_rating = None
+        self.display_type = None
+        self.hide_from_catalog = None
+        self.hide_from_data_json = None
+        self.number_of_comments = None
+        self.oid = None
+        self.publication_append_enabled = None
+        self.publication_group = None
+        self.row_class = None
+
+
+
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
 
         :param asset_json:
         :return:
         """
-        self.public = asset_json.get("public", None)
-        self.derived_view = asset_json.get("derived_view", None)
-        self.domain = asset_json.get("domain", None)
-        self.visits = asset_json.get("visits", -9999)
         self.creation_date = asset_json.get("creation_date", None)
-        self.last_update_date_data = asset_json.get("last_update_date_data", None)
-        self.downloads = asset_json.get("downloads", -9999)
-        self.license = asset_json.get("license", None)
-        self.publication_stage = asset_json.get("publication_stage", None)
         self.data_provided_by = asset_json.get("data_provided_by", None)
         self.date_metadata_written = asset_json.get("date_metadata_written", None)
-        self.time_period_of_content = asset_json.get("time_period_of_content", None)
-        self.place_keywords = asset_json.get("place_keywords", None)
-        self.update_frequency = asset_json.get("update_frequency", None)
+        self.derived_view = asset_json.get("derived_view", None)
+        self.domain = asset_json.get("domain", None)
+        self.downloads = asset_json.get("downloads", -9999)
         self.jurisdiction = asset_json.get("jurisdiction", None)
+        self.last_update_date_data = asset_json.get("last_update_date_data", None)
+        self.license = asset_json.get("license", None)
+        self.owner_u_id = asset_json.get("owner_uid", None)
+        self.place_keywords = asset_json.get("place_keywords", None)
+        self.provenance = asset_json.get("provenance", None)
+        self.public = asset_json.get("public", None)
+        self.publication_stage = asset_json.get("publication_stage", None)
         self.source_link = asset_json.get("source_link", None)
         self.state_agency_performing_data_updates = asset_json.get("state_agency_performing_data_updates", None)
-        self.owner_u_id = asset_json.get("owner_uid", None)
-        self.provenance = asset_json.get("provenance", None)
+        self.time_period_of_content = asset_json.get("time_period_of_content", None)
+        self.update_frequency = asset_json.get("update_frequency", None)
+        self.visits = asset_json.get("visits", -9999)
         return None
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
@@ -123,6 +156,22 @@ class DatasetSocrata:
         self.title = dataset_json.get("title", None)
         return None
 
+    def assign_metadata_json_to_class_values(self, metadata_json: dict):
+        self.average_rating = metadata_json.get("averageRating", None)
+        self.display_type = metadata_json.get("displayType", None)
+        self.hide_from_catalog = metadata_json.get("hideFromCatalog", None)
+        self.hide_from_data_json = metadata_json.get("hideFromDataJson", None)
+        self.number_of_comments = metadata_json.get("numberOfComments", None)
+        self.oid = metadata_json.get("oid", None)
+        self.publication_append_enabled = metadata_json.get("publicationAppendEnabled", None)
+        self.publication_group = metadata_json.get("publicationGroup", None)
+        self.row_class = metadata_json.get("rowClass", None)
+        self. = metadata_json.get("", None)
+        self. = metadata_json.get("", None)
+        self. = metadata_json.get("", None)
+        self. = metadata_json.get("", None)
+        return
+
     def build_metadata_url(self):
         """
 
@@ -139,7 +188,7 @@ class DatasetSocrata:
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
         return None
 
-    # def cast_and_convert_class_attributes(self):
+    # def cast_and_convert_class_attributes(self): # Going to do in pandas dataframe
 
 
     def extract_four_by_four(self):
