@@ -35,6 +35,7 @@ def main():
     socrata_datajson_counter = itertools.count()
     socrata_datajson_object_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
+    socrata_displaytype_map_counter = itertools.count()
     socrata_metadata_counter = itertools.count()
     boolean_string_replacement_dict = {"true": True, "false": False}
 
@@ -82,7 +83,7 @@ def main():
 
         # Before storing obj in dict see that it passes the exclusion filter
         # FIXME: Seeing two dataset freshness datasets. Determine if valid or is an issue
-        if not dataset_socrata.passes_filter(gis_counter=socrata_gis_dataset_counter):
+        if not dataset_socrata.passes_filter_data_json(gis_counter=socrata_gis_dataset_counter):
             continue
 
         # proceed with processing and store object for use
@@ -153,8 +154,30 @@ def main():
         metadata_json = DatasetSocrata.SOCRATA_CLIENT.get_metadata(dataset_identifier=fourbyfour,
                                                                    content_type="json")
         dataset_obj.assign_metadata_json_to_class_values(metadata_json=metadata_json)
+
+    key_and_displaytype_list = [(key, value.display_type) for key, value in socrata_class_objects_dict.items()]
+    for key, display_type in key_and_displaytype_list:
+        if display_type.lower() == "map":
+            result = socrata_class_objects_dict.pop(key, None)
+            if result is not None:
+                next(socrata_gis_dataset_counter)
+                next(socrata_displaytype_map_counter)
+            else:
+                print(f"Error, object {key} unsuccessfully deleted after detecting metadata displayType = map.")
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata datasets handled: {socrata_metadata_counter}")
+    print(f"Number of displayType = 'map' objects deleted from dataset invntory: {socrata_displaytype_map_counter}")
+    print(f"Number of GIS Datasets encountered has been updated: {socrata_gis_dataset_counter}")
+    print(f"Number of remaining public Socrata dataset objects: {len(socrata_class_objects_dict)}")
+
+    # Check the displayType values
+    display_type_values_set = set()
+    for key, obj in socrata_class_objects_dict.items():
+        display_type_values_set.add(obj.display_type)
+        if obj.display_type.lower() == "map":
+            print(obj.four_by_four)
+    print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
+
 
     # ===================================================
     # ARCGIS ONLINE
