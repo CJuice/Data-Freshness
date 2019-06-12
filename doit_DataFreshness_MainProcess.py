@@ -4,6 +4,9 @@ Main processing script coordinating all functionality for completing data freshn
 
 
 def main():
+    import time
+    start_time = time.time()
+    print(f"Start Time: {start_time} seconds since Epoch")
 
     # IMPORTS
     import configparser
@@ -11,14 +14,17 @@ def main():
     import pprint
     import json
     import itertools
+    import datetime
 
     from DataFreshness.doit_DataFreshness_Utility import Utility
     from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
     import DataFreshness.doit_DataFreshness_Variables as var
     import os
+    print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
 
     # VARIABLES
+
     arcgisonline_counter = itertools.count()
     asset_inventory_url = None
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
@@ -32,6 +38,9 @@ def main():
     socrata_metadata_counter = itertools.count()
     boolean_string_replacement_dict = {"true": True, "false": False}
 
+    print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+
+
 
     # CLASSES
     # FUNCTIONS
@@ -39,6 +48,7 @@ def main():
 
     # ===================================================
     # SOCRATA
+    print(f"Beginning Socrata Process...")
     # Need a socrata client for making requests for protected information
     DatasetSocrata.SOCRATA_CLIENT = DatasetSocrata.create_socrata_client(domain=var.md_open_data_domain,
                                                                          app_token=credentials_parser["SOCRATA"][
@@ -83,9 +93,10 @@ def main():
         next(socrata_datajson_object_counter)
 
     # Print outs for general understanding of data.json level process
+    print(f"\nData.json Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of data.json datasets handled: {socrata_datajson_counter}")
-    print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
     print(f"Number of data.json GIS Datasets encountered: {socrata_gis_dataset_counter}")
+    print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
 
     # Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     asset_inventory_json_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
@@ -131,20 +142,25 @@ def main():
             socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
 
     # Print outs for general understanding of asset inventory level process
+    print(f"\nAsset Inventory Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
-    print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
+    print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
 
     # Now that have all values from data.json and asset inventory...
     for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
-        metadata_json = DatasetSocrata.SOCRATA_CLIENT.get(dataset_identifier=fourbyfour,
-                                                          content_type="json")
-        print(metadata_json)
-    #     exit()
+        next(socrata_metadata_counter)
+        metadata_json = DatasetSocrata.SOCRATA_CLIENT.get_metadata(dataset_identifier=fourbyfour,
+                                                                   content_type="json")
+        dataset_obj.assign_metadata_json_to_class_values(metadata_json=metadata_json)
+    print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(f"Number of metadata datasets handled: {socrata_metadata_counter}")
+
     # ===================================================
     # ARCGIS ONLINE
 
     # ===================================================
+
 
 if __name__ == "__main__":
     main()
