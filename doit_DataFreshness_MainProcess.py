@@ -29,6 +29,7 @@ def main():
     socrata_datajson_counter = itertools.count()
     socrata_datajson_object_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
+    socrata_metadata_counter = itertools.count()
     boolean_string_replacement_dict = {"true": True, "false": False}
 
 
@@ -121,13 +122,13 @@ def main():
         else:
             # Objects in the data.json are public and visible. If a u_id is not in the dict of objects created from
             #   the data.json then it is likely not public. But, filtered above anyway so as to be explicit about it.
-            existing_data_obj = socrata_class_objects_dict.get(u_id, None)
+            socrata_data_obj = socrata_class_objects_dict.get(u_id, None)
 
-        if existing_data_obj is None:
+        if socrata_data_obj is None:
             continue
         else:
-            # print(obj.get("name", None), existing_data_obj.title)
-            existing_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
+            # print(obj.get("name", None), socrata_data_obj.title)
+            socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
 
     # Print outs for general understanding of asset inventory level process
     print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
@@ -135,10 +136,11 @@ def main():
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
 
     # Now that have all values from data.json and asset inventory...
-
-    # temp_set = set()
-    # for obj in socrata_class_objects_dict.values():
-    #     print(obj.title)
+    for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
+        metadata_json = DatasetSocrata.SOCRATA_CLIENT.get(dataset_identifier=fourbyfour,
+                                                          content_type="json")
+        print(metadata_json)
+    #     exit()
     # ===================================================
     # ARCGIS ONLINE
 
