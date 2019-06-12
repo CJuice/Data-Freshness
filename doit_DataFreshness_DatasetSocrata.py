@@ -18,8 +18,6 @@ class DatasetSocrata:
     LIMIT_MAX_AND_OFFSET = 10000
     SOCRATA_DATASET_TITLE_EXCLUSION_FILTERS = ("MD iMAP:", "Dataset Freshness", "Homepage Categories")
 
-
-    # Methods
     def __init__(self):
         """
 
@@ -27,19 +25,21 @@ class DatasetSocrata:
         listing captures the decisions made while building:
 
         KEY: d = data.json, a = asset inventory, m = metadata
-        Asset Inventory Notes:
+
+        DATA JSON NOTES:
+        contactPoint - dict values covered elsewhere without need for extraction (owner (a), contactEmail (a))
+        modified - viewLastModified (m) or indexUpdatedAt (m) (more detailed but these two are not identical)
+
+        ASSET INVENTORY NOTES:
         dataset_link - landingPage
         u_id - four by four code extracted from landing page value (d)
         type - @type (d)
         name- title (d)
         description - description (d)
-        last_update_date_data - publicationDate (m)
         category - theme (d)
         keywords - keyword (d)
-        owner - contactPoint (d)
-        contactemail - contactPoint (d)
 
-        Metadata Notes:
+        METADATA NOTES:
         id - four by four code extracted from landing page value (d)
         name - title (d)
         attribution - data provided by (a)
@@ -49,18 +49,31 @@ class DatasetSocrata:
         description - description (d)
         downloadCount - downloads (a)
         iconUrl - Not stored, did not appear to be useful
-        indexUpdatedAt - modified (d)
         licenseId - license (a)
         newBackend - Not stored, did not appear to be useful
         provenance - provenance (a)
-        publicationDate - issued (d)
         publicationStage - publication_stage (a)
+        viewCount - visits (a)
+        viewType - Not stored, did not appear to be useful
+        disabledFeatureFlag - Not stored, did not appear to be useful
+        grants - Not stored, did not appear to be useful
+        license - Appears to be covered by license (a) or even licenseId (m)
+        metadata - Most if not all info is already captured
+        owner - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
+        query - Not stored, did not appear to be useful
+        rights - Not stored, did not appear to be useful
+        tableAuthor - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
+        tags - keyword (d)
+        flags - Not stored, did not appear to be useful
 
         :param dataset_json:
         """
+        # FIXME: Resolve differences between, and need of or value of, issued (d) vs last_update_date_data (a) publicationDate (m) vs rowsUpdatedAt (m) vs indexUpdatedAt (m)
+        # NOTES: issued is most generic and only accurate to the day.
+
         # DATA.JSON SOURCED VALUES
         self.access_level = None
-        self.contact_point_dict = None
+        # self.contact_point_dict = None
         self.description = None
         self.distribution_list = None
         self.four_by_four = None
@@ -69,7 +82,6 @@ class DatasetSocrata:
         self.landing_page = None
         self.issued = None
         self.metadata_url = None
-        self.modified = None
         self.publisher_dict = None
         self.resource_url = None
         self.theme_list = None
@@ -77,6 +89,7 @@ class DatasetSocrata:
         self.type = None
 
         # ASSET INVENTORY SOURCED VALUES
+        self.contact_email = None
         self.creation_date = None
         self.data_provided_by = None
         self.date_metadata_written = None
@@ -86,6 +99,7 @@ class DatasetSocrata:
         self.jurisdiction = None
         self.last_update_date_data = None
         self.license = None
+        self.owner = None
         self.owner_u_id = None
         self.place_keywords = None
         self.provenance = None
@@ -102,12 +116,20 @@ class DatasetSocrata:
         self.display_type = None
         self.hide_from_catalog = None
         self.hide_from_data_json = None
+        self.index_updated_at = None
         self.number_of_comments = None
         self.oid = None
         self.publication_append_enabled = None
+        self.publication_date = None
         self.publication_group = None
         self.row_class = None
-
+        self.rows_updated_at = None
+        self.rows_updated_by = None
+        self.table_id = None
+        self.total_times_rated = None
+        self.view_last_modified = None
+        self.approvals = None
+        self.columns = None
 
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
@@ -116,6 +138,7 @@ class DatasetSocrata:
         :param asset_json:
         :return:
         """
+        self.contact_email = asset_json.get("contactEmail", None)
         self.creation_date = asset_json.get("creation_date", None)
         self.data_provided_by = asset_json.get("data_provided_by", None)
         self.date_metadata_written = asset_json.get("date_metadata_written", None)
@@ -125,6 +148,7 @@ class DatasetSocrata:
         self.jurisdiction = asset_json.get("jurisdiction", None)
         self.last_update_date_data = asset_json.get("last_update_date_data", None)
         self.license = asset_json.get("license", None)
+        self.owner = asset_json.get("owner", None)
         self.owner_u_id = asset_json.get("owner_uid", None)
         self.place_keywords = asset_json.get("place_keywords", None)
         self.provenance = asset_json.get("provenance", None)
@@ -147,6 +171,7 @@ class DatasetSocrata:
         self.description = dataset_json.get("description", None)
         self.distribution_list = dataset_json.get("distribution", None)
         self.identifier_url = dataset_json.get("identifier", None)
+        self.issued = dataset_json.get("issued", None)
         self.keyword_list = dataset_json.get("keyword", None)
         self.landing_page = dataset_json.get("landingPage", None)
         self.modified = dataset_json.get("modified", None)
@@ -164,12 +189,17 @@ class DatasetSocrata:
         self.number_of_comments = metadata_json.get("numberOfComments", None)
         self.oid = metadata_json.get("oid", None)
         self.publication_append_enabled = metadata_json.get("publicationAppendEnabled", None)
+        self.publication_date = metadata_json.get("publicationDate", None)
         self.publication_group = metadata_json.get("publicationGroup", None)
         self.row_class = metadata_json.get("rowClass", None)
-        self. = metadata_json.get("", None)
-        self. = metadata_json.get("", None)
-        self. = metadata_json.get("", None)
-        self. = metadata_json.get("", None)
+        self.rows_updated_at = metadata_json.get("rowsUpdatedAt", None)
+        self.rows_updated_by = metadata_json.get("rowsUpdatedBy", None)
+        self.table_id = metadata_json.get("tableId", None)
+        self.total_times_rated = metadata_json.get("totalTimesRated", None)
+        self.view_last_modified = metadata_json.get("viewLastModified", None)
+        self.approvals = metadata_json.get("approvals", None)
+        self.columns = metadata_json.get("columns", None)
+        self.index_updated_at = metadata_json.get("indexUpdatedAt", None)
         return
 
     def build_metadata_url(self):
