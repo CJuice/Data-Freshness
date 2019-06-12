@@ -48,7 +48,8 @@ def main():
                                                                              "password"])
 
     # Get the data.json from Socrata so have an inventory of all public datasets
-    # TODO: Redesign to handle more records than default limit, even if doesn't need it at this time
+    # Did no design to handle iterative requests for record count greater than limit. It appears to send all datasets
+    #   in initial request.
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
     try:
@@ -80,32 +81,32 @@ def main():
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
         next(socrata_datajson_object_counter)
 
+    # Print outs for general understanding of data.json level process
     print(f"Number of data.json datasets handled: {socrata_datajson_counter}")
     print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
-    print(f"Number of GIS Datasets encountered: {socrata_gis_dataset_counter}")
+    print(f"Number of data.json GIS Datasets encountered: {socrata_gis_dataset_counter}")
 
-    # TODO: Get all asset inventory information, and then store values in existing dataset objects using the 4x4
-    # TODO: Get all asset inventory json, make a giant dictionary or even class objects, and
-    #  then query locally to eliminate web transactions
-    asset_inventory_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
+    # Get all asset inventory information, and then store values in existing dataset objects using the 4x4
+    asset_inventory_json_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
         client=DatasetSocrata.SOCRATA_CLIENT,
         fourbyfour=credentials_parser['SOCRATA']['asset_inventory_fourbyfour'])
 
-    for obj in asset_inventory_data_list:
+    for asset_json_obj in asset_inventory_json_data_list:
         next(socrata_assetinventory_counter)
 
-        public_raw = obj.get("public", None)
+        # exchange json 'true' & 'false' for python True & False
+        public_raw = asset_json_obj.get("public", None)
         public = boolean_string_replacement_dict.get(public_raw, None)
 
         # Filter out datasets where public is not True
         if public is None:
-            pprint.pprint(f"Issue extracting 'public' from obj json. Skipped: {obj}")
+            pprint.pprint(f"Issue extracting 'public' from asset inventory json. Skipped: {asset_json_obj}")
             continue
         elif public is True:
+            # These are the datasets of interest
             next(socrata_assetinventory_public_dataset_counter)
             pass
         elif public is False:
-            # print(f"Dataset 'public' status is False. Skipped.")
             next(socrata_assetinventory_non_public_dataset_counter)
             continue
         else:
@@ -113,23 +114,27 @@ def main():
             exit()
 
         # For public datasets, extract u_id and use that to get corresponding data.json based Socrata dataset object
-        u_id = obj.get("u_id", None)
+        u_id = asset_json_obj.get("u_id", None)
         if u_id is None:
-            pprint.pprint(f"Issue extracting 'u_id'' from obj json. Skipped: {obj}")
+            pprint.pprint(f"Issue extracting 'u_id'' from asset inventory json. Skipped: {asset_json_obj}")
             continue
         else:
             # Objects in the data.json are public and visible. If a u_id is not in the dict of objects created from
-            #   the data.json then it is likely not public
+            #   the data.json then it is likely not public. But, filtered above anyway so as to be explicit about it.
             existing_data_obj = socrata_class_objects_dict.get(u_id, None)
 
         if existing_data_obj is None:
             continue
         else:
             # print(obj.get("name", None), existing_data_obj.title)
-            existing_data_obj.assign_asset_inventory_json_to_class_values(asset_json=obj)
+            existing_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
+
+    # Print outs for general understanding of asset inventory level process
     print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
     print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
+
+    # Now that have all values from data.json and asset inventory...
 
     # temp_set = set()
     # for obj in socrata_class_objects_dict.values():
