@@ -1,11 +1,12 @@
 """
 
 """
+import datetime
+import itertools
 import os
+import time
 import DataFreshness.doit_DataFreshness_Variables as var
 from sodapy import Socrata
-import time
-import itertools
 
 
 class DatasetSocrata:
@@ -31,7 +32,7 @@ class DatasetSocrata:
         modified - viewLastModified (m) or indexUpdatedAt (m) (more detailed but these two are not identical)
 
         ASSET INVENTORY NOTES:
-        dataset_link - landingPage
+        dataset_link - landingPage(d)
         u_id - four by four code extracted from landing page value (d)
         type - @type (d)
         name- title (d)
@@ -59,6 +60,15 @@ class DatasetSocrata:
         grants - Not stored, did not appear to be useful
         license - Appears to be covered by license (a) or even licenseId (m)
         metadata - Most if not all info is already captured
+            Jurisdiction - jurisdiction (a)
+            Agency - state_agency_performing_updates (a)
+            Time Period
+                Update Frequency - update_frequency (a)
+                Time Period of Content - time_period_of_content (a)
+                Date Metadata Written - date_metadata_written (a)
+            Place Keywords - place_keywords (a)
+
+
         owner - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
         query - Not stored, did not appear to be useful
         rights - Not stored, did not appear to be useful
@@ -129,6 +139,9 @@ class DatasetSocrata:
         self.table_id = None
         self.total_times_rated = None
         self.view_last_modified = None
+
+        # DERIVED VALUES
+        self.date_of_most_recent_data_change = None
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -220,6 +233,14 @@ class DatasetSocrata:
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
         return None
 
+    def extract_four_by_four(self):
+        """
+
+        :return:
+        """
+        self.four_by_four = os.path.basename(self.landing_page)
+        return None
+
     # def cast_and_convert_class_attributes(self): # Going to do in pandas dataframe
 
     def passes_filter_data_json(self, gis_counter: itertools.count):
@@ -270,13 +291,15 @@ class DatasetSocrata:
         else:
             return True
 
-    def extract_four_by_four(self):
-        """
+    # TODO: After assessing output values determine if need to process update frequency further
+    # def process_update_frequency(self):
+    #     """
+    #
+    #     :return:
+    #     """
+    #     if self.update_frequency is None:
+    #         self.update_frequency =
 
-        :return:
-        """
-        self.four_by_four = os.path.basename(self.landing_page)
-        return None
 
     @staticmethod
     def create_socrata_client(domain: str, app_token: str, username:str, password: str) -> Socrata:
@@ -330,3 +353,10 @@ class DatasetSocrata:
             else:
                 more_records_exist_than_response_limit_allows = False
         return master_list_of_dicts
+
+    def calculate_date_of_most_recent_data_change(self):
+        if self.rows_updated_at is None:
+            self.rows_updated_at = self.publication_date
+
+        date_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+        delta_view_change = int(round((var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))

@@ -28,17 +28,17 @@ def main():
 
     arcgisonline_counter = itertools.count()
     asset_inventory_url = None
+    boolean_string_replacement_dict = {"true": True, "false": False}
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
-    socrata_class_objects_dict = {}
     socrata_assetinventory_counter = itertools.count()
     socrata_assetinventory_non_public_dataset_counter = itertools.count()
     socrata_assetinventory_public_dataset_counter = itertools.count()
+    socrata_class_objects_dict = {}
+    socrata_displaytype_map_counter = itertools.count()
     socrata_datajson_counter = itertools.count()
     socrata_datajson_object_counter = itertools.count()
     socrata_gis_dataset_counter = itertools.count()
-    socrata_displaytype_map_counter = itertools.count()
     socrata_metadata_counter = itertools.count()
-    boolean_string_replacement_dict = {"true": True, "false": False}
 
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
@@ -178,11 +178,8 @@ def main():
             print(obj.four_by_four)
     # print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
 
-    # TODO: Need a master pandas dataframe from all remaining Socrata datasets
-    # df_columns = list(DatasetSocrata().__dict__.keys())
-    # print(df_columns)
+    # Need a master pandas dataframe from all remaining Socrata datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
-    # print(list(socrata_class_objects_dict.items()))
     master_socrata_df = pd.DataFrame(data=df_data,
                                      # index=list(socrata_class_objects_dict.keys()),
                                      # columns=df_columns,
@@ -191,9 +188,20 @@ def main():
     print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_socrata_df.info())
 
-    # TODO: Need to convert field types an process values such as dates
-    # TODO: Need to match existing data freshness output and write json and excel files for all objects
+    # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
+    # Use rows_updated_by four-by-four value to build socrata profile url
+    master_socrata_df["rows_updated_by"] = master_socrata_df["rows_updated_by"].apply(lambda value: var.md_socrata_profile_url.format(root=var.md_open_data_url, user_four_by_four=value))
 
+    # TODO: Need to match existing data freshness output and write json and excel files for all objects
+    # For full production version can write Socrata and AGOL at same time but for testing can just output Socrata now
+    master_socrata_df.to_excel(excel_writer=var.output_excel_file_path,
+                               sheet_name=var.output_excel_sheetname,
+                               na_rep=np.NaN,
+                               float_format=None,
+                               columns=,  # TODO
+                               header=var.output_report_headers,
+                               index=,
+                               index_label=)
 
     # ===================================================
     # ARCGIS ONLINE
