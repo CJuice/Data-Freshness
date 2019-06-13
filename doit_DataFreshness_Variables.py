@@ -19,8 +19,9 @@ dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "land
                                           "Agency Performing Data Updates": "state_agency_performing_updates",
                                           "Owner": "owner", "Data Provided By": "data_provided_by",
                                           "Source URL": "source_link", "User who Made Last Update": "rows_updated_by",
-                                          "Update Frequency": "update_frequency", "Date of Most Recent Data Change": "",
-                                      "Days Since Last Data Update": "",
+                                          "Update Frequency": "update_frequency",
+                                          "Date of Most Recent Data Change": "rows_updated_at", # FIXME
+                                          "Days Since Last Data Update": "",
                                       "Date of Most Recent View Change in Data or Metadata": "",
                                       "Updated Recently Enough": "", "Number of Rows": "", "Tags Keywords": "",
                                       "Column Names": "", "Missing Metadata Fields": "", "Portal": "",

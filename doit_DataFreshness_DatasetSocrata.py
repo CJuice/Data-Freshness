@@ -142,6 +142,10 @@ class DatasetSocrata:
 
         # DERIVED VALUES
         self.date_of_most_recent_data_change = None
+        self.days_since_last_data_update = None
+        self.date_of_most_recent_view_change = None
+        self.days_since_last_view_update = None
+        self.number_of_rows_in_dataset = None
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -355,8 +359,53 @@ class DatasetSocrata:
         return master_list_of_dicts
 
     def calculate_date_of_most_recent_data_change(self):
+        """
+
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
         if self.rows_updated_at is None:
             self.rows_updated_at = self.publication_date
+        self.date_of_most_recent_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
 
-        date_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
-        delta_view_change = int(round((var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))
+    def calculate_days_since_last_data_update(self):
+        """
+
+        :return:
+        """
+        self.days_since_last_data_update = int(
+            round(
+                (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day
+            )
+        )
+
+    def calculate_date_of_most_recent_view_change(self):
+        """
+
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
+        if self.view_last_modified is None:
+            self.view_last_modified = self.publication_date
+        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+
+    def calculate_days_since_last_view_change(self):
+        """
+
+        :return:
+        """
+        self.days_since_last_view_update = int(
+            round(
+                (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day
+            )
+        )
+
+    def calculate_number_of_rows_in_dataset(self):
+        """
+
+        :return:
+        """
+        first_column_dict = self.columns[0]
+        cached_contents_dict = first_column_dict.get("cachedContents", {})
+        self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null", -9999),
+                                              cached_contents_dict.get("null", -9999)])

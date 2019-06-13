@@ -178,6 +178,14 @@ def main():
             print(obj.four_by_four)
     # print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
 
+    # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe creation
+    for key, obj in socrata_class_objects_dict.items():
+        # FIXME: Output string format may need revising
+        obj.calculate_date_of_most_recent_data_change()
+        obj.days_since_last_data_update()
+        obj.calculate_date_of_most_recent_view_change()
+        obj.calculate_days_since_last_view_change()
+
     # Need a master pandas dataframe from all remaining Socrata datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
     master_socrata_df = pd.DataFrame(data=df_data,
