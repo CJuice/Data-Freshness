@@ -80,6 +80,7 @@ class DatasetSocrata:
         """
         # FIXME: Resolve differences between, and need of or value of, issued (d) vs last_update_date_data (a) publicationDate (m) vs rowsUpdatedAt (m) vs indexUpdatedAt (m)
         # NOTES: issued is most generic and only accurate to the day.
+        self.portal = "Socrata"
 
         # DATA.JSON SOURCED VALUES
         self.access_level = None
@@ -141,11 +142,15 @@ class DatasetSocrata:
         self.view_last_modified = None
 
         # DERIVED VALUES
+        self.column_names_list = None
         self.date_of_most_recent_data_change = None
         self.days_since_last_data_update = None
         self.date_of_most_recent_view_change = None
         self.days_since_last_view_update = None
         self.number_of_rows_in_dataset = None
+        self.updated_recently_enough = True  # FIXME: Hardcoded until develop function. just using so can output dataframe now
+        self.missing_metadata_fields = None  # FIXME: Hardcoded until develop function. just using so can output dataframe now
+
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -394,11 +399,8 @@ class DatasetSocrata:
 
         :return:
         """
-        self.days_since_last_view_update = int(
-            round(
-                (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day
-            )
-        )
+        self.days_since_last_view_update = int(round(
+            (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day))
 
     def calculate_number_of_rows_in_dataset(self):
         """
@@ -409,3 +411,14 @@ class DatasetSocrata:
         cached_contents_dict = first_column_dict.get("cachedContents", {})
         self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null", -9999),
                                               cached_contents_dict.get("null", -9999)])
+
+    def assemble_column_names_list(self):
+        """
+
+        :return:
+        """
+        temp = []
+        for column_dict in self.columns:
+            temp.append(column_dict.get("name", None))
+        # self.column_names_list = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
+        self.column_names_list = temp
