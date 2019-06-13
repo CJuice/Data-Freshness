@@ -378,11 +378,8 @@ class DatasetSocrata:
 
         :return:
         """
-        self.days_since_last_data_update = int(
-            round(
-                (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day
-            )
-        )
+        self.days_since_last_data_update = int(round(
+                (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))
 
     def calculate_date_of_most_recent_view_change(self):
         """
@@ -407,10 +404,9 @@ class DatasetSocrata:
 
         :return:
         """
-        first_column_dict = self.columns[0]
+        first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
         cached_contents_dict = first_column_dict.get("cachedContents", {})
-        self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null", -9999),
-                                              cached_contents_dict.get("null", -9999)])
+        self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null"), cached_contents_dict.get("null")]) if 0 < len(cached_contents_dict) else -9999
 
     def assemble_column_names_list(self):
         """

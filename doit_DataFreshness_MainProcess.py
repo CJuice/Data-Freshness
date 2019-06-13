@@ -181,15 +181,17 @@ def main():
     # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe creation
     for key, obj in socrata_class_objects_dict.items():
         # FIXME: Output string format may need revising
+        x = 0
         try:
             obj.calculate_date_of_most_recent_data_change()
-            obj.days_since_last_data_update()
+        except TypeError as te:
+            print(obj.four_by_four, te, x)
+        else:
+            obj.calculate_days_since_last_data_update()
             obj.calculate_date_of_most_recent_view_change()
             obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone. new column needed
             obj.calculate_number_of_rows_in_dataset()
             obj.assemble_column_names_list()
-        except TypeError as te:
-            print(obj.four_by_four, te)
 
     # Need a master pandas dataframe from all remaining Socrata datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
@@ -203,8 +205,9 @@ def main():
     print(master_socrata_df.head())
 
     # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
-    # Use rows_updated_by four-by-four value to build socrata profile url
-    master_socrata_df["rows_updated_by"] = master_socrata_df["rows_updated_by"].apply(lambda value: var.md_socrata_profile_url.format(root=var.md_open_data_url, user_four_by_four=value))
+    # Use rows_updated_by four-by-four value to build socrata profile url. FIXME: Removing from report and process. links not public
+    # master_socrata_df["rows_updated_by"] = master_socrata_df["rows_updated_by"].apply(lambda value: var.md_socrata_profile_url.format(root=var.md_open_data_url, user_four_by_four=value))
+
     # Convert the key_word_list to a comma separated string
     master_socrata_df["keyword_list"] = master_socrata_df["keyword_list"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
     # Convert the columns list to a comma separated string

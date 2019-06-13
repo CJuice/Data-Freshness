@@ -17,7 +17,8 @@ md_socrata_profile_url = "{root}/profile/{user_four_by_four}"
 #                          "Portal", "Category"]
 dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "landing_page",
                                           "Agency Performing Data Updates": "state_agency_performing_data_updates",
-                                          "Owner": "owner", "Data Provided By": "data_provided_by",
+                                          "Owner": "owner",
+                                          # "Data Provided By": "data_provided_by",  # FIXME: Link is not public, can remove from report
                                           "Source URL": "source_link", "User who Made Last Update": "rows_updated_by",
                                           "Update Frequency": "update_frequency",
                                           "Date of Most Recent Data Change": "date_of_most_recent_data_change",
