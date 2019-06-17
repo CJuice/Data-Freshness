@@ -406,7 +406,12 @@ class DatasetSocrata:
         """
         first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
         cached_contents_dict = first_column_dict.get("cachedContents", {})
-        self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null"), cached_contents_dict.get("null")]) if 0 < len(cached_contents_dict) else -9999
+        try:
+            self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null"),
+                                              cached_contents_dict.get("null")]) if 0 < len(cached_contents_dict) else -9999
+        except TypeError as te:
+            print(f"TypeError raised in calculate_number_of_rows_in_dataset(): {self.four_by_four}: {cached_contents_dict}")
+            self.number_of_rows_in_dataset = -9999
 
     def assemble_column_names_list(self):
         """

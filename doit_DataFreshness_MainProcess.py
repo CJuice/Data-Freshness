@@ -59,8 +59,8 @@ def main():
                                                                              "password"])
 
     # Get the data.json from Socrata so have an inventory of all public datasets
-    # Did no design to handle iterative requests for record count greater than limit. It appears to send all datasets
-    #   in initial request.
+    # Did not design to handle iterative requests for record count greater than limit. It appears to send all datasets
+    #   in initial request so not necessary for now.
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
     try:
@@ -190,7 +190,7 @@ def main():
             obj.calculate_days_since_last_data_update()
             obj.calculate_date_of_most_recent_view_change()
             obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone. new column needed
-            obj.calculate_number_of_rows_in_dataset()
+            obj.calculate_number_of_rows_in_dataset()  # FIXME: This is failing. appears that a None is present
             obj.assemble_column_names_list()
 
     # Need a master pandas dataframe from all remaining Socrata datasets
