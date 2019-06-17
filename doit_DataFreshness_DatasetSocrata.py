@@ -420,8 +420,4 @@ class DatasetSocrata:
 
         :return:
         """
-        temp = []
-        for column_dict in self.columns:
-            temp.append(column_dict.get("name", None))
-        # self.column_names_list = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
-        self.column_names_list = temp
+        self.column_names_list = ", ".join([column_dict.get("name", None) for column_dict in self.columns])

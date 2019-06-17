@@ -190,7 +190,7 @@ def main():
             obj.calculate_days_since_last_data_update()
             obj.calculate_date_of_most_recent_view_change()
             obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone. new column needed
-            obj.calculate_number_of_rows_in_dataset()  # FIXME: This is failing. appears that a None is present
+            obj.calculate_number_of_rows_in_dataset()
             obj.assemble_column_names_list()
 
     # Need a master pandas dataframe from all remaining Socrata datasets
