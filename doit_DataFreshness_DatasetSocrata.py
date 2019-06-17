@@ -402,15 +402,17 @@ class DatasetSocrata:
     def calculate_number_of_rows_in_dataset(self):
         """
 
+        NOTE: The 'non_null' key is missing from some datasets
         :return:
         """
         first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
         cached_contents_dict = first_column_dict.get("cachedContents", {})
         try:
-            self.number_of_rows_in_dataset = sum([cached_contents_dict.get("non_null"),
-                                              cached_contents_dict.get("null")]) if 0 < len(cached_contents_dict) else -9999
+            self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
+                                              int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
         except TypeError as te:
-            print(f"TypeError raised in calculate_number_of_rows_in_dataset(): {self.four_by_four}: {cached_contents_dict}")
+            print(f"TypeError in calculate_number_of_rows_in_dataset() (*check for 'non_null' key): {self.four_by_four}: {cached_contents_dict} {te}")
+            print(f"\t non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')}")
             self.number_of_rows_in_dataset = -9999
 
     def assemble_column_names_list(self):
