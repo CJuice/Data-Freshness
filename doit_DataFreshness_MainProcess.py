@@ -30,6 +30,7 @@ def main():
     asset_inventory_url = None
     boolean_string_replacement_dict = {"true": True, "false": False}
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
+    dataset_freshness_dataset_counter = itertools.count()
     socrata_assetinventory_counter = itertools.count()
     socrata_assetinventory_non_public_dataset_counter = itertools.count()
     socrata_assetinventory_public_dataset_counter = itertools.count()
@@ -84,6 +85,7 @@ def main():
         # Before storing obj in dict see that it passes the exclusion filter
         # FIXME: Seeing two dataset freshness datasets. Determine if valid or is an issue
         if not dataset_socrata.passes_filter_data_json(gis_counter=socrata_gis_dataset_counter):
+            next(dataset_freshness_dataset_counter)
             continue
 
         # proceed with processing and store object for use
@@ -98,6 +100,8 @@ def main():
     print(f"Number of data.json datasets handled: {socrata_datajson_counter}")
     print(f"Number of data.json GIS Datasets encountered: {socrata_gis_dataset_counter}")
     print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
+    print(f"Number of data.json dataset freshness datasets encountered and skipped. {dataset_freshness_dataset_counter}")
+
 
     # Get all asset inventory information, and then store values in existing dataset objects using the 4x4
     asset_inventory_json_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(

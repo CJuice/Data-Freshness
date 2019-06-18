@@ -156,9 +156,9 @@ class DatasetSocrata:
         """
         """
         try:
-            self.category_string = ", ".join(self.theme_list)
+            self.category_string = ", ".join(self.theme_list) if self.theme_list is not None else None
         except TypeError as te:
-            print(type(self.theme_list), self.theme_list, te)
+            print(f"TypeError in assemble_category_output_string(): {type(self.theme_list)}, {self.theme_list}, {te}")
             self.category_string = self.theme_list
 
     def assemble_column_names_output_string(self):
