@@ -9,6 +9,7 @@ md_open_data_domain = r"opendata.maryland.gov"
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
 md_socrata_profile_url = "{root}/profile/{user_four_by_four}"
+null_string = "NULL"
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
 please_describe_below = "Other (Please Describe Below)"
 # output_report_headers = ["Dataset Name", "Link", "Agency Performing Data Updates", "Owner", "Data Provided By",
@@ -30,7 +31,7 @@ dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "land
                                           "Days Since Last View Update": "days_since_last_view_update",
                                           "Updated Recently Enough": "updated_recently_enough",
                                           "Number of Rows": "number_of_rows_in_dataset",
-                                          "Tags Keywords": "keyword_list", "Column Names": "column_names_string",
+                                          "Tags Keywords": "keyword_tags_string", "Column Names": "column_names_string",
                                           "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
                                           "Category": "category_string"}
 

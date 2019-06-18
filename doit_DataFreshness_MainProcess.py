@@ -193,6 +193,7 @@ def main():
         else:
             obj.assemble_category_output_string()
             obj.assemble_column_names_output_string()
+            obj.assemble_keywords_output_string()
             obj.calculate_days_since_last_data_update()
             obj.calculate_date_of_most_recent_view_change()
             obj.calculate_days_since_last_view_change()
@@ -214,7 +215,8 @@ def main():
     # master_socrata_df["rows_updated_by"] = master_socrata_df["rows_updated_by"].apply(lambda value: var.md_socrata_profile_url.format(root=var.md_open_data_url, user_four_by_four=value))
 
     # Convert the key_word_list to a comma separated string
-    master_socrata_df["keyword_list"] = master_socrata_df["keyword_list"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
+    # master_socrata_df["keyword_list"] = master_socrata_df["keyword_list"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
+    master_socrata_df.fillna(value=var.null_string, inplace=True)
 
     # TODO: Need to match existing data freshness output and write json and excel files for all objects
     # For full production version can write Socrata and AGOL at same time but for testing can just output Socrata now

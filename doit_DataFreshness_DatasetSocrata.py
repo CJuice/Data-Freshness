@@ -144,6 +144,7 @@ class DatasetSocrata:
         # DERIVED VALUES
         self.category_string = None
         self.column_names_string = None
+        self.keyword_tags_string = None
         self.date_of_most_recent_data_change = None
         self.date_of_most_recent_view_change = None
         self.days_since_last_data_update = None
@@ -156,7 +157,7 @@ class DatasetSocrata:
         """
         """
         try:
-            self.category_string = ", ".join(self.theme_list) if self.theme_list is not None else None
+            self.category_string = ", ".join(self.theme_list) if self.theme_list is not None else var.null_string
         except TypeError as te:
             print(f"TypeError in assemble_category_output_string(): {type(self.theme_list)}, {self.theme_list}, {te}")
             self.category_string = self.theme_list
@@ -166,7 +167,10 @@ class DatasetSocrata:
 
         :return:
         """
-        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
+        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns]) if 0 < len(self.columns) else var.null_string
+
+    def assemble_keywords_output_string(self):
+        self.keyword_tags_string = ", ".join(list(self.keyword_list)) if self.keyword_list is not None and 0 < len(self.keyword_list)else var.null_string
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
