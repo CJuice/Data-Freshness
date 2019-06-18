@@ -49,6 +49,7 @@ def main():
     # ===================================================
     # SOCRATA
     print(f"\nBeginning Socrata Process...")
+
     # Need a socrata client for making requests for protected information
     DatasetSocrata.SOCRATA_CLIENT = DatasetSocrata.create_socrata_client(domain=var.md_open_data_domain,
                                                                          app_token=credentials_parser["SOCRATA"][
@@ -59,7 +60,7 @@ def main():
                                                                              "password"])
 
     # Get the data.json from Socrata so have an inventory of all public datasets
-    # Did not design to handle iterative requests for record count greater than limit. It appears to send all datasets
+    #   Did not design to handle iterative requests for record count greater than limit. It appears to send all datasets
     #   in initial request so not necessary for now.
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
@@ -72,7 +73,7 @@ def main():
         socrata_data_json = response_socrata_json.get("dataset", {})
 
     # Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
-    # Add filtering for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories"
+    # Filter for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories"
     for json_obj in socrata_data_json:
         next(socrata_datajson_counter)
 
@@ -147,7 +148,7 @@ def main():
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
     print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
 
-    # Now that have all values from data.json and asset inventory...
+    # Now that have all values from data.json and asset inventory, get and assign metadata info for every dataset
     for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
         next(socrata_metadata_counter)
         metadata_json = DatasetSocrata.SOCRATA_CLIENT.get_metadata(dataset_identifier=fourbyfour,
@@ -170,7 +171,7 @@ def main():
     print(f"Number of GIS Datasets encountered has been updated: {socrata_gis_dataset_counter}")
     print(f"Number of remaining public Socrata dataset objects: {len(socrata_class_objects_dict)}")
 
-    # Check the displayType values
+    # Check the displayType values to see the types that remain. A validation step.
     display_type_values_set = set()
     for key, obj in socrata_class_objects_dict.items():
         display_type_values_set.add(obj.display_type)
@@ -210,9 +211,6 @@ def main():
 
     # Convert the key_word_list to a comma separated string
     master_socrata_df["keyword_list"] = master_socrata_df["keyword_list"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
-    # Convert the columns list to a comma separated string
-    # master_socrata_df["columns"] = master_socrata_df["columns"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
-
 
     # TODO: Need to match existing data freshness output and write json and excel files for all objects
     # For full production version can write Socrata and AGOL at same time but for testing can just output Socrata now
