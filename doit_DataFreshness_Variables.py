@@ -30,7 +30,7 @@ dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "land
                                           "Number of Rows": "number_of_rows_in_dataset",
                                           "Tags Keywords": "keyword_list", "Column Names": "column_names_list",
                                           "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
-                                          "Category": "theme_list"}
+                                          "Category": "category_string"}
 
 # TODO: dictionary of columns and their types for pandas.
 # output_report_headers_column_types = {"Dataset Name": str, "Link": str, "Agency Performing Data Updates": str,

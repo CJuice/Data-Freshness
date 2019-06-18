@@ -308,6 +308,8 @@ class DatasetSocrata:
         except TypeError as te:
             print(f"TypeError in calculate_number_of_rows_in_dataset( ({self.four_by_four}) non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')} {te}")
             self.number_of_rows_in_dataset = -9999
+        # TODO: For datasets that don't supply a non_null count then may need to make requests to actual dataset and count
+        #   the number of records. This is more efficient than doing so for every single dataet. Only making costly requests for subset of all datasets.
 
     def extract_four_by_four(self):
         """
