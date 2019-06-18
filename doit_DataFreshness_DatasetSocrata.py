@@ -32,49 +32,48 @@ class DatasetSocrata:
         modified - viewLastModified (m) or indexUpdatedAt (m) (more detailed but these two are not identical)
 
         ASSET INVENTORY NOTES:
-        dataset_link - landingPage(d)
-        u_id - four by four code extracted from landing page value (d)
-        type - @type (d)
-        name- title (d)
-        description - description (d)
         category - theme (d)
+        dataset_link - landingPage(d)
+        description - description (d)
         keywords - keyword (d)
+        name- title (d)
+        type - @type (d)
+        u_id - four by four code extracted from landing page value (d)
 
         METADATA NOTES:
-        id - four by four code extracted from landing page value (d)
-        name - title (d)
         attribution - data provided by (a)
         attributionLink - sourceLink (a)
         category - theme (d)
         createdAt - creation_date (a)
         description - description (d)
-        downloadCount - downloads (a)
-        iconUrl - Not stored, did not appear to be useful
-        licenseId - license (a)
-        newBackend - Not stored, did not appear to be useful
-        provenance - provenance (a)
-        publicationStage - publication_stage (a)
-        viewCount - visits (a)
-        viewType - Not stored, did not appear to be useful
         disabledFeatureFlag - Not stored, did not appear to be useful
+        downloadCount - downloads (a)
+        flags - Not stored, did not appear to be useful
         grants - Not stored, did not appear to be useful
+        iconUrl - Not stored, did not appear to be useful
+        id - four by four code extracted from landing page value (d)
         license - Appears to be covered by license (a) or even licenseId (m)
-        metadata - Most if not all info is already captured
+        licenseId - license (a)
+        metadata - Most if not all info is already captured. But update frequency parameter essential.
             Jurisdiction - jurisdiction (a)
             Agency - state_agency_performing_updates (a)
             Time Period
                 Update Frequency - update_frequency (a)
                 Time Period of Content - time_period_of_content (a)
                 Date Metadata Written - date_metadata_written (a)
+                'Other Update Frequency - If frequency isn't included in list above, please describe it here.' - UNIQUE!
             Place Keywords - place_keywords (a)
-
-
+        name - title (d)
+        newBackend - Not stored, did not appear to be useful
         owner - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
+        provenance - provenance (a)
+        publicationStage - publication_stage (a)
         query - Not stored, did not appear to be useful
         rights - Not stored, did not appear to be useful
         tableAuthor - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
         tags - keyword (d)
-        flags - Not stored, did not appear to be useful
+        viewCount - visits (a)
+        viewType - Not stored, did not appear to be useful
 
         :param dataset_json:
         """
@@ -131,6 +130,7 @@ class DatasetSocrata:
         self.index_updated_at = None
         self.number_of_comments = None
         self.oid = None
+        self.other_update_frequency = None
         self.publication_append_enabled = None
         self.publication_date = None
         self.publication_group = None
@@ -231,6 +231,7 @@ class DatasetSocrata:
         self.number_of_comments = metadata_json.get("numberOfComments", None)
         self.index_updated_at = metadata_json.get("indexUpdatedAt", None)
         self.oid = metadata_json.get("oid", None)
+        self.other_update_frequency = metadata_json.get("Time Period", {}).get(var.other_update_frequency, None)
         self.publication_append_enabled = metadata_json.get("publicationAppendEnabled", None)
         self.publication_date = metadata_json.get("publicationDate", None)
         self.publication_group = metadata_json.get("publicationGroup", None)
@@ -370,6 +371,19 @@ class DatasetSocrata:
             return False
         else:
             return True
+
+    def process_update_frequency(self):
+        """
+
+        :return:
+        """
+        if self.update_frequency is None:
+            self.update_frequency = "Error"
+        elif self.update_frequency == var.please_describe_below and self.other_update_frequency is not None:
+            self.update_frequency = self.other_update_frequency
+        else:
+            pass
+        return
 
     # TODO: After assessing output values determine if need to process update frequency further
     # def process_update_frequency(self):

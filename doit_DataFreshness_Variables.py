@@ -9,6 +9,8 @@ md_open_data_domain = r"opendata.maryland.gov"
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
 md_socrata_profile_url = "{root}/profile/{user_four_by_four}"
+other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
+please_describe_below = "Other (Please Describe Below)"
 # output_report_headers = ["Dataset Name", "Link", "Agency Performing Data Updates", "Owner", "Data Provided By",
 #                          "Source URL", "User who Made Last Update", "Update Frequency",
 #                          "Date of Most Recent Data Change", "Days Since Last Data Update",

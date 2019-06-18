@@ -198,6 +198,7 @@ def main():
             obj.calculate_date_of_most_recent_view_change()
             obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone.
             obj.calculate_number_of_rows_in_dataset()
+            obj.process_update_frequency()
 
     # Need a master pandas dataframe from all remaining Socrata datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
