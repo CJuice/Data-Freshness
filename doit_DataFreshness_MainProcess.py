@@ -84,8 +84,8 @@ def main():
 
         # Before storing obj in dict see that it passes the exclusion filter
         # FIXME: Seeing two dataset freshness datasets. Determine if valid or is an issue
-        if not dataset_socrata.passes_filter_data_json(gis_counter=socrata_gis_dataset_counter):
-            next(dataset_freshness_dataset_counter)
+        if not dataset_socrata.passes_filter_data_json(gis_counter=socrata_gis_dataset_counter,
+                                                       dataset_freshness_counter=dataset_freshness_dataset_counter):
             continue
 
         # proceed with processing and store object for use

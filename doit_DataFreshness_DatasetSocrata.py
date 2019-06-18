@@ -321,10 +321,11 @@ class DatasetSocrata:
 
     # def cast_and_convert_class_attributes(self): # Going to do in pandas dataframe
 
-    def passes_filter_data_json(self, gis_counter: itertools.count):
+    def passes_filter_data_json(self, gis_counter: itertools.count, dataset_freshness_counter: itertools.count):
         """
 
         :param gis_counter:
+        :param dataset_freshness_counter:
         :return:
         """
 
@@ -337,6 +338,7 @@ class DatasetSocrata:
         elif self.title.startswith("Dataset Freshness"):
             print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
             print(f"\tTITLE: {self.title}")
+            next(dataset_freshness_counter)
             return False
         elif self.title.startswith("Homepage Categories"):
             # This was a filter used in the original design. Have not see any of these but preserving functionality.
