@@ -24,6 +24,7 @@ dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "land
                                           "Date of Most Recent Data Change": "date_of_most_recent_data_change",
                                           "Days Since Last Data Update": "days_since_last_data_update",
                                           "Date of Most Recent View Change in Data or Metadata": "date_of_most_recent_view_change",
+                                          "Days Since Last View Update": "days_since_last_view_update",
                                           "Updated Recently Enough": "updated_recently_enough",
                                           "Number of Rows": "number_of_rows_in_dataset",
                                           "Tags Keywords": "keyword_list", "Column Names": "column_names_list",

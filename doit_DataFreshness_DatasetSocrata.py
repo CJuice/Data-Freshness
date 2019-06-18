@@ -155,7 +155,11 @@ class DatasetSocrata:
     def assemble_category_output_string(self):
         """
         """
-        self.category_string = ", ".join(self.theme_list)
+        try:
+            self.category_string = ", ".join(self.theme_list)
+        except TypeError as te:
+            print(type(self.theme_list), self.theme_list, te)
+            self.category_string = self.theme_list
 
     def assemble_column_names_output_string(self):
         """
