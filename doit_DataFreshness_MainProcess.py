@@ -176,11 +176,11 @@ def main():
     print(f"Number of remaining public Socrata dataset objects: {len(socrata_class_objects_dict)}")
 
     # Check the displayType values to see the types that remain. A validation step.
-    display_type_values_set = set()
-    for key, obj in socrata_class_objects_dict.items():
-        display_type_values_set.add(obj.display_type)
-        if obj.display_type.lower() == "map":
-            print(obj.four_by_four)
+    # display_type_values_set = set()
+    # for key, obj in socrata_class_objects_dict.items():
+    #     display_type_values_set.add(obj.display_type)
+    #     if obj.display_type.lower() == "map":
+    #         print(obj.four_by_four)
     # print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
 
     # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe creation
@@ -196,14 +196,12 @@ def main():
             obj.assemble_column_names_output_string()
             obj.calculate_days_since_last_data_update()
             obj.calculate_date_of_most_recent_view_change()
-            obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone. new column needed
+            obj.calculate_days_since_last_view_change()  # FIXME: Existing report doesn't report this value alone.
             obj.calculate_number_of_rows_in_dataset()
 
     # Need a master pandas dataframe from all remaining Socrata datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in socrata_class_objects_dict.values()]
     master_socrata_df = pd.DataFrame(data=df_data,
-                                     # index=list(socrata_class_objects_dict.keys()),
-                                     # columns=df_columns,
                                      dtype=None,
                                      copy=False)
     print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
