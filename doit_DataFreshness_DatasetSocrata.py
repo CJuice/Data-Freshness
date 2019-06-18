@@ -145,13 +145,24 @@ class DatasetSocrata:
         self.category_string = None
         self.column_names_string = None
         self.date_of_most_recent_data_change = None
-        self.days_since_last_data_update = None
         self.date_of_most_recent_view_change = None
+        self.days_since_last_data_update = None
         self.days_since_last_view_update = None
+        self.missing_metadata_fields = None  # FIXME: Hardcoded until develop function. just using so can output dataframe now
         self.number_of_rows_in_dataset = None
         self.updated_recently_enough = True  # FIXME: Hardcoded until develop function. just using so can output dataframe now
-        self.missing_metadata_fields = None  # FIXME: Hardcoded until develop function. just using so can output dataframe now
 
+    def assemble_category_output_string(self):
+        """
+        """
+        self.category_string = ", ".join(self.theme_list)
+
+    def assemble_column_names_output_string(self):
+        """
+
+        :return:
+        """
+        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
@@ -243,6 +254,58 @@ class DatasetSocrata:
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
         return None
 
+    def calculate_date_of_most_recent_data_change(self):
+        """
+
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
+        if self.rows_updated_at is None:
+            self.rows_updated_at = self.publication_date
+        self.date_of_most_recent_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+
+    def calculate_date_of_most_recent_view_change(self):
+        """
+
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
+        if self.view_last_modified is None:
+            self.view_last_modified = self.publication_date
+        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+
+    def calculate_days_since_last_data_update(self):
+        """
+
+        :return:
+        """
+        self.days_since_last_data_update = int(round(
+                (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))
+
+    def calculate_days_since_last_view_change(self):
+        """
+
+        :return:
+        """
+        self.days_since_last_view_update = int(round(
+            (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day))
+
+    def calculate_number_of_rows_in_dataset(self):
+        """
+
+        NOTE: The 'non_null' key is missing from some datasets
+        :return:
+        """
+        first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
+        cached_contents_dict = first_column_dict.get("cachedContents", {})
+        try:
+            self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
+                                              int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
+        except TypeError as te:
+            print(f"TypeError in calculate_number_of_rows_in_dataset() (*check for 'non_null' key): {self.four_by_four}: {cached_contents_dict} {te}")
+            print(f"\t non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')}")
+            self.number_of_rows_in_dataset = -9999
+
     def extract_four_by_four(self):
         """
 
@@ -310,7 +373,6 @@ class DatasetSocrata:
     #     if self.update_frequency is None:
     #         self.update_frequency =
 
-
     @staticmethod
     def create_socrata_client(domain: str, app_token: str, username:str, password: str) -> Socrata:
         """
@@ -363,67 +425,3 @@ class DatasetSocrata:
             else:
                 more_records_exist_than_response_limit_allows = False
         return master_list_of_dicts
-
-    def calculate_date_of_most_recent_data_change(self):
-        """
-
-        The choices made in this function originated in the original Date Freshness process.
-        :return:
-        """
-        if self.rows_updated_at is None:
-            self.rows_updated_at = self.publication_date
-        self.date_of_most_recent_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
-
-    def calculate_days_since_last_data_update(self):
-        """
-
-        :return:
-        """
-        self.days_since_last_data_update = int(round(
-                (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))
-
-    def calculate_date_of_most_recent_view_change(self):
-        """
-
-        The choices made in this function originated in the original Date Freshness process.
-        :return:
-        """
-        if self.view_last_modified is None:
-            self.view_last_modified = self.publication_date
-        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
-
-    def calculate_days_since_last_view_change(self):
-        """
-
-        :return:
-        """
-        self.days_since_last_view_update = int(round(
-            (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day))
-
-    def calculate_number_of_rows_in_dataset(self):
-        """
-
-        NOTE: The 'non_null' key is missing from some datasets
-        :return:
-        """
-        first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
-        cached_contents_dict = first_column_dict.get("cachedContents", {})
-        try:
-            self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
-                                              int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
-        except TypeError as te:
-            print(f"TypeError in calculate_number_of_rows_in_dataset() (*check for 'non_null' key): {self.four_by_four}: {cached_contents_dict} {te}")
-            print(f"\t non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')}")
-            self.number_of_rows_in_dataset = -9999
-
-    def assemble_column_names_output_string(self):
-        """
-
-        :return:
-        """
-        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
-
-    def assemble_category_output_strin(self):
-        """
-        """
-        self.category_string = ", ".join(self.theme_list)
