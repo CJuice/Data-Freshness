@@ -307,7 +307,7 @@ class DatasetSocrata:
             self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
                                               int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
         except TypeError as te:
-            print(f"TypeError in calculate_number_of_rows_in_dataset( ({self.four_by_four}) non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')} {te}")
+            # print(f"TypeError in calculate_number_of_rows_in_dataset( ({self.four_by_four}) non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')} {te}")
             self.number_of_rows_in_dataset = -9999
         # TODO: For datasets that don't supply a non_null count then may need to make requests to actual dataset and count
         #   the number of records. This is more efficient than doing so for every single dataet. Only making costly requests for subset of all datasets.
@@ -410,7 +410,7 @@ class DatasetSocrata:
             full_exmaple_set_of_keys = set(var.expected_socrata_asset_inventory_json_keys_dict.keys())
             included_asset_json_keys_set = set(asset_json.keys())
             difference = full_exmaple_set_of_keys.difference(included_asset_json_keys_set)
-            self.missing_metadata_fields = ", ".join([var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference])
+            self.missing_metadata_fields = ", ".join([var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference]) if 0 < len(difference) else "All Fields Present"
         return
 
     def process_update_frequency(self):
@@ -421,7 +421,7 @@ class DatasetSocrata:
         if self.update_frequency is None:
             self.update_frequency = "No Value Present"
         elif self.update_frequency == var.please_describe_below and self.other_update_frequency is not None:
-            print(self.update_frequency, self.other_update_frequency)
+            # print(self.update_frequency, self.other_update_frequency)
             self.update_frequency = self.other_update_frequency
         else:
             pass
