@@ -142,7 +142,8 @@ class DatasetSocrata:
         self.view_last_modified = None
 
         # DERIVED VALUES
-        self.column_names_list = None
+        self.category_string = None
+        self.column_names_string = None
         self.date_of_most_recent_data_change = None
         self.days_since_last_data_update = None
         self.date_of_most_recent_view_change = None
@@ -415,9 +416,14 @@ class DatasetSocrata:
             print(f"\t non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')}")
             self.number_of_rows_in_dataset = -9999
 
-    def assemble_column_names_list(self):
+    def assemble_column_names_output_string(self):
         """
 
         :return:
         """
-        self.column_names_list = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
+        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns])
+
+    def assemble_category_output_strin(self):
+        """
+        """
+        self.category_string = ", ".join(self.theme_list)
