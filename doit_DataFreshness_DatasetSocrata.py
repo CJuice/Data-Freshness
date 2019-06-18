@@ -306,8 +306,7 @@ class DatasetSocrata:
             self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
                                               int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
         except TypeError as te:
-            print(f"TypeError in calculate_number_of_rows_in_dataset() (*check for 'non_null' key): {self.four_by_four}: {cached_contents_dict} {te}")
-            print(f"\t non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')}")
+            print(f"TypeError in calculate_number_of_rows_in_dataset( ({self.four_by_four}) non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')} {te}")
             self.number_of_rows_in_dataset = -9999
 
     def extract_four_by_four(self):
