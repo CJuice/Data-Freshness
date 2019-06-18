@@ -231,7 +231,7 @@ class DatasetSocrata:
         self.number_of_comments = metadata_json.get("numberOfComments", None)
         self.index_updated_at = metadata_json.get("indexUpdatedAt", None)
         self.oid = metadata_json.get("oid", None)
-        self.other_update_frequency = metadata_json.get("Time Period", {}).get(var.other_update_frequency, None)
+        self.other_update_frequency = metadata_json.get("metadata", {}).get("custom_fields", {}).get("Time Period", {}).get(var.other_update_frequency, None)
         self.publication_append_enabled = metadata_json.get("publicationAppendEnabled", None)
         self.publication_date = metadata_json.get("publicationDate", None)
         self.publication_group = metadata_json.get("publicationGroup", None)
@@ -378,8 +378,9 @@ class DatasetSocrata:
         :return:
         """
         if self.update_frequency is None:
-            self.update_frequency = "Error"
+            self.update_frequency = "No Value Present"
         elif self.update_frequency == var.please_describe_below and self.other_update_frequency is not None:
+            print(self.update_frequency, self.other_update_frequency)
             self.update_frequency = self.other_update_frequency
         else:
             pass

@@ -185,12 +185,10 @@ def main():
 
     # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe creation
     for key, obj in socrata_class_objects_dict.items():
-        # FIXME: Output string format may need revising
-        x = 0
         try:
-            obj.calculate_date_of_most_recent_data_change()
+            obj.calculate_date_of_most_recent_data_change()  # FIXME: Output string format may need revising
         except TypeError as te:
-            print(obj.four_by_four, te, x)
+            print(obj.four_by_four, te)
         else:
             obj.assemble_category_output_string()
             obj.assemble_column_names_output_string()
