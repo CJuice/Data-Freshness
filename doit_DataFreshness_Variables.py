@@ -46,3 +46,20 @@ dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "land
 #                                       "Category": str}
 output_excel_file_path = r"Docs\Socrata_data_output.xlsx"
 output_excel_sheetname = "The Data Nasty"
+updated_enough_affirmative = "Yes"
+updated_enough_negative = "No"
+better_metadata_needed = "Better Metadata Needed."
+all_map_layers = "All map layers from MD iMAP are in the process of being surveyed to determine this information."
+whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
+update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
+metadata_missing = "Metadata on update frequency are missing. Dataset owner should provide this information to resolve this issue."
+as_needed_needs_processing = "As Needed, requires processing"
+static_cut_string = f"{updated_enough_affirmative}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
+socrata_updated_enough_dict = {"Monthly": 31, "Static Data": updated_enough_affirmative, "Every 10 Years": 3650,
+                               "Annually": 365, "Quarterly": 91, "Continually": 31, "Weekly": 7, "Daily": 1,
+                               "Triennially (Every Three Years)": 1095, "Biannually": 730,
+                               "Semiannually (Twice per Year)": 183, "Static Cut": static_cut_string,
+                               "As Needed": as_needed_needs_processing,
+                               all_map_layers: f"{better_metadata_needed} {whether_dataset}",
+                               "": f"{better_metadata_needed} {update_frequency_missing}",
+                               }

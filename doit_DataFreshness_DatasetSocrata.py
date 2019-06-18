@@ -150,7 +150,7 @@ class DatasetSocrata:
         self.days_since_last_view_update = None
         self.missing_metadata_fields = None  # FIXME: Hardcoded until develop function. just using so can output dataframe now
         self.number_of_rows_in_dataset = None
-        self.updated_recently_enough = True  # FIXME: Hardcoded until develop function. just using so can output dataframe now
+        self.updated_recently_enough = None
 
     def assemble_category_output_string(self):
         """
@@ -320,7 +320,21 @@ class DatasetSocrata:
         self.four_by_four = os.path.basename(self.landing_page)
         return None
 
-    # def cast_and_convert_class_attributes(self): # Going to do in pandas dataframe
+    def is_up_to_date(self):
+        """
+
+        :return:
+        """
+        result = var.socrata_updated_enough_dict.get(self.update_frequency, None)
+        value = None
+        if result is None:
+            value = var.metadata_missing
+        elif result == var.as_needed_needs_processing:
+            value = var.static_cut_string if self.days_since_last_data_update < 32 else var.better_metadata_needed
+        else:
+            value = "UNKNOWN ERROR: See is_up_to_date()"
+        self.updated_recently_enough = value
+        return
 
     def passes_filter_data_json(self, gis_counter: itertools.count, dataset_freshness_counter: itertools.count):
         """
