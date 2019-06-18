@@ -398,6 +398,21 @@ class DatasetSocrata:
         else:
             return True
 
+    def determine_missing_metadata_fields(self, asset_json):
+        """
+
+        :param asset_json:
+        :return:
+        """
+        if len(asset_json) == 0:
+            self.missing_metadata_fields = "Error generating missing metadata list"
+        else:
+            full_exmaple_set_of_keys = set(var.expected_socrata_asset_inventory_json_keys_dict.keys())
+            included_asset_json_keys_set = set(asset_json.keys())
+            difference = full_exmaple_set_of_keys.difference(included_asset_json_keys_set)
+            self.missing_metadata_fields = ", ".join([var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference])
+        return
+
     def process_update_frequency(self):
         """
 
@@ -411,15 +426,6 @@ class DatasetSocrata:
         else:
             pass
         return
-
-    # TODO: After assessing output values determine if need to process update frequency further
-    # def process_update_frequency(self):
-    #     """
-    #
-    #     :return:
-    #     """
-    #     if self.update_frequency is None:
-    #         self.update_frequency =
 
     @staticmethod
     def create_socrata_client(domain: str, app_token: str, username:str, password: str) -> Socrata:

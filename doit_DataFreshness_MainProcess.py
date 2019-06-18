@@ -145,6 +145,7 @@ def main():
         else:
             # print(obj.get("name", None), socrata_data_obj.title)
             socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
+            socrata_data_obj.determine_missing_metadata_fields(asset_json=asset_json_obj)
 
     # Print outs for general understanding of asset inventory level process
     print(f"\nAsset Inventory Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
