@@ -325,15 +325,27 @@ class DatasetSocrata:
 
         :return:
         """
-        result = var.socrata_updated_enough_dict.get(self.update_frequency, None)
-        value = None
-        if result is None:
-            value = var.metadata_missing
-        elif result == var.as_needed_needs_processing:
-            value = var.static_cut_string if self.days_since_last_data_update < 32 else var.better_metadata_needed
+
+        updated_enough_ints = {"Monthly": 31, "Every 10 Years": 3650,
+                               "Annually": 365, "Quarterly": 91, "Continually": 31, "Weekly": 7, "Daily": 1,
+                               "Triennially (Every Three Years)": 1095, "Biannually": 730,
+                               "Semiannually (Twice per Year)": 183}
+        updated_enough_strings = {"Static Data": var.updated_enough_affirmative,
+                                  "Static Cut": var.evaluation_difficult,
+                                  "As Needed": var.evaluation_difficult,
+                                  var.all_map_layers: f"{var.better_metadata_needed} {var.whether_dataset}",
+                                  "": f"{var.better_metadata_needed} {var.update_frequency_missing}"}
+        answer = None
+        int_check = updated_enough_ints.get(self.update_frequency, None)
+        string_check = updated_enough_strings.get(self.update_frequency, None)
+        if int_check is not None:
+            answer = var.updated_enough_affirmative if self.days_since_last_data_update <= int_check else var.updated_enough_negative
+        elif string_check is not None:
+            answer = string_check
         else:
-            value = "UNKNOWN ERROR: See is_up_to_date()"
-        self.updated_recently_enough = value
+            answer = var.metadata_missing
+
+        self.updated_recently_enough = answer
         return
 
     def passes_filter_data_json(self, gis_counter: itertools.count, dataset_freshness_counter: itertools.count):
