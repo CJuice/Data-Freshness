@@ -10,7 +10,8 @@ import time
 class Utility:
 
     @staticmethod
-    def request_GET(url, params=None):
+    def request_GET(url: str, params: dict = None) -> requests.models.Response:
+
         if params is None:
             params = {}
 
@@ -18,6 +19,20 @@ class Utility:
             response = requests.get(url=url, params=params)
         except Exception as e:
             print(f"Error with request to {url}. Code {response.status_code}. Error:{e}")
+            exit()
+        else:
+            return response
+
+    @staticmethod
+    def request_POST(url: str, data: dict = None, json: dict = None, verify: bool = False) -> requests.models.Response:
+        if data is None:
+            data = {}
+
+        try:
+            response = requests.post(url=url, data=data, json=json, verify=verify)
+        except Exception as e:
+            # TODO: Refine
+            print(f"Error during post request to url:{url}, data:{data}: {e}")
             exit()
         else:
             return response

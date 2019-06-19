@@ -5,6 +5,7 @@ import time
 
 # NOT DERIVED
 all_map_layers = "All map layers from MD iMAP are in the process of being surveyed to determine this information."
+arcgis_root_url = r"https://www.arcgis.com"
 better_metadata_needed = "Better Metadata Needed."
 credentials_config_file_path = r"doit_DataFreshness_Credentials/doit_DataFreshness_Credentials.cfg"
 dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "landing_page",
