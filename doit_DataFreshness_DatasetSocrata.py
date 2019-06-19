@@ -5,7 +5,7 @@ import datetime
 import itertools
 import os
 import time
-import DataFreshness.doit_DataFreshness_Variables as var
+import DataFreshness.doit_DataFreshness_Variables_Socrata as var
 from sodapy import Socrata
 
 
