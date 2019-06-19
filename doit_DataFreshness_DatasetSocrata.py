@@ -265,29 +265,9 @@ class DatasetSocrata:
         """
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
 
-    def calculate_date_of_most_recent_data_change(self):
-        """
-
-        The choices made in this function originated in the original Date Freshness process.
-        :return:
-        """
-        if self.rows_updated_at is None:
-            self.rows_updated_at = self.publication_date
-        self.date_of_most_recent_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
-
-    def calculate_date_of_most_recent_view_change(self):
-        """
-
-        The choices made in this function originated in the original Date Freshness process.
-        :return:
-        """
-        if self.view_last_modified is None:
-            self.view_last_modified = self.publication_date
-        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
-
     def calculate_days_since_last_data_update(self):
         """
-
+        Subtract rows updated date in seconds from process initiation time in seconds and convert to whole days.
         :return:
         """
         self.days_since_last_data_update = int(round(
@@ -295,7 +275,7 @@ class DatasetSocrata:
 
     def calculate_days_since_last_view_change(self):
         """
-
+        Subtract view updated date in seconds from process initiation time in seconds and convert to whole days.
         :return:
         """
         self.days_since_last_view_update = int(round(
@@ -303,8 +283,11 @@ class DatasetSocrata:
 
     def calculate_number_of_rows_in_dataset(self):
         """
+        Extract null/non-null values from metadata json and sum to determine number of rows in dataset
 
-        NOTE: The 'non_null' key is missing from some datasets
+        NOTE: The 'non_null' key is missing from some datasets. It may be necessary to add more functionality that
+            makes requests when the json values are not available in order to determine the number of rows. A database
+            flag value of -9999 is currently used to indicate non-existent row counts.
         :return:
         """
         first_column_dict = self.columns[0] if 0 < len(self.columns) else {}
@@ -313,10 +296,29 @@ class DatasetSocrata:
             self.number_of_rows_in_dataset = sum([int(cached_contents_dict.get("non_null")),
                                               int(cached_contents_dict.get("null"))]) if 0 < len(cached_contents_dict) else -9999
         except TypeError as te:
-            # print(f"TypeError in calculate_number_of_rows_in_dataset( ({self.four_by_four}) non_null={cached_contents_dict.get('non_null')}, null={cached_contents_dict.get('null')} {te}")
             self.number_of_rows_in_dataset = -9999
         # TODO: For datasets that don't supply a non_null count then may need to make requests to actual dataset and count
-        #   the number of records. This is more efficient than doing so for every single dataet. Only making costly requests for subset of all datasets.
+        #   the number of records. This is more efficient than doing so for every single dataet. Only make costly web requests for subset of all datasets.
+
+    def determine_date_of_most_recent_data_change(self):
+        """
+        Calculate the date of the most recent change
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
+        if self.rows_updated_at is None:
+            self.rows_updated_at = self.publication_date
+        self.date_of_most_recent_data_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+
+    def determine_date_of_most_recent_view_change(self):
+        """
+
+        The choices made in this function originated in the original Date Freshness process.
+        :return:
+        """
+        if self.view_last_modified is None:
+            self.view_last_modified = self.publication_date
+        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
 
     def extract_four_by_four(self):
         """
