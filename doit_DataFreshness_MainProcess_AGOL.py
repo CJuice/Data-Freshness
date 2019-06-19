@@ -46,8 +46,12 @@ def main():
         # print(len(result))
         agol_dataset = DatasetAGOL()
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
-        agol_class_objects_dict[agol_dataset.id] = agol_dataset
+        agol_dataset.build_standardized_url()
 
+        # Store the objects for use
+        agol_class_objects_dict[agol_dataset.id] = agol_dataset
+        print(agol_dataset.url)
+        print("\t", agol_dataset.standardized_url)
     # print(len(agol_class_objects_dict))
 
 

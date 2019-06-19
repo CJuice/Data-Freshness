@@ -15,6 +15,8 @@ class DatasetAGOL:
     SORT_FIELD = 'title'
 
     def __init__(self):
+
+        # NON-DERIVED
         self.access = None
         self.access_information = None
         self.app_categories = None
@@ -55,6 +57,10 @@ class DatasetAGOL:
         self.type_ = None
         self.type_keywords = None
         self.url = None
+
+        # DERIVED
+        self.standardized_url = None
+        self.standardized_url_2 = None
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
@@ -98,6 +104,19 @@ class DatasetAGOL:
         self.type_keywords = data_json.get("typeKeywords", None)
         self.url = data_json.get("url", None)
 
+    def build_standardized_url(self):
+        # FIXME: This functionality was taken from the old process but it only works for really basic titles. Special
+        #   characters cause bad url's. Need to resolve what the purpose of this url should be: send user to data.imap.maryland.gov
+        #   or send to the application wherever it is hosted. We have the url provided in response to agol but these are
+        #   not standardized. If we want a clean look we should maybe use the id to build the agol url for it.
+
+        # EXISTING METHOD
+        # groomed_title = self.title.replace("- ", "").replace(" ", "-").lower()
+        # self.standardized_url = f"https://data.imap.maryland.gov/datasets/{groomed_title}"
+
+        # NEW OPTIONS TO EXPLORE
+        self.standardized_url = f"https://maryland.maps.arcgis.com/home/item.html?id={self.id}"
+
     # def build_arcgis_request_data_dict(self, start_num: int = None) -> dict:
     #     return {
     #         'q': DatasetAGOL.OWNER,
@@ -137,7 +156,7 @@ class DatasetAGOL:
                 results = resp_json.get("results", {})
                 start_number = resp_json.get("nextStart", None)
                 master_list_of_dicts.extend(results)
-                print(f"Start Number: {start_number}")
+                # print(f"Start Number: {start_number}")
 
                 # number_of_records_returned = len(results)
                 # request_cycle_record_count += number_of_records_returned
