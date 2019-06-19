@@ -17,7 +17,7 @@ def main():
 
     from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
     from DataFreshness.doit_DataFreshness_Utility import Utility
-    import DataFreshness.doit_DataFreshness_Variables as var
+    import DataFreshness.doit_DataFreshness_Variables_Socrata as var
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
@@ -228,13 +228,6 @@ def main():
     #                            sheet_name="Pat is a data pimp",
     #                            na_rep=np.NaN,
     #                            index=False)
-
-    # ===================================================
-    # ARCGIS ONLINE
-    print(f"\nBeginning ArcGIS Online Process...")
-
-
-    # ===================================================
 
 
 if __name__ == "__main__":
