@@ -63,12 +63,12 @@ output_excel_sheetname = "The Data Nasty"
 please_describe_below = "Other (Please Describe Below)"
 process_initiation_datetime_in_seconds = float(round(time.time()))
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
-updated_enough_affirmative = "Yes"
-updated_enough_negative = "No"
+updated_enough_yes = "Yes"
+updated_enough_no = "No"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
 
 # DERIVED
-evaluation_difficult = f"{updated_enough_affirmative}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
+evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
 

@@ -1,5 +1,5 @@
 """
-
+Contains a single class for socrata dataset representation per MD DoIT needs.
 """
 import datetime
 import itertools
@@ -11,7 +11,17 @@ from sodapy import Socrata
 
 class DatasetSocrata:
     """
-
+    Class for storing information on a socrata datasets and for processing values for output needs.
+    The limit max and offset can be changed. A 1000 is the default set by socrata.
+    The client is used to access resources that are protected.
+    The title exclusion filters are for focusing the processing and excluding items not of interest.
+    An object is instantiated to None for all attributes and then the values are assigned after extraction from json or
+        after processing.
+    Attributes are organized by their original source or into derived values. Three resources are consulted and these
+    are the data.json, the asset inventory, and the metadata json provided by Socrata. The values in the response json
+    are extracted, assigned, and stored as attributes but the original json is not saved. The attributes have been
+    organized alphabetically within their source groups. The derived values group are attributes that are derived from
+    processing raw values from the json and involve decision making or conversions.
     """
 
     # Class attributes available to all instances
@@ -21,9 +31,10 @@ class DatasetSocrata:
 
     def __init__(self):
         """
+        Instantiate the default dataset object in preparation for value assignments.
 
-        Values in asset inventory json that were previously sourced from data.json have been ignored. The following
-        listing captures the decisions made while building:
+        Values in asset inventory json (for example) that were previously sourced from data.json have been ignored.
+         The following listing captures the decisions made while building this process.
 
         d = data.json, a = asset inventory, m = metadata
 
@@ -74,12 +85,12 @@ class DatasetSocrata:
         tags - keyword (d)
         viewCount - visits (a)
         viewType - Not stored, did not appear to be useful
-
-        :param dataset_json:
         """
+
         # FIXME: Resolve differences between, and need of or value of, issued (d) vs last_update_date_data (a) publicationDate (m) vs rowsUpdatedAt (m) vs indexUpdatedAt (m)
         # NOTES: issued is most generic and only accurate to the day.
-        self.portal = "Socrata"
+
+        self.portal = "Socrata"  # Would make a constant but mapping to pandas dataframe field becomes more cumbersome.
 
         # DATA.JSON SOURCED VALUES
         self.access_level = None
@@ -144,12 +155,12 @@ class DatasetSocrata:
         # DERIVED VALUES
         self.category_string = None
         self.column_names_string = None
-        self.keyword_tags_string = None
         self.date_of_most_recent_data_change = None
         self.date_of_most_recent_view_change = None
         self.days_since_last_data_update = None
         self.days_since_last_view_update = None
-        self.missing_metadata_fields = None  # FIXME: Hardcoded until develop function. just using so can output dataframe now
+        self.keyword_tags_string = None
+        self.missing_metadata_fields = None
         self.number_of_rows_in_dataset = None
         self.updated_recently_enough = None
 
@@ -302,8 +313,9 @@ class DatasetSocrata:
 
     def determine_date_of_most_recent_data_change(self):
         """
-        Calculate the date of the most recent change
-        The choices made in this function originated in the original Date Freshness process.
+        Determine the date of the most recent data change, based off of the rows_update_at value.
+        When a rows_updated_at value is not present the publication_date was chosen as a substitute. The choices
+        made in this function originated in the original Date Freshness process.
         :return:
         """
         if self.rows_updated_at is None:
@@ -312,8 +324,9 @@ class DatasetSocrata:
 
     def determine_date_of_most_recent_view_change(self):
         """
-
-        The choices made in this function originated in the original Date Freshness process.
+        Determine the date of the most recent view change, based off of the views_last_modified.
+        When a views_last_modified value is not present the publication_date was chosen as a substitute. The choices
+        made in this function originated in the original Date Freshness process.
         :return:
         """
         if self.view_last_modified is None:
@@ -322,7 +335,7 @@ class DatasetSocrata:
 
     def extract_four_by_four(self):
         """
-
+        Extract the four-by-four dataset id value from the landing page url
         :return:
         """
         self.four_by_four = os.path.basename(self.landing_page)
@@ -330,7 +343,11 @@ class DatasetSocrata:
 
     def is_up_to_date(self):
         """
-
+        Determine if a dataset is up to date according to its update frequency.
+        Created two dictionaries, instead of one, to hold integer comparison value snd string values. The integer
+        values are checked against the number of days since the data has been updated. If the update frequency value
+        is a string then retrieve the string value from the string dict. If no value is found in the dicts then the
+        metadata is deemed as missing.
         :return:
         """
 
@@ -338,16 +355,18 @@ class DatasetSocrata:
                                "Annually": 365, "Quarterly": 91, "Continually": 31, "Weekly": 7, "Daily": 1,
                                "Triennially (Every Three Years)": 1095, "Biannually": 730,
                                "Semiannually (Twice per Year)": 183}
-        updated_enough_strings = {"Static Data": var.updated_enough_affirmative,
+        updated_enough_strings = {"Static Data": var.updated_enough_yes,
                                   "Static Cut": var.evaluation_difficult,
                                   "As Needed": var.evaluation_difficult,
                                   var.all_map_layers: f"{var.better_metadata_needed} {var.whether_dataset}",
                                   "": f"{var.better_metadata_needed} {var.update_frequency_missing}"}
         answer = None
+
         int_check = updated_enough_ints.get(self.update_frequency, None)
         string_check = updated_enough_strings.get(self.update_frequency, None)
+
         if int_check is not None:
-            answer = var.updated_enough_affirmative if self.days_since_last_data_update <= int_check else var.updated_enough_negative
+            answer = var.updated_enough_yes if self.days_since_last_data_update <= int_check else var.updated_enough_no
         elif string_check is not None:
             answer = string_check
         else:
@@ -358,9 +377,13 @@ class DatasetSocrata:
 
     def passes_filter_data_json(self, gis_counter: itertools.count, dataset_freshness_counter: itertools.count):
         """
-
-        :param gis_counter:
-        :param dataset_freshness_counter:
+        Determine if a dataset is to be processed or passed on based on the title.
+        All GIS datasets are not processed in the Socrata portion of the process because these "datasets" are just
+        a reference to ArcGIS Online. The dataset freshness report is skipped so as to not self inspect. The
+        'Homepage Categories' value was in the original design. On testing, none of these were encountered but to be
+        safe the check was included in this redesign.
+        :param gis_counter: itertools counter for gis dataset tracking
+        :param dataset_freshness_counter: itertools counter for any data freshenss dataset tracking
         :return:
         """
 
@@ -382,34 +405,10 @@ class DatasetSocrata:
         else:
             return True
 
-    def passes_filter_metadata_json(self, gis_counter: itertools.count):
-        """
-
-        :param gis_counter:
-        :return:
-        """
-
-        if self.title is None:
-            print(f"Unexpectedly encountered None value for self.title during passes_filter() call: {self.__dict__}")
-            return False
-        elif self.title.startswith("MD iMAP"):
-            next(gis_counter)
-            return False
-        elif self.title.startswith("Dataset Freshness"):
-            print("Dataset Freshness dataset encountered during passes_filter(). skipped.")
-            print(f"\tTITLE: {self.title}")
-            return False
-        elif self.title.startswith("Homepage Categories"):
-            # This was a filter used in the original design. Have not see any of these but preserving functionality.
-            print("Homepage Categories title encountered during passes_filter(). Skipped")
-            return False
-        else:
-            return True
-
     def determine_missing_metadata_fields(self, asset_json):
         """
-
-        :param asset_json:
+        Compare values in asset inventory json to a default set of possible metadata values to determine missing values.
+        :param asset_json: asset inventory json on socrata dataset
         :return:
         """
         if len(asset_json) == 0:
@@ -418,12 +417,14 @@ class DatasetSocrata:
             full_exmaple_set_of_keys = set(var.expected_socrata_asset_inventory_json_keys_dict.keys())
             included_asset_json_keys_set = set(asset_json.keys())
             difference = full_exmaple_set_of_keys.difference(included_asset_json_keys_set)
-            self.missing_metadata_fields = ", ".join([var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference]) if 0 < len(difference) else "All Fields Present"
+            self.missing_metadata_fields = ", ".join(
+                [var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference]) if 0 < len(
+                difference) else "All Fields Present"
         return
 
     def process_update_frequency(self):
         """
-
+        Process the update frequency value if is equal to test condition and substitute appropriate value.
         :return:
         """
         if self.update_frequency is None:
@@ -439,8 +440,8 @@ class DatasetSocrata:
         """
         Create and return a Socrata client for use.
 
-        NOTE_1: It seems absolutely essential the the domain be a domain and not a url; 'https://opendata.maryland.gov'
-            will not substitute for 'opendata.maryland.gov'.
+        NOTE_1: It is absolutely essential the the domain be a domain and not a url; 'https://opendata.maryland.gov'
+            will not substitute for 'opendata.maryland.gov'. Loose use of the term domain will get cause you grief.
 
         :param domain: domain for maryland open data portal.
         :param app_token: application token for throttling limitations
@@ -455,11 +456,13 @@ class DatasetSocrata:
     def request_and_aggregate_all_socrata_records(client: Socrata, fourbyfour: str,
                                                   limit_max_and_offset: int = LIMIT_MAX_AND_OFFSET) -> list:
         """
-
-        :param client:
-        :param fourbyfour:
-        :param limit_max_and_offset:
-        :return:
+        Make web requests and accumulate records until no more are returned for the dataset of interest
+        For datasets with a lot of records it is necessary to make multiple requests to Socrata.
+        :param client: Socrata Client
+        :param fourbyfour: the XXXX-XXXX id that socrata uses to identify an asset
+        :param limit_max_and_offset: number or records to return and the value used to offset requests to get
+            next batch of records in a large dataset.
+        :return: returns a list of json/dicts for datasets
         """
         more_records_exist_than_response_limit_allows = True
         total_record_count = 0

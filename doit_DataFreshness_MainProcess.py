@@ -9,15 +9,11 @@ def main():
     print(f"Start Time: {start_time} seconds since Epoch")
 
     # IMPORTS
-    import configparser
-    import datetime
     import itertools
     import json
     import numpy as np
-    import os
     import pandas as pd
     import pprint
-    import sodapy
 
     from DataFreshness.doit_DataFreshness_DatasetSocrata import DatasetSocrata
     from DataFreshness.doit_DataFreshness_Utility import Utility
@@ -25,9 +21,7 @@ def main():
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
-
     arcgisonline_counter = itertools.count()
-    asset_inventory_url = None
     boolean_string_replacement_dict = {"true": True, "false": False}
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     dataset_freshness_dataset_counter = itertools.count()
@@ -61,8 +55,8 @@ def main():
                                                                              "password"])
 
     # Get the data.json from Socrata so have an inventory of all public datasets
-    #   Did not design to handle iterative requests for record count greater than limit. It appears to send all datasets
-    #   in initial request so not necessary for now.
+    #   Did not design to handle iterative requests for record count greater than limit. Socrata response for data.json
+    #   appears to send all datasets in initial request so not necessary for now.
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
     try:
@@ -82,17 +76,21 @@ def main():
         dataset_socrata = DatasetSocrata()
         dataset_socrata.assign_data_json_to_class_values(dataset_json=json_obj)
 
-        # Before storing obj in dict see that it passes the exclusion filter
+        # Before storing obj, see that it passes the exclusion filter and is desired
         # FIXME: Seeing two dataset freshness datasets. Determine if valid or is an issue
         if not dataset_socrata.passes_filter_data_json(gis_counter=socrata_gis_dataset_counter,
                                                        dataset_freshness_counter=dataset_freshness_dataset_counter):
             continue
 
-        # proceed with processing and store object for use
+        # proceed with processing
         dataset_socrata.extract_four_by_four()
         dataset_socrata.build_metadata_url()
         dataset_socrata.build_resource_url()
+
+        # store object for use
         socrata_class_objects_dict[dataset_socrata.four_by_four] = dataset_socrata
+
+        # track the count of stored objects
         next(socrata_datajson_object_counter)
 
     # Print outs for general understanding of data.json level process
@@ -102,13 +100,14 @@ def main():
     print(f"Number of data.json dataset objects created. {socrata_datajson_object_counter}")
     print(f"Number of data.json dataset freshness datasets encountered and skipped. {dataset_freshness_dataset_counter}")
 
-
-    # Get all asset inventory information, and then store values in existing dataset objects using the 4x4
+    # Get all asset inventory information, and then store values in existing dataset objects using the 4x4 id
     asset_inventory_json_data_list = DatasetSocrata.request_and_aggregate_all_socrata_records(
         client=DatasetSocrata.SOCRATA_CLIENT,
         fourbyfour=credentials_parser['SOCRATA']['asset_inventory_fourbyfour'])
 
     for asset_json_obj in asset_inventory_json_data_list:
+
+        # track count
         next(socrata_assetinventory_counter)
 
         # exchange json 'true' & 'false' for python True & False
@@ -120,6 +119,7 @@ def main():
             pprint.pprint(f"Issue extracting 'public' from asset inventory json. Skipped: {asset_json_obj}")
             continue
         elif public is True:
+
             # These are the datasets of interest
             next(socrata_assetinventory_public_dataset_counter)
             pass
@@ -130,7 +130,7 @@ def main():
             print(f"Unexpected 'public' value extracted from asset inventory json: {public}")
             exit()
 
-        # For public datasets, extract u_id and use that to get corresponding data.json based Socrata dataset object
+        # For public datasets, extract u_id (four-by-four) and use that to get corresponding data.json based object
         u_id = asset_json_obj.get("u_id", None)
         if u_id is None:
             pprint.pprint(f"Issue extracting 'u_id'' from asset inventory json. Skipped: {asset_json_obj}")
@@ -143,8 +143,9 @@ def main():
         if socrata_data_obj is None:
             continue
         else:
-            # print(obj.get("name", None), socrata_data_obj.title)
             socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
+
+            # while the full asset json is still available, determine missing fields from expected set of fields
             socrata_data_obj.determine_missing_metadata_fields(asset_json=asset_json_obj)
 
     # Print outs for general understanding of asset inventory level process
@@ -155,20 +156,26 @@ def main():
 
     # Now that have all values from data.json and asset inventory, get and assign metadata info for every dataset
     for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
+
+        # track count
         next(socrata_metadata_counter)
+
+        # request metadata and assign values from response to existing objects
         metadata_json = DatasetSocrata.SOCRATA_CLIENT.get_metadata(dataset_identifier=fourbyfour,
                                                                    content_type="json")
         dataset_obj.assign_metadata_json_to_class_values(metadata_json=metadata_json)
 
-    key_and_displaytype_list = [(key, value.display_type) for key, value in socrata_class_objects_dict.items()]
-    for key, display_type in key_and_displaytype_list:
+    # previous version of data freshness filtered out datasets with a display type equal to "map". Seems the MD iMAP
+    #   filter is not affective for these. Suspect this may be a native socrata gis implementation/feature.
+    id_and_displaytype_list = [(socrat_id, socrat_obj.display_type) for socrat_id, socrat_obj in socrata_class_objects_dict.items()]
+    for socrat_id, display_type in id_and_displaytype_list:
         if display_type.lower() == "map":
-            result = socrata_class_objects_dict.pop(key, None)
+            result = socrata_class_objects_dict.pop(socrat_id, None)
             if result is not None:
                 next(socrata_gis_dataset_counter)
                 next(socrata_displaytype_map_counter)
             else:
-                print(f"Error, object {key} unsuccessfully deleted after detecting metadata displayType = map.")
+                print(f"Error, object {socrat_id} unsuccessfully deleted after detecting metadata displayType = map.")
 
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata datasets handled: {socrata_metadata_counter}")
@@ -176,18 +183,11 @@ def main():
     print(f"Number of GIS Datasets encountered has been updated: {socrata_gis_dataset_counter}")
     print(f"Number of remaining public Socrata dataset objects: {len(socrata_class_objects_dict)}")
 
-    # Check the displayType values to see the types that remain. A validation step.
-    # display_type_values_set = set()
-    # for key, obj in socrata_class_objects_dict.items():
-    #     display_type_values_set.add(obj.display_type)
-    #     if obj.display_type.lower() == "map":
-    #         print(obj.four_by_four)
-    # print(f"Datasets where displayType = 'map' have been deleted. Remaining values detected: {display_type_values_set}")
-
-    # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe creation
+    # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe
+    #  creation but after losing source json
     for key, obj in socrata_class_objects_dict.items():
         try:
-            obj.determine_date_of_most_recent_data_change()  # TODO: Output string format may need revising
+            obj.determine_date_of_most_recent_data_change()  # TODO: Output string format may need revising. Ask Pat.
         except TypeError as te:
             print(obj.four_by_four, te)
         else:
@@ -211,11 +211,6 @@ def main():
     print(master_socrata_df.head())
 
     # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
-    # Use rows_updated_by four-by-four value to build socrata profile url. FIXME: Removing from report and process. links not public
-    # master_socrata_df["rows_updated_by"] = master_socrata_df["rows_updated_by"].apply(lambda value: var.md_socrata_profile_url.format(root=var.md_open_data_url, user_four_by_four=value))
-
-    # Convert the key_word_list to a comma separated string
-    # master_socrata_df["keyword_list"] = master_socrata_df["keyword_list"].apply(lambda value: ", ".join(list(value)) if value is not None else value)
     master_socrata_df.fillna(value=var.null_string, inplace=True)
 
     # TODO: Need to match existing data freshness output and write json and excel files for all objects
@@ -227,6 +222,12 @@ def main():
                                columns=list(var.dataframe_to_header_mapping_for_output.values()),
                                header=list(var.dataframe_to_header_mapping_for_output.keys()),
                                index=False)
+
+    # #quick write of full frame for pat
+    # master_socrata_df.to_excel(excel_writer=r"Docs\Socrata_data_output_FULL.xlsx",
+    #                            sheet_name="Pat is a data pimp",
+    #                            na_rep=np.NaN,
+    #                            index=False)
 
     # ===================================================
     # ARCGIS ONLINE
