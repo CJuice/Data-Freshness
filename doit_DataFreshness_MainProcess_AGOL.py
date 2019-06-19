@@ -39,8 +39,10 @@ def main():
     # Print outs for general understanding of data.json level process
     print(f"Data Catalog Results Requests Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"{len(master_list_of_results)} results collected")
-    # for item in master_list_of_results:
-    #     print(item)
+
+    for item in master_list_of_results:
+        print(item)
+        exit()
 
 
 
