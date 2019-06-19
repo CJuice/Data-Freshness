@@ -21,7 +21,6 @@ def main():
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
-    arcgisonline_counter = itertools.count()
     boolean_string_replacement_dict = {"true": True, "false": False}
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     dataset_freshness_dataset_counter = itertools.count()

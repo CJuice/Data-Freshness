@@ -20,6 +20,7 @@ def main():
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
+    arcgisonline_counter = itertools.count()
 
     # CLASSES
     # FUNCTIONS
