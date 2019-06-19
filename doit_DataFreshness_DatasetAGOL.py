@@ -56,8 +56,7 @@ class DatasetAGOL:
         self.type_keywords = None
         self.url = None
 
-
-    def assign_data_catalog_json_to_class_values(self, data_json):
+    def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
         self.access_information = data_json.get("accessInformation", None)
         self.app_categories = data_json.get("appCategories", None)
@@ -138,7 +137,8 @@ class DatasetAGOL:
                 results = resp_json.get("results", {})
                 start_number = resp_json.get("nextStart", None)
                 master_list_of_dicts.extend(results)
-                # print(f"Start Number: {start_number}")
+                print(f"Start Number: {start_number}")
+
                 # number_of_records_returned = len(results)
                 # request_cycle_record_count += number_of_records_returned
                 # total_record_count += number_of_records_returned

@@ -26,6 +26,8 @@ def main():
     # VARIABLES
     agol_counter = itertools.count()
     agol_data_catalog_responses = []
+    agol_class_objects_dict = {}
+
     # CLASSES
     # FUNCTIONS
     # FUNCTIONALITY
@@ -40,9 +42,13 @@ def main():
     print(f"Data Catalog Results Requests Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"{len(master_list_of_results)} results collected")
 
-    for item in master_list_of_results:
-        print(item)
-        exit()
+    for result in master_list_of_results:
+        # print(len(result))
+        agol_dataset = DatasetAGOL()
+        agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
+        agol_class_objects_dict[agol_dataset.id] = agol_dataset
+
+    # print(len(agol_class_objects_dict))
 
 
 
