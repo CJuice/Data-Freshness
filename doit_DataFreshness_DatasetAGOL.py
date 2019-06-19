@@ -114,7 +114,7 @@ class DatasetAGOL:
         # groomed_title = self.title.replace("- ", "").replace(" ", "-").lower()
         # self.standardized_url = f"https://data.imap.maryland.gov/datasets/{groomed_title}"
 
-        # NEW OPTIONS TO EXPLORE
+        # Spoke with Matt, this is what we are going with.
         self.standardized_url = f"https://maryland.maps.arcgis.com/home/item.html?id={self.id}"
 
     # def build_arcgis_request_data_dict(self, start_num: int = None) -> dict:
