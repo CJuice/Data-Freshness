@@ -3,7 +3,6 @@
 """
 import requests
 import configparser
-from sodapy import Socrata
 import time
 
 
