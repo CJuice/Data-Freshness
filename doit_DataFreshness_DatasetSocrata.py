@@ -15,8 +15,8 @@ class DatasetSocrata:
     """
 
     # Class attributes available to all instances
-    SOCRATA_CLIENT = None
     LIMIT_MAX_AND_OFFSET = 10000
+    SOCRATA_CLIENT = None
     SOCRATA_DATASET_TITLE_EXCLUSION_FILTERS = ("MD iMAP:", "Dataset Freshness", "Homepage Categories")
 
     def __init__(self):
@@ -155,6 +155,8 @@ class DatasetSocrata:
 
     def assemble_category_output_string(self):
         """
+        Make a comma separated string of category values if is not None, otherwise value is 'NULL'
+        :return:
         """
         try:
             self.category_string = ", ".join(self.theme_list) if self.theme_list is not None else var.null_string
@@ -164,18 +166,22 @@ class DatasetSocrata:
 
     def assemble_column_names_output_string(self):
         """
-
+        Make a comma separated string of column names if is not None, otherwise value is 'NULL'
         :return:
         """
-        self.column_names_string = ", ".join([column_dict.get("name", None) for column_dict in self.columns]) if 0 < len(self.columns) else var.null_string
+        self.column_names_string = ", ".join([column_dict.get("name") for column_dict in self.columns]) if self.columns is not None and 0 < len(self.columns) else var.null_string
 
     def assemble_keywords_output_string(self):
+        """
+        Make a comma separated string of keywords/tags if is not None, otherwise value is 'NULL'
+        :return:
+        """
         self.keyword_tags_string = ", ".join(list(self.keyword_list)) if self.keyword_list is not None and 0 < len(self.keyword_list)else var.null_string
 
     def assign_asset_inventory_json_to_class_values(self, asset_json):
         """
-
-        :param asset_json:
+        Assign all json values to instance attributes.
+        :param asset_json: asset inventory json response
         :return:
         """
         self.contact_email = asset_json.get("contactemail", None)
@@ -199,12 +205,11 @@ class DatasetSocrata:
         self.time_period_of_content = asset_json.get("time_period_of_content", None)
         self.update_frequency = asset_json.get("update_frequency", None)
         self.visits = asset_json.get("visits", -9999)
-        return None
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
         """
-
-        :param dataset_json:
+        Assign all data.json values to instance attributes
+        :param dataset_json: the data.json response for all public datasets
         :return:
         """
         self.access_level = dataset_json.get("accessLevel", None)
@@ -218,12 +223,11 @@ class DatasetSocrata:
         self.type = dataset_json.get("@type", None)
         self.theme_list = dataset_json.get("theme", None)
         self.title = dataset_json.get("title", None)
-        return None
 
     def assign_metadata_json_to_class_values(self, metadata_json: dict):
         """
-
-        :param metadata_json:
+        Assign all metadata json values to instance attributes
+        :param metadata_json: the metadata json response
         :return:
         """
         self.approvals = metadata_json.get("approvals", None)
@@ -249,19 +253,17 @@ class DatasetSocrata:
 
     def build_metadata_url(self):
         """
-
+        Build the metadata url string
         :return:
         """
         self.metadata_url = f"{var.md_open_data_url}/api/views/{self.four_by_four}.json"
-        return None
 
     def build_resource_url(self):
         """
-
+        Build the resource url string
         :return:
         """
         self.resource_url = f"{var.md_open_data_url}/resource/{self.four_by_four}.json"
-        return None
 
     def calculate_date_of_most_recent_data_change(self):
         """
@@ -423,9 +425,8 @@ class DatasetSocrata:
         :return:
         """
         if self.update_frequency is None:
-            self.update_frequency = "No Value Present"
+            self.update_frequency = var.null_string
         elif self.update_frequency == var.please_describe_below and self.other_update_frequency is not None:
-            # print(self.update_frequency, self.other_update_frequency)
             self.update_frequency = self.other_update_frequency
         else:
             pass
