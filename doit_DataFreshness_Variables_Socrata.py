@@ -5,7 +5,6 @@ import time
 
 # NOT DERIVED
 all_map_layers = "All map layers from MD iMAP are in the process of being surveyed to determine this information."
-arcgis_root_url = r"https://www.arcgis.com"
 better_metadata_needed = "Better Metadata Needed."
 credentials_config_file_path = r"doit_DataFreshness_Credentials/doit_DataFreshness_Credentials.cfg"
 dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "landing_page",
@@ -68,7 +67,6 @@ updated_enough_no = "No"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
 
 # DERIVED
-arcgis_data_catalog_url = f"{arcgis_root_url}/sharing/rest/search"
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
