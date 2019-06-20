@@ -23,12 +23,12 @@ class Utility:
             return response
 
     @staticmethod
-    def request_POST(url: str, data: dict = None, json: dict = None, verify: bool = False) -> requests.models.Response:
+    def request_POST(url: str, data: dict = None, verify: bool = False) -> requests.models.Response:
         if data is None:
             data = {}
 
         try:
-            response = requests.post(url=url, data=data, json=json, verify=verify)
+            response = requests.post(url=url, data=data, verify=verify)
         except Exception as e:
             # TODO: Refine
             print(f"Error during post request to url:{url}, data:{data}: {e}")

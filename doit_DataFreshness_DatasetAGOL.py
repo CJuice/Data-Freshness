@@ -1,7 +1,7 @@
 """
 
 """
-import DataFreshness.doit_DataFreshness_Variables_Socrata as var
+import DataFreshness.doit_DataFreshness_Variables_AGOL as var
 from DataFreshness.doit_DataFreshness_Utility import Utility
 import json
 
@@ -59,8 +59,8 @@ class DatasetAGOL:
         self.url = None
 
         # DERIVED
+        self.metadata_url = None
         self.standardized_url = None
-        self.standardized_url_2 = None
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
@@ -104,18 +104,13 @@ class DatasetAGOL:
         self.type_keywords = data_json.get("typeKeywords", None)
         self.url = data_json.get("url", None)
 
-    def build_standardized_url(self):
-        # FIXME: This functionality was taken from the old process but it only works for really basic titles. Special
-        #   characters cause bad url's. Need to resolve what the purpose of this url should be: send user to data.imap.maryland.gov
-        #   or send to the application wherever it is hosted. We have the url provided in response to agol but these are
-        #   not standardized. If we want a clean look we should maybe use the id to build the agol url for it.
-
-        # EXISTING METHOD
-        # groomed_title = self.title.replace("- ", "").replace(" ", "-").lower()
-        # self.standardized_url = f"https://data.imap.maryland.gov/datasets/{groomed_title}"
-
+    def build_standardized_item_url(self):
         # Spoke with Matt, this is what we are going with.
-        self.standardized_url = f"https://maryland.maps.arcgis.com/home/item.html?id={self.id}"
+        self.standardized_url = var.arcgis_item_url.format(item_id=self.id)
+
+    def build_metadata_xml_url(self):
+        self.metadata_url = var.arcgis_metadata_url.format(arcgis_sharing_rest_url=var.arcgis_sharing_rest_url,
+                                                           item_id=self.id)
 
     # def build_arcgis_request_data_dict(self, start_num: int = None) -> dict:
     #     return {
@@ -127,30 +122,28 @@ class DatasetAGOL:
     #     }
 
     @staticmethod
-    def request_all_data_catalog_results(url: str) -> list:
+    def request_all_data_catalog_results() -> list:
         """
         Make web requests and accumulate records until no more are returned for the dataset of interest
 
         :return: returns a list of json/dicts for datasets
         """
         more_records_exist = True
-        # total_record_count = 0
         start_number = 0
         master_list_of_dicts = []
 
         while more_records_exist:
-            # request_cycle_record_count = 0
             data = {'q': DatasetAGOL.OWNER,
                     'num': DatasetAGOL.RECORD_LIMIT,
                     'start': start_number,
                     'sortField': DatasetAGOL.SORT_FIELD,
                     'f': 'json'
                     }
-            response = Utility.request_POST(url=url, data=data)
+            response = Utility.request_POST(url=var.arcgis_data_catalog_url, data=data)
             try:
                 resp_json = response.json()
             except json.JSONDecodeError as jse:
-                print(f"JSONDecodeError after making post request to arcgis online. url={url}, data={data} {jse}")
+                print(f"JSONDecodeError after making post request to arcgis online. url={var.arcgis_data_catalog_url}, data={data} {jse}")
                 exit()
             else:
                 results = resp_json.get("results", {})
@@ -158,12 +151,9 @@ class DatasetAGOL:
                 master_list_of_dicts.extend(results)
                 # print(f"Start Number: {start_number}")
 
-                # number_of_records_returned = len(results)
-                # request_cycle_record_count += number_of_records_returned
-                # total_record_count += number_of_records_returned
-
             # AGOL nextStart equal to -1 must indicate end of records reached
             if start_number == -1:
                 more_records_exist = False
 
         return master_list_of_dicts
+

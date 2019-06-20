@@ -36,23 +36,28 @@ def main():
     # ===================================================
     # ARCGIS ONLINE
     print(f"\nBeginning ArcGIS Online Process...")
-    master_list_of_results = DatasetAGOL.request_all_data_catalog_results(url=var.arcgis_data_catalog_url)
+    master_list_of_results = DatasetAGOL.request_all_data_catalog_results()
 
     # Print outs for general understanding of data.json level process
     print(f"Data Catalog Results Requests Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"{len(master_list_of_results)} results collected")
 
     for result in master_list_of_results:
-        # print(len(result))
         agol_dataset = DatasetAGOL()
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
-        agol_dataset.build_standardized_url()
+        agol_dataset.build_standardized_item_url()
 
         # Store the objects for use
         agol_class_objects_dict[agol_dataset.id] = agol_dataset
-        print(agol_dataset.url)
-        print("\t", agol_dataset.standardized_url)
-    # print(len(agol_class_objects_dict))
+
+    # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
+    for item_id, agol_dataset in agol_class_objects_dict.items():
+        agol_dataset.build_metadata_xml_url()
+        metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
+        if 300 < metadata_response.status_code:
+            print(f"ISSUE: AGOL Item {agol_dataset.standardized_url} metadata url request response is {metadata_response.status_code}. Resource skipped.")
+            continue
+
 
 
 
