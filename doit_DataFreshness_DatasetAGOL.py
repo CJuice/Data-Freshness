@@ -17,6 +17,7 @@ class DatasetAGOL:
     def __init__(self):
 
         # NON-DERIVED
+        # Data Catalog sourced attributes
         self.access = None
         self.access_information = None
         self.app_categories = None
@@ -57,6 +58,9 @@ class DatasetAGOL:
         self.type_ = None
         self.type_keywords = None
         self.url = None
+
+        # Metadata XML sourced attributes
+
 
         # DERIVED
         self.metadata_url = None

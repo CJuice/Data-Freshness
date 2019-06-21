@@ -57,7 +57,9 @@ def main():
         if 300 < metadata_response.status_code:
             print(f"ISSUE: AGOL Item {agol_dataset.standardized_url} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
-
+        # TODO: Need to handle sml and parse to usable form
+        # TODO: Need to determine overlap of values between metadata content and data catalog content, document decisions on choices of values and source
+        # TODO: Need to develop functionality to extract values from xml and assign to attributes in class objects.
 
 
 
