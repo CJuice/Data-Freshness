@@ -1,8 +1,9 @@
 """
 
 """
-import requests
 import configparser
+import xml.etree.ElementTree as ET
+import requests
 import time
 
 
@@ -57,3 +58,45 @@ class Utility:
         """
         return (time.time() - start_time)
 
+    @staticmethod
+    def extract_all_immediate_child_features_from_element(element: ET.Element, tag_name: str) -> list:
+        """
+        Extract all immediate children of the element provided to the method.
+
+        :param element: ET.Element of interest to be interrogated
+        :param tag_name: tag of interest on which to search
+        :return: list of all discovered ET.Element items
+        """
+        try:
+            return element.findall(tag_name)
+        except AttributeError as ae:
+            print(f"AttributeError: Unable to extract '{tag_name}' from {element.text}: {ae}")
+            exit()
+
+    @staticmethod
+    def extract_first_immediate_child_feature_from_element(element: ET.Element, tag_name: str) -> ET.Element:
+        """Extract first immediate child feature from provided xml ET.Element based on provided tag name
+
+        :param element: xml ET.Element to interrogate
+        :param tag_name: name of desired tag
+        :return: ET.Element of interest
+        """
+
+        try:
+            return element.find(tag_name)
+        except AttributeError as ae:
+            print(f"AttributeError: Unable to extract '{tag_name}' from {element.text}: {ae}")
+            exit()
+
+    @staticmethod
+    def parse_xml_response_to_element(response_xml_str: str) -> ET.Element:
+        """
+        Process xml response content to xml ET.Element
+        :param response_xml_str: string xml from response
+        :return: xml ET.Element
+        """
+        try:
+            return ET.fromstring(response_xml_str)
+        except Exception as e:  # TODO: Improve exception handling
+            print(f"Unable to process xml response to Element using ET.fromstring(): {e}")
+            exit()

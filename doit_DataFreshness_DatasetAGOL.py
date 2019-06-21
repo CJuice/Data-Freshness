@@ -15,6 +15,50 @@ class DatasetAGOL:
     SORT_FIELD = 'title'
 
     def __init__(self):
+        """
+                Instantiate the default dataset object in preparation for value assignments.
+
+                Values in metadata xml (for example) that were previously sourced from data catalog have been ignored.
+                 The following listing captures the decisions made while building this process.
+
+                d = data catalog, m = metadata
+
+                DATA CATALOG NOTES:
+                METADATA NOTES:
+                dataIdInfo
+                    resTitle - title (d)
+                    idAbs - desription (d)
+                    idPurp - title (d) or snippit (d) (appears to just be the title value)
+                    idCredit - accessInformation (d)
+                    dataChar>CharSetDc - Not stored (unknown meaning or value)
+                    searchKeys>keyword - tags (d)
+                    resConst>Consts>useLimit - licenseInfo (d)
+                dataExt>geoEle>GeoBndBox> - Not stored (Appears to be bounding box coordinates). Not present in all.
+                distInfo
+                    distTranOps>onLineSrc>linkage - url (d)
+                Esri
+                    ArcGISStyle - Not Stored (metadata style indicator)
+                    ArcGISFormat - Not Stored (unknown meaning)
+                    ArcGISProfile - Not Stored (unknown value)
+                    PublishStatus - Not Stored (unknown meaning or value)
+                mdDateSt - Not Stored (unknonw meaning or value)
+                mdFileID - id (d)
+                mdChar>CharSetCd - Not Stored (uknown meaning or value)
+                mdContact>role<RoleCd - Not Stored (uknown meaning or value)
+                Binary - Not Stored (appears to be for images like thumbnails). Not present in all.
+
+
+                XML NOTES:
+                    From examining every asset as of 20190621 CJuice. I did not explore every nook and cranny. There
+                    could be remaining values present to exploit but deep comparison of the xml for every asset
+                    would need to occur.
+                    set of children xml elements under dataIdInfo -
+                        {'resConst', 'dataExt', 'searchKeys', 'dataChar', 'idAbs', 'idPurp', 'idCitation', 'idCredit'}
+                    set of root xml elements -
+                        {'mdChar', 'Esri', 'mdContact', 'mdDateSt', 'dataIdInfo', 'distInfo', 'Binary', 'mdFileID'}
+
+
+        """
 
         # NON-DERIVED
         # Data Catalog sourced attributes
@@ -60,7 +104,11 @@ class DatasetAGOL:
         self.url = None
 
         # Metadata XML sourced attributes
-
+        self.esri_metadata_xml_element = None
+        self.meta_creation_date = None
+        self.meta_creation_time = None
+        self.meta_modification_date = None
+        self.meta_modification_time = None
 
         # DERIVED
         self.metadata_url = None
@@ -124,6 +172,27 @@ class DatasetAGOL:
     #         'sortField': DatasetAGOL.SORT_FIELD,
     #         'f': 'json'
     #     }
+    def extract_and_assign_esri_date_time_values(self):
+        if self.esri_metadata_xml_element is None:
+            # print("it's None")
+            return
+
+        esri_xml_tags_and_values = {"CreaDate": None,
+                                    "CreaTime": None,
+                                    "ModDate": None,
+                                    "ModTime": None}
+        for tag_name, value in esri_xml_tags_and_values.items():
+            try:
+                esri_xml_tags_and_values[tag_name] = Utility.extract_first_immediate_child_feature_from_element(element=self.esri_metadata_xml_element,
+                                                                                            tag_name=tag_name).text
+            except AttributeError as ae:
+                print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.standardized_url}")
+
+        self.meta_creation_date = esri_xml_tags_and_values.get("CreaDate")
+        self.meta_creation_time = esri_xml_tags_and_values.get("CreaTime")
+        self.meta_modification_date = esri_xml_tags_and_values.get("ModDate")
+        self.meta_modification_time = esri_xml_tags_and_values.get("ModTime")
+        return
 
     @staticmethod
     def request_all_data_catalog_results() -> list:
