@@ -55,39 +55,22 @@ def main():
         #     break
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
-    master_set = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
+
         if 300 < metadata_response.status_code:
             print(f"ISSUE: AGOL Item {agol_dataset.standardized_url} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
 
-        # TODO: Need to handle sml and parse to usable form
+        # Need to handle sml and parse to usable form
         metadata_xml_element = Utility.parse_xml_response_to_element(response_xml_str=metadata_response.text)
 
-        # Need to determine overlap of values between metadata content and data catalog content, document decisions on choices of values and source
-        # TODO: Need to develop functionality to extract values from xml and assign to attributes in class objects.
-        root_element = Utility.extract_first_immediate_child_feature_from_element(element=metadata_xml_element, tag_name=".")
-        # print(list(root_element))
-        # data_id_element_list = Utility.extract_all_immediate_child_features_from_element(element=metadata_xml_element, tag_name="dataIdInfo")
-        # print(metadata_xml_element.find("Esri"))
-        agol_dataset.esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(element=root_element,
-                                                                                                   tag_name="Esri")
+        # Need to extract values from xml and assign to attributes in class objects.
+        agol_dataset.esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(
+            element=metadata_xml_element,
+            tag_name="Esri")
         agol_dataset.extract_and_assign_esri_date_time_values()
-
-        # continue
-        # print(agol_dataset.meta_creation_date)
-        # print(agol_dataset.meta_creation_time)
-        # print(agol_dataset.meta_modification_date)
-        # print(agol_dataset.meta_modification_time)
-        # if esri_xml_element is not None:
-        #     print("\n")
-        #     print(Utility.extract_first_immediate_child_feature_from_element(element=esri_xml_element, tag_name="CreaDate").text)
-        #     print(Utility.extract_first_immediate_child_feature_from_element(element=esri_xml_element, tag_name="CreaTime").text)
-        #     print(Utility.extract_first_immediate_child_feature_from_element(element=esri_xml_element, tag_name="ModDate").text)
-        #     print(Utility.extract_first_immediate_child_feature_from_element(element=esri_xml_element, tag_name="ModTime").text)
-        #     print(Utility.extract_first_immediate_child_feature_from_element(element=esri_xml_element, tag_name="CreaDate").text)
 
 
     # ===================================================

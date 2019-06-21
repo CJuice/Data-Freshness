@@ -47,7 +47,6 @@ class DatasetAGOL:
                 mdContact>role<RoleCd - Not Stored (uknown meaning or value)
                 Binary - Not Stored (appears to be for images like thumbnails). Not present in all.
 
-
                 XML NOTES:
                     From examining every asset as of 20190621 CJuice. I did not explore every nook and cranny. There
                     could be remaining values present to exploit but deep comparison of the xml for every asset
@@ -56,8 +55,6 @@ class DatasetAGOL:
                         {'resConst', 'dataExt', 'searchKeys', 'dataChar', 'idAbs', 'idPurp', 'idCitation', 'idCredit'}
                     set of root xml elements -
                         {'mdChar', 'Esri', 'mdContact', 'mdDateSt', 'dataIdInfo', 'distInfo', 'Binary', 'mdFileID'}
-
-
         """
 
         # NON-DERIVED
@@ -173,8 +170,12 @@ class DatasetAGOL:
     #         'f': 'json'
     #     }
     def extract_and_assign_esri_date_time_values(self):
+        """
+
+        :return:
+        """
         if self.esri_metadata_xml_element is None:
-            # print("it's None")
+            print(f"ESRI XML Tag is None. Asset: {self.standardized_url}")
             return
 
         esri_xml_tags_and_values = {"CreaDate": None,
