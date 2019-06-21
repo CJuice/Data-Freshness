@@ -55,6 +55,7 @@ def main():
         #     break
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
+    test__set = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
@@ -71,7 +72,14 @@ def main():
             element=metadata_xml_element,
             tag_name="Esri")
         agol_dataset.extract_and_assign_esri_date_time_values()
-
+        try:
+            test__set.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("date"))])
+        except TypeError as te:
+            # print(te, agol_dataset.standardized_url)
+            pass
+        else:
+            print(list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("date")), agol_dataset.metadata_url)
+    print(test__set)
 
     # ===================================================
 

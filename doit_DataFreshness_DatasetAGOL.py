@@ -51,10 +51,15 @@ class DatasetAGOL:
                     From examining every asset as of 20190621 CJuice. I did not explore every nook and cranny. There
                     could be remaining values present to exploit but deep comparison of the xml for every asset
                     would need to occur.
-                    set of children xml elements under dataIdInfo -
-                        {'resConst', 'dataExt', 'searchKeys', 'dataChar', 'idAbs', 'idPurp', 'idCitation', 'idCredit'}
                     set of root xml elements -
                         {'mdChar', 'Esri', 'mdContact', 'mdDateSt', 'dataIdInfo', 'distInfo', 'Binary', 'mdFileID'}
+                    set of children xml elements under dataIdInfo -
+                        {'resConst', 'dataExt', 'searchKeys', 'dataChar', 'idAbs', 'idPurp', 'idCitation', 'idCredit'}
+                    set of children xml elements under idCitation -
+                        {'date', 'citRespParty', 'resTitle', 'collTitle'}
+                    set of children xml elements under date -
+                        {'reviseDate', 'pubDate'}
+
         """
 
         # NON-DERIVED
