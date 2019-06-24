@@ -55,7 +55,8 @@ def main():
         #     break
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
-    test__set = set()
+    test_set_1 = set()
+    test_set_2 = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
@@ -68,18 +69,29 @@ def main():
         metadata_xml_element = Utility.parse_xml_response_to_element(response_xml_str=metadata_response.text)
 
         # Need to extract values from xml and assign to attributes in class objects.
+        #   ESRI tags - CreaDate, CreaTime, ModDate, ModTime
         agol_dataset.esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(
             element=metadata_xml_element,
             tag_name="Esri")
         agol_dataset.extract_and_assign_esri_date_time_values()
+
+        #   pubDate tag (Publication Date)
+
+        #   rpOrgName tag (Organization Name)
+        #   MaintFreqCd tag (Maintenance Update Frequency)
+
         try:
-            test__set.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("date"))])
+            test_set_1.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty"))])
         except TypeError as te:
-            # print(te, agol_dataset.standardized_url)
+            print(agol_dataset.type_, te, agol_dataset.standardized_url)
             pass
         else:
-            print(list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("date")), agol_dataset.metadata_url)
-    print(test__set)
+            print(agol_dataset.type_, list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty")), agol_dataset.metadata_url)
+            pass
+        # test_set_2.update((agol_dataset.type_,))
+
+    print(test_set_1)
+    # print(test_set_2)
 
     # ===================================================
 
