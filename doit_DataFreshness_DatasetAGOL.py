@@ -107,10 +107,13 @@ class DatasetAGOL:
 
         # Metadata XML sourced attributes
         self.esri_metadata_xml_element = None
+        self.maintenance_frequency_code = None
         self.meta_creation_date = None
         self.meta_creation_time = None
         self.meta_modification_date = None
         self.meta_modification_time = None
+        self.organization_name = None
+        self.publication_date = None
 
         # DERIVED
         self.metadata_url = None
@@ -174,12 +177,17 @@ class DatasetAGOL:
     #         'sortField': DatasetAGOL.SORT_FIELD,
     #         'f': 'json'
     #     }
-    def extract_and_assign_esri_date_time_values(self):
+    def extract_and_assign_esri_date_time_values(self, element):
         """
 
+        :param element:
         :return:
         """
-        if self.esri_metadata_xml_element is None:
+        esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(
+            element=element,
+            tag_name="Esri")
+
+        if esri_metadata_xml_element is None:
             print(f"ESRI XML Tag is None. Asset: {self.standardized_url}")
             return
 
@@ -187,6 +195,7 @@ class DatasetAGOL:
                                     "CreaTime": None,
                                     "ModDate": None,
                                     "ModTime": None}
+
         for tag_name, value in esri_xml_tags_and_values.items():
             try:
                 esri_xml_tags_and_values[tag_name] = Utility.extract_first_immediate_child_feature_from_element(element=self.esri_metadata_xml_element,
@@ -198,7 +207,51 @@ class DatasetAGOL:
         self.meta_creation_time = esri_xml_tags_and_values.get("CreaTime")
         self.meta_modification_date = esri_xml_tags_and_values.get("ModDate")
         self.meta_modification_time = esri_xml_tags_and_values.get("ModTime")
+
         return
+
+    def extract_and_assign_maintenance_frequency(self, element):
+        """
+
+        After the following dataIdInfo/resMaint/maintFreq/MaintFreqCd
+        :param element:
+        :return:
+        """
+        data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element, tag_name="dataIdInfo") if element is not None else None
+        res_maintenance_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="resMaint") if data_id_info_element is not None else None
+        maint_freq_element = Utility.extract_first_immediate_child_feature_from_element(element=res_maintenance_element, tag_name="maintFreq") if res_maintenance_element is not None else None
+        maint_freq_code_element = Utility.extract_first_immediate_child_feature_from_element(element=maint_freq_element, tag_name="maintFreqCd") if maint_freq_element is not None else None
+        self.maintenance_frequency_code = maint_freq_code_element.text if maint_freq_code_element is not None else None
+
+    def extract_and_assign_organization_name(self, element):
+        """
+
+        After the following dataIdInfo/idCitation/citRespParty/rpOrgName
+        :param element:
+        :return:
+        """
+        data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element,
+                                                                                          tag_name="dataIdInfo") if element is not None else None
+        id_citation_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element,
+                                                                                         tag_name="idCitation") if data_id_info_element is not None else None
+        cit_resp_party_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element,
+                                                                                  tag_name="citRespParty") if id_citation_element is not None else None
+        rp_org_name_element = Utility.extract_first_immediate_child_feature_from_element(element=cit_resp_party_element,
+                                                                                      tag_name="rpOrgName") if cit_resp_party_element is not None else None
+        self.organization_name = rp_org_name_element.text if rp_org_name_element is not None else None
+
+    def extract_and_assign_publication_date(self, element):
+        """
+
+        After the following dataIdInfo/idCitation/date/pubDate
+        :param element:
+        :return:
+        """
+        data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element, tag_name="dataIdInfo") if element is not None else None
+        id_citation_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="idCitation") if data_id_info_element is not None else None
+        date_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element, tag_name="date") if id_citation_element is not None else None
+        pub_date_element = Utility.extract_first_immediate_child_feature_from_element(element=date_element, tag_name="pubDate") if date_element is not None else None
+        self.publication_date = pub_date_element.text if pub_date_element is not None else None
 
     @staticmethod
     def request_all_data_catalog_results() -> list:

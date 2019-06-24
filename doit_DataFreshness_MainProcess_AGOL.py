@@ -70,24 +70,24 @@ def main():
 
         # Need to extract values from xml and assign to attributes in class objects.
         #   ESRI tags - CreaDate, CreaTime, ModDate, ModTime
-        agol_dataset.esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(
-            element=metadata_xml_element,
-            tag_name="Esri")
-        agol_dataset.extract_and_assign_esri_date_time_values()
+        agol_dataset.extract_and_assign_esri_date_time_values(element=metadata_xml_element)
 
         #   pubDate tag (Publication Date)
+        agol_dataset.extract_and_assign_publication_date(element=metadata_xml_element)
 
         #   rpOrgName tag (Organization Name)
+        agol_dataset.extract_and_assign_organization_name(element=metadata_xml_element)
+
         #   MaintFreqCd tag (Maintenance Update Frequency)
 
-        try:
-            test_set_1.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty"))])
-        except TypeError as te:
-            print(agol_dataset.type_, te, agol_dataset.standardized_url)
-            pass
-        else:
-            print(agol_dataset.type_, list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty")), agol_dataset.metadata_url)
-            pass
+        # try:
+        #     test_set_1.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty"))])
+        # except TypeError as te:
+        #     print(agol_dataset.type_, te, agol_dataset.standardized_url)
+        #     pass
+        # else:
+        #     print(agol_dataset.type_, list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty")), agol_dataset.metadata_url)
+        #     pass
         # test_set_2.update((agol_dataset.type_,))
 
     print(test_set_1)
