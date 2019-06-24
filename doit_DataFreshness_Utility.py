@@ -59,7 +59,7 @@ class Utility:
         return (time.time() - start_time)
 
     @staticmethod
-    def extract_all_immediate_child_features_from_element(element: ET.Element, tag_name: str) -> list:
+    def extract_all_immediate_child_features_from_element(element: ET.Element, tag_name: str):
         """
         Extract all immediate children of the element provided to the method.
 
@@ -71,10 +71,10 @@ class Utility:
             return element.findall(tag_name)
         except AttributeError as ae:
             print(f"AttributeError: Unable to extract '{tag_name}' from {element.text}: {ae}")
-            exit()
+            return None
 
     @staticmethod
-    def extract_first_immediate_child_feature_from_element(element: ET.Element, tag_name: str) -> ET.Element:
+    def extract_first_immediate_child_feature_from_element(element: ET.Element, tag_name: str):
         """Extract first immediate child feature from provided xml ET.Element based on provided tag name
 
         :param element: xml ET.Element to interrogate
@@ -86,7 +86,7 @@ class Utility:
             return element.find(tag_name)
         except AttributeError as ae:
             print(f"AttributeError: Unable to extract '{tag_name}' from {element.text}: {ae}")
-            exit()
+            return None
 
     @staticmethod
     def parse_xml_response_to_element(response_xml_str: str) -> ET.Element:
