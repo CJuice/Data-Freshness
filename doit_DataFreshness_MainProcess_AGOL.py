@@ -79,6 +79,7 @@ def main():
         agol_dataset.extract_and_assign_organization_name(element=metadata_xml_element)
 
         #   MaintFreqCd tag (Maintenance Update Frequency)
+        agol_dataset.extract_and_assign_maintenance_frequency(element=metadata_xml_element)
 
         # try:
         #     test_set_1.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty"))])
@@ -90,7 +91,7 @@ def main():
         #     pass
         # test_set_2.update((agol_dataset.type_,))
 
-    print(test_set_1)
+    # print(test_set_1)
     # print(test_set_2)
 
     # ===================================================

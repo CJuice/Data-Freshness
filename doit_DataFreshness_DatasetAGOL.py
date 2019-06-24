@@ -198,8 +198,9 @@ class DatasetAGOL:
 
         for tag_name, value in esri_xml_tags_and_values.items():
             try:
-                esri_xml_tags_and_values[tag_name] = Utility.extract_first_immediate_child_feature_from_element(element=self.esri_metadata_xml_element,
-                                                                                            tag_name=tag_name).text
+                esri_xml_tags_and_values[tag_name] = Utility.extract_first_immediate_child_feature_from_element(
+                    element=esri_metadata_xml_element,
+                    tag_name=tag_name).text
             except AttributeError as ae:
                 print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.standardized_url}")
 
