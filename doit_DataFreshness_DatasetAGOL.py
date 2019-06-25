@@ -28,7 +28,10 @@ class DatasetAGOL:
                 d = data catalog, m = metadata
 
                 DATA CATALOG NOTES:
+                appCategories - dropped after inspection. All values Null
                 banner - dropped after inspection. All values Null
+                categories - dropped after inspection. All values Null
+                culture - dropped after inspection. All values en-us
                 documentation - dropped after inspection. All values Null
                 groupDesignations - dropped after inspection. All values Null
                 guid - dropped after inspection. All values Null
@@ -84,13 +87,13 @@ class DatasetAGOL:
         # Data Catalog sourced attributes
         self.access = None
         self.access_information = None
-        self.app_categories = None
+        # self.app_categories = None
         self.average_rating = None
         # self.banner = None
-        self.categories = None
+        # self.categories = None
         self.content_status = None
         self.created = None
-        self.culture = None
+        # self.culture = None
         self.description = None
         # self.documentation = None
         self.extent = None
@@ -149,13 +152,13 @@ class DatasetAGOL:
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
         self.access_information = data_json.get("accessInformation", None)
-        self.app_categories = data_json.get("appCategories", None)
+        # self.app_categories = data_json.get("appCategories", None)
         self.average_rating = data_json.get("avgRating", None)
         # self.banner = data_json.get("banner", None)
-        self.categories = data_json.get("categories", None)
+        # self.categories = data_json.get("categories", None)
         self.content_status = data_json.get("contentStatus", None)
         self.created = data_json.get("created", None)
-        self.culture = data_json.get("culture", None)
+        # self.culture = data_json.get("culture", None)
         self.description = data_json.get("description", None)
         # self.documentation = data_json.get("documentation", None)
         self.extent = data_json.get("extent", None)
