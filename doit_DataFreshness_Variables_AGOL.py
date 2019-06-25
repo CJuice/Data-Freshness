@@ -24,5 +24,5 @@ arcgis_sharing_rest_url = f"{arcgis_root_url}/sharing/rest"
 arcgis_data_catalog_url = f"{arcgis_sharing_rest_url}/search"
 arcgis_metadata_url = "{arcgis_sharing_rest_url}/content/items/{item_id}/info/metadata/metadata.xml"
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
-process_initiation_datetime = datetime.datetime.now()
+process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
 number_of_seconds_in_a_day = 86400

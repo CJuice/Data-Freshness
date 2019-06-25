@@ -149,6 +149,7 @@ class DatasetAGOL:
         self.modified_dt = None
         self.publication_date_dt = None
         self.standardized_url = None
+        self.updated_recently_enough = None
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
@@ -206,7 +207,11 @@ class DatasetAGOL:
         :return:
         """
         if self.publication_date_dt is not None:
-            self.days_since_last_data_update = (var.process_initiation_datetime - self.publication_date_dt).days
+            try:
+                self.days_since_last_data_update = (var.process_initiation_datetime - self.publication_date_dt).days
+            except TypeError as te:
+                print(f"TypeError: {te}. pub tz:{self.publication_date_dt.tzinfo}, process tz: {var.process_initiation_datetime.tzinfo}, {self.standardized_url}")
+                self.days_since_last_data_update = None
 
     def convert_milliseconds_attributes_to_datetime(self):
 
@@ -297,8 +302,6 @@ class DatasetAGOL:
         self.publication_date = pub_date_element.text if pub_date_element is not None else None
 
     def is_up_to_date(self):
-        # FIXME: adjust to AGOL. Just copied from socrata so far.
-
         """
         Determine if a dataset is up to date according to its update frequency.
         Created two dictionaries, instead of one, to hold integer comparison value snd string values. The integer
@@ -308,7 +311,7 @@ class DatasetAGOL:
         :return:
         """
 
-        updated_enough_ints = {"Continual": 31,
+        updated_enough_ints = {"Continual": 0,
                                "Daily": 1,
                                "Weekly": 7,
                                "Fortnightly": 14,
@@ -328,7 +331,7 @@ class DatasetAGOL:
         int_check = updated_enough_ints.get(self.maintenance_frequency_code, None)
         string_check = updated_enough_strings.get(self.maintenance_frequency_code, None)
 
-        if int_check is not None:
+        if int_check is not None and self.days_since_last_data_update is not None:
             answer = var.updated_enough_yes if self.days_since_last_data_update <= int_check else var.updated_enough_no
         elif string_check is not None:
             answer = string_check
