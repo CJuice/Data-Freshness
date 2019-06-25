@@ -83,6 +83,7 @@ def main():
         #   see how they are coming along. Use a pandas dataframe so can output for Sam/Matt/Pat
         agol_dataset.convert_milliseconds_attributes_to_datetime()
         agol_dataset.parse_date_like_string_attributes()
+        agol_dataset.parse_html_attribute_values_to_soup_get_text()
 
     # Need a master pandas dataframe from all agol datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]

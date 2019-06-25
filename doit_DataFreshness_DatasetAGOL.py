@@ -6,6 +6,7 @@ from DataFreshness.doit_DataFreshness_Utility import Utility
 import json
 import datetime
 from dateutil import parser as date_parser
+from bs4 import BeautifulSoup
 
 
 class DatasetAGOL:
@@ -27,12 +28,24 @@ class DatasetAGOL:
                 d = data catalog, m = metadata
 
                 DATA CATALOG NOTES:
-                thumbnail - dropped storage because doesn't appear to have much value at this time
+                banner - dropped after inspection. All values Null
+                documentation - dropped after inspection. All values Null
+                groupDesignations - dropped after inspection. All values Null
+                guid - dropped after inspection. All values Null
+                industries - dropped after inspection. All values Null
+                languages - dropped after inspection. All values Null
                 largeThumbnail - dropped storage because doesn't appear to have much value at this time
+                listed - dropped after inspection. All values Null
+                proxyFilter - dropped after inspection. All values Null
+                screenshots - dropped after inspection. All values Null
+                size - dropped after inspection. All values Null
+                snippet - dropped after inspection. All values Null
+                thumbnail - dropped storage because doesn't appear to have much value at this time
+
                 METADATA NOTES:
                 dataIdInfo
                     resTitle - title (d)
-                    idAbs - desription (d)
+                    idAbs - description (d)
                     idPurp - title (d) or snippit (d) (appears to just be the title value)
                     idCredit - accessInformation (d)
                     dataChar>CharSetDc - Not stored (unknown meaning or value)
@@ -73,22 +86,22 @@ class DatasetAGOL:
         self.access_information = None
         self.app_categories = None
         self.average_rating = None
-        self.banner = None
+        # self.banner = None
         self.categories = None
         self.content_status = None
         self.created = None
         self.culture = None
         self.description = None
-        self.documentation = None
+        # self.documentation = None
         self.extent = None
-        self.group_designations = None
-        self.guid = None
+        # self.group_designations = None
+        # self.guid = None
         self.id = None
-        self.industries = None
-        self.languages = None
+        # self.industries = None
+        # self.languages = None
         # self.large_thumbnail = None
         self.license_info = None
-        self.listed = None
+        # self.listed = None
         self.modified = None
         self.name = None
         self.number_of_comments = None
@@ -97,11 +110,11 @@ class DatasetAGOL:
         self.org_id = None
         self.owner = None
         self.properties = None
-        self.proxy_filter = None
+        # self.proxy_filter = None
         self.score_completeness = None
-        self.screenshots = None
-        self.size = None
-        self.snippet = None
+        # self.screenshots = None
+        # self.size = None
+        # self.snippet = None
         self.spatial_reference = None
         self.tags = None
         # self.thumbnail = None
@@ -122,6 +135,8 @@ class DatasetAGOL:
 
         # DERIVED
         self.created_dt = None
+        self.description_text = None
+        self.license_info_text = None
         self.meta_creation_date_dt = None
         self.meta_creation_time_dt = None
         self.meta_modification_date_dt = None
@@ -136,22 +151,22 @@ class DatasetAGOL:
         self.access_information = data_json.get("accessInformation", None)
         self.app_categories = data_json.get("appCategories", None)
         self.average_rating = data_json.get("avgRating", None)
-        self.banner = data_json.get("banner", None)
+        # self.banner = data_json.get("banner", None)
         self.categories = data_json.get("categories", None)
         self.content_status = data_json.get("contentStatus", None)
         self.created = data_json.get("created", None)
         self.culture = data_json.get("culture", None)
         self.description = data_json.get("description", None)
-        self.documentation = data_json.get("documentation", None)
+        # self.documentation = data_json.get("documentation", None)
         self.extent = data_json.get("extent", None)
-        self.group_designations = data_json.get("groupDesignations", None)
-        self.guid = data_json.get("guid", None)
+        # self.group_designations = data_json.get("groupDesignations", None)
+        # self.guid = data_json.get("guid", None)
         self.id = data_json.get("id", None)
-        self.industries = data_json.get("industries", None)
-        self.languages = data_json.get("languages", None)
+        # self.industries = data_json.get("industries", None)
+        # self.languages = data_json.get("languages", None)
         # self.large_thumbnail = data_json.get("largeThumbnail", None)
         self.license_info = data_json.get("licenseInfo", None)
-        self.listed = data_json.get("listed", None)
+        # self.listed = data_json.get("listed", None)
         self.modified = data_json.get("modified", None)
         self.name = data_json.get("name", None)
         self.number_of_comments = data_json.get("numComments", None)
@@ -160,11 +175,11 @@ class DatasetAGOL:
         self.org_id = data_json.get("orgId", None)
         self.owner = data_json.get("owner", None)
         self.properties = data_json.get("properties", None)
-        self.proxy_filter = data_json.get("proxyFilter", None)
+        # self.proxy_filter = data_json.get("proxyFilter", None)
         self.score_completeness = data_json.get("scoreCompleteness", None)
-        self.screenshots = data_json.get("screenshots", None)
-        self.size = data_json.get("size", None)
-        self.snippet = data_json.get("snippit", None)
+        # self.screenshots = data_json.get("screenshots", None)
+        # self.size = data_json.get("size", None)
+        # self.snippet = data_json.get("snippit", None)
         self.spatial_reference = data_json.get("spatialReference", None)
         self.tags = data_json.get("tags", None)
         # self.thumbnail = data_json.get("thumbnail", None)
@@ -277,6 +292,12 @@ class DatasetAGOL:
         :return:
         """
         def local_inner_function(attribute_name, value):
+            """
+
+            :param attribute_name:
+            :param value:
+            :return:
+            """
             try:
                 return date_parser.parse(value)
             except (ValueError, TypeError) as err:
@@ -292,6 +313,27 @@ class DatasetAGOL:
         self.meta_modification_time_dt = local_inner_function(attribute_name="meta_modification_time",
                                                               value=self.meta_modification_time)
         self.publication_date_dt = local_inner_function(attribute_name="publication_date", value=self.publication_date)
+
+    def parse_html_attribute_values_to_soup_get_text(self):
+        """
+
+        :return:
+        """
+        def local_inner_function(attribute_name, value):
+            """
+
+            :param attribute_name:
+            :param value:
+            :return:
+            """
+            try:
+                soup = BeautifulSoup(self.license_info, "html.parser")
+                return soup.get_text()
+            except Exception as e:
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup {e}")
+                return None
+        self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info)
+        self.description_text = local_inner_function(attribute_name="description", value=self.description)
 
 
     @staticmethod
