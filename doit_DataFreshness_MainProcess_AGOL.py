@@ -55,13 +55,11 @@ def main():
         #     break
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
-    test_set_1 = set()
-    test_set_2 = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
 
-        if 300 < metadata_response.status_code:
+        if 300 <= metadata_response.status_code:
             print(f"ISSUE: AGOL Item {agol_dataset.standardized_url} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
 
@@ -81,16 +79,28 @@ def main():
         #   MaintFreqCd tag (Maintenance Update Frequency)
         agol_dataset.extract_and_assign_maintenance_frequency(element=metadata_xml_element)
 
-        # try:
-        #     test_set_1.update([item.tag for item in list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty"))])
-        # except TypeError as te:
-        #     print(agol_dataset.type_, te, agol_dataset.standardized_url)
-        #     pass
-        # else:
-        #     print(agol_dataset.type_, list(metadata_xml_element.find("dataIdInfo").find("idCitation").find("citRespParty")), agol_dataset.metadata_url)
-        #     pass
-        # test_set_2.update((agol_dataset.type_,))
+        # TODO: check the results of the above function runs. See what values are being picked up. Inspect the objects and
+        #   see how they are coming along. Use a pandas dataframe so can output for Sam/Matt/Pat
 
+
+    # Need a master pandas dataframe from all agol datasets
+    df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]
+    master_agol_df = pd.DataFrame(data=df_data,
+                                  dtype=None,
+                                  copy=False)
+    print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(master_agol_df.info())
+    print(master_agol_df.head())
+
+    # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
+    master_agol_df.fillna(value=var.null_string, inplace=True)
+
+    # TODO: Need to match existing data freshness output and write json and excel files for all objects
+    master_agol_df.to_excel(excel_writer=var.output_excel_file_path,
+                            sheet_name=var.output_excel_sheetname,
+                            na_rep=np.NaN,
+                            float_format=None,
+                            index=False)
     # print(test_set_1)
     # print(test_set_2)
 
