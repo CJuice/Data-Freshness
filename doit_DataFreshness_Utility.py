@@ -100,3 +100,4 @@ class Utility:
         except Exception as e:  # TODO: Improve exception handling
             print(f"Unable to process xml response to Element using ET.fromstring(): {e}")
             exit()
+

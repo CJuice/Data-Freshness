@@ -81,7 +81,8 @@ def main():
 
         # TODO: check the results of the above function runs. See what values are being picked up. Inspect the objects and
         #   see how they are coming along. Use a pandas dataframe so can output for Sam/Matt/Pat
-
+        agol_dataset.convert_milliseconds_attributes_to_datetime()
+        agol_dataset.parse_date_like_string_attributes()
 
     # Need a master pandas dataframe from all agol datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]
@@ -90,7 +91,7 @@ def main():
                                   copy=False)
     print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_agol_df.info())
-    print(master_agol_df.head())
+    # print(master_agol_df.head())
 
     # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
     master_agol_df.fillna(value=var.null_string, inplace=True)

@@ -4,12 +4,15 @@
 import DataFreshness.doit_DataFreshness_Variables_AGOL as var
 from DataFreshness.doit_DataFreshness_Utility import Utility
 import json
+import datetime
+from dateutil import parser as date_parser
 
 
 class DatasetAGOL:
     """
 
     """
+
     OWNER = 'owner:mdimapdatacatalog'
     RECORD_LIMIT = '100' # When changed from 100 the return quanity doesn't actually change. Unsure why ineffective.
     SORT_FIELD = 'title'
@@ -24,6 +27,8 @@ class DatasetAGOL:
                 d = data catalog, m = metadata
 
                 DATA CATALOG NOTES:
+                thumbnail - dropped storage because is doesn't appear to have much value
+
                 METADATA NOTES:
                 dataIdInfo
                     resTitle - title (d)
@@ -99,14 +104,14 @@ class DatasetAGOL:
         self.snippet = None
         self.spatial_reference = None
         self.tags = None
-        self.thumbnail = None
+        # self.thumbnail = None
         self.title = None
         self.type_ = None
         self.type_keywords = None
         self.url = None
 
         # Metadata XML sourced attributes
-        self.esri_metadata_xml_element = None
+        # self.esri_metadata_xml_element = None
         self.maintenance_frequency_code = None
         self.meta_creation_date = None
         self.meta_creation_time = None
@@ -116,7 +121,14 @@ class DatasetAGOL:
         self.publication_date = None
 
         # DERIVED
+        self.created_dt = None
+        self.meta_creation_date_dt = None
+        self.meta_creation_time_dt = None
+        self.meta_modification_date_dt = None
+        self.meta_modification_time_dt = None
         self.metadata_url = None
+        self.modified_dt = None
+        self.publication_date_dt = None
         self.standardized_url = None
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
@@ -155,7 +167,7 @@ class DatasetAGOL:
         self.snippet = data_json.get("snippit", None)
         self.spatial_reference = data_json.get("spatialReference", None)
         self.tags = data_json.get("tags", None)
-        self.thumbnail = data_json.get("thumbnail", None)
+        # self.thumbnail = data_json.get("thumbnail", None)
         self.title = data_json.get("title", None)
         self.type_ = data_json.get("type", None)
         self.type_keywords = data_json.get("typeKeywords", None)
@@ -169,14 +181,17 @@ class DatasetAGOL:
         self.metadata_url = var.arcgis_metadata_url.format(arcgis_sharing_rest_url=var.arcgis_sharing_rest_url,
                                                            item_id=self.id)
 
-    # def build_arcgis_request_data_dict(self, start_num: int = None) -> dict:
-    #     return {
-    #         'q': DatasetAGOL.OWNER,
-    #         'num': DatasetAGOL.RECORD_LIMIT,
-    #         'start': start_num,
-    #         'sortField': DatasetAGOL.SORT_FIELD,
-    #         'f': 'json'
-    #     }
+    def convert_milliseconds_attributes_to_datetime(self):
+
+        try:
+            self.created_dt = datetime.datetime.fromtimestamp(self.created/1000)
+        except TypeError as te:
+            print(f"TypeError during convert_milliseconds_to_datetime(). millis value:{self.created}, {te}")
+        try:
+            self.modified_dt = datetime.datetime.fromtimestamp(self.modified/1000)
+        except TypeError as te:
+            print(f"TypeError during convert_milliseconds_to_datetime(). millis value:{self.modified}, {te}")
+
     def extract_and_assign_esri_date_time_values(self, element):
         """
 
@@ -253,6 +268,31 @@ class DatasetAGOL:
         date_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element, tag_name="date") if id_citation_element is not None else None
         pub_date_element = Utility.extract_first_immediate_child_feature_from_element(element=date_element, tag_name="pubDate") if date_element is not None else None
         self.publication_date = pub_date_element.text if pub_date_element is not None else None
+
+    def parse_date_like_string_attributes(self):
+        """
+
+        NOTE: The attributes of interest at the time of design were esri's creation date and time, esri's modification
+        date and time, and the publication date that is auto-populated unless we manually enter a value
+        :return:
+        """
+        def local_inner_function(attribute_name, value):
+            try:
+                return date_parser.parse(value)
+            except (ValueError, TypeError) as err:
+                print(f"Unable to parse {attribute_name} value: {value}, {err}")
+                return None
+
+        self.meta_creation_date_dt = local_inner_function(attribute_name="meta_creation_date",
+                                                          value=self.meta_creation_date)
+        self.meta_creation_time_dt = local_inner_function(attribute_name="meta_creation_time",
+                                                          value=self.meta_creation_time)
+        self.meta_modification_date_dt = local_inner_function(attribute_name="meta_modification_date",
+                                                              value=self.meta_modification_date)
+        self.meta_modification_time_dt = local_inner_function(attribute_name="meta_modification_time",
+                                                              value=self.meta_modification_time)
+        self.publication_date_dt = local_inner_function(attribute_name="publication_date", value=self.publication_date)
+
 
     @staticmethod
     def request_all_data_catalog_results() -> list:
