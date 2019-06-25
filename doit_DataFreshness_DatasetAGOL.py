@@ -355,6 +355,12 @@ class DatasetAGOL:
             :param value:
             :return:
             """
+            # For real time or continual update data we have used "Continual" in the publication date metadata field.
+            #   Since that is not a datetime we need to check and convert. This is necessary for later steps when we
+            #   determine the freshness of the data.
+            if value == "Continual":
+                return datetime.datetime.now(datetime.timezone.utc)
+
             try:
                 return date_parser.parse(value)
             except (ValueError, TypeError) as err:
