@@ -138,6 +138,7 @@ class DatasetAGOL:
 
         # DERIVED
         self.created_dt = None
+        self.days_since_last_data_update = None
         self.description_text = None
         self.license_info_text = None
         self.meta_creation_date_dt = None
@@ -198,6 +199,14 @@ class DatasetAGOL:
     def build_metadata_xml_url(self):
         self.metadata_url = var.arcgis_metadata_url.format(arcgis_sharing_rest_url=var.arcgis_sharing_rest_url,
                                                            item_id=self.id)
+
+    def calculate_days_since_last_data_update(self):
+        """
+        Subtract rows updated date in seconds from process initiation time in seconds and convert to whole days.
+        :return:
+        """
+        if self.publication_date_dt is not None:
+            self.days_since_last_data_update = (var.process_initiation_datetime - self.publication_date_dt).days
 
     def convert_milliseconds_attributes_to_datetime(self):
 
@@ -286,6 +295,48 @@ class DatasetAGOL:
         date_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element, tag_name="date") if id_citation_element is not None else None
         pub_date_element = Utility.extract_first_immediate_child_feature_from_element(element=date_element, tag_name="pubDate") if date_element is not None else None
         self.publication_date = pub_date_element.text if pub_date_element is not None else None
+
+    def is_up_to_date(self):
+        # FIXME: adjust to AGOL. Just copied from socrata so far.
+
+        """
+        Determine if a dataset is up to date according to its update frequency.
+        Created two dictionaries, instead of one, to hold integer comparison value snd string values. The integer
+        values are checked against the number of days since the data has been updated. If the update frequency value
+        is a string then retrieve the string value from the string dict. If no value is found in the dicts then the
+        metadata is deemed as missing.
+        :return:
+        """
+
+        updated_enough_ints = {"Continual": 31,
+                               "Daily": 1,
+                               "Weekly": 7,
+                               "Fortnightly": 14,
+                               "Monthly": 31,
+                               "Quarterly": 91,
+                               "Biannually": 730,
+                               "Annually": 365}
+
+        updated_enough_strings = {"Static Data": var.updated_enough_yes,
+                                  "As Needed": var.evaluation_difficult,
+                                  "Irregular": var.evaluation_difficult,
+                                  "Not Planned": var.updated_enough_yes,
+                                  "Unknown": f"{var.better_metadata_needed} {var.update_frequency_missing}",
+                                  "": f"{var.better_metadata_needed} {var.update_frequency_missing}"}
+        answer = None
+
+        int_check = updated_enough_ints.get(self.maintenance_frequency_code, None)
+        string_check = updated_enough_strings.get(self.maintenance_frequency_code, None)
+
+        if int_check is not None:
+            answer = var.updated_enough_yes if self.days_since_last_data_update <= int_check else var.updated_enough_no
+        elif string_check is not None:
+            answer = string_check
+        else:
+            answer = var.metadata_missing
+
+        self.updated_recently_enough = answer
+        return
 
     def parse_date_like_string_attributes(self):
         """
