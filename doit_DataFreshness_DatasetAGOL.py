@@ -27,8 +27,8 @@ class DatasetAGOL:
                 d = data catalog, m = metadata
 
                 DATA CATALOG NOTES:
-                thumbnail - dropped storage because is doesn't appear to have much value
-
+                thumbnail - dropped storage because doesn't appear to have much value at this time
+                largeThumbnail - dropped storage because doesn't appear to have much value at this time
                 METADATA NOTES:
                 dataIdInfo
                     resTitle - title (d)
@@ -86,7 +86,7 @@ class DatasetAGOL:
         self.id = None
         self.industries = None
         self.languages = None
-        self.large_thumbnail = None
+        # self.large_thumbnail = None
         self.license_info = None
         self.listed = None
         self.modified = None
@@ -149,7 +149,7 @@ class DatasetAGOL:
         self.id = data_json.get("id", None)
         self.industries = data_json.get("industries", None)
         self.languages = data_json.get("languages", None)
-        self.large_thumbnail = data_json.get("largeThumbnail", None)
+        # self.large_thumbnail = data_json.get("largeThumbnail", None)
         self.license_info = data_json.get("licenseInfo", None)
         self.listed = data_json.get("listed", None)
         self.modified = data_json.get("modified", None)
