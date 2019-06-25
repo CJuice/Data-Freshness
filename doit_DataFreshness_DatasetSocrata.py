@@ -333,6 +333,23 @@ class DatasetSocrata:
             self.view_last_modified = self.publication_date
         self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
 
+    def determine_missing_metadata_fields(self, asset_json):
+        """
+        Compare values in asset inventory json to a default set of possible metadata values to determine missing values.
+        :param asset_json: asset inventory json on socrata dataset
+        :return:
+        """
+        if len(asset_json) == 0:
+            self.missing_metadata_fields = "Error generating missing metadata list"
+        else:
+            full_exmaple_set_of_keys = set(var.expected_socrata_asset_inventory_json_keys_dict.keys())
+            included_asset_json_keys_set = set(asset_json.keys())
+            difference = full_exmaple_set_of_keys.difference(included_asset_json_keys_set)
+            self.missing_metadata_fields = ", ".join(
+                [var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference]) if 0 < len(
+                difference) else "All Fields Present"
+        return
+
     def extract_four_by_four(self):
         """
         Extract the four-by-four dataset id value from the landing page url
@@ -404,23 +421,6 @@ class DatasetSocrata:
             return False
         else:
             return True
-
-    def determine_missing_metadata_fields(self, asset_json):
-        """
-        Compare values in asset inventory json to a default set of possible metadata values to determine missing values.
-        :param asset_json: asset inventory json on socrata dataset
-        :return:
-        """
-        if len(asset_json) == 0:
-            self.missing_metadata_fields = "Error generating missing metadata list"
-        else:
-            full_exmaple_set_of_keys = set(var.expected_socrata_asset_inventory_json_keys_dict.keys())
-            included_asset_json_keys_set = set(asset_json.keys())
-            difference = full_exmaple_set_of_keys.difference(included_asset_json_keys_set)
-            self.missing_metadata_fields = ", ".join(
-                [var.expected_socrata_asset_inventory_json_keys_dict.get(value) for value in difference]) if 0 < len(
-                difference) else "All Fields Present"
-        return
 
     def process_update_frequency(self):
         """
