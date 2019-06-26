@@ -150,6 +150,8 @@ class DatasetAGOL:
         self.publication_date_dt = None
         self.standardized_url = None
         self.updated_recently_enough = None
+        self.maintenance_frequency_word = None
+
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
@@ -258,7 +260,7 @@ class DatasetAGOL:
 
         return
 
-    def extract_and_assign_maintenance_frequency(self, element):
+    def extract_and_assign_maintenance_frequency_code(self, element):
         """
 
         After the following dataIdInfo/resMaint/maintFreq/MaintFreqCd
@@ -268,9 +270,9 @@ class DatasetAGOL:
         data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element, tag_name="dataIdInfo") if element is not None else None
         res_maintenance_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="resMaint") if data_id_info_element is not None else None
         maint_freq_element = Utility.extract_first_immediate_child_feature_from_element(element=res_maintenance_element, tag_name="maintFreq") if res_maintenance_element is not None else None
-        maint_freq_code_element = Utility.extract_first_immediate_child_feature_from_element(element=maint_freq_element, tag_name="maintFreqCd") if maint_freq_element is not None else None
-        self.maintenance_frequency_code = maint_freq_code_element.attrib if maint_freq_code_element is not None else None
-        # TODO: If the attrib extraction works, then need to convert the code (eg 001) to a meaningful string or just preserve current key:value relationships for future developers to understand
+        maint_freq_code_element = Utility.extract_first_immediate_child_feature_from_element(element=maint_freq_element, tag_name="MaintFreqCd") if maint_freq_element is not None else None
+        maint_freq_code_dict = maint_freq_code_element.attrib if maint_freq_code_element is not None else None
+        self.maintenance_frequency_code = maint_freq_code_dict.get("Value", None) if maint_freq_code_dict is not None else None
 
     def extract_and_assign_organization_name(self, element):
         """
@@ -322,14 +324,15 @@ class DatasetAGOL:
                                "Biannually": 730,
                                "Annually": 365}
 
-        updated_enough_strings = {"Static Data": var.updated_enough_yes,
-                                  "As Needed": var.evaluation_difficult,
+        updated_enough_strings = {"As Needed": var.evaluation_difficult,
                                   "Irregular": var.evaluation_difficult,
                                   "Not Planned": var.updated_enough_yes,
                                   "Unknown": f"{var.better_metadata_needed} {var.update_frequency_missing}",
-                                  "": f"{var.better_metadata_needed} {var.update_frequency_missing}"}
-        answer = None
+                                  "": f"{var.better_metadata_needed} {var.update_frequency_missing}",
+                                  "Empty": f"{var.better_metadata_needed} {var.update_frequency_missing}",
+                                  "-9999": "DoIT ERROR"}
 
+        answer = None
         int_check = updated_enough_ints.get(self.maintenance_frequency_code, None)
         string_check = updated_enough_strings.get(self.maintenance_frequency_code, None)
 
@@ -400,6 +403,32 @@ class DatasetAGOL:
         self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info)
         self.description_text = local_inner_function(attribute_name="description", value=self.description)
 
+    def process_maintenance_frequency_code(self):
+        """
+
+        Note: To keep AGOL process similar to socrata process we will convert the code to a word and then use the word
+        to check if is up to date. Could just use these codes instead but wanted to keep similar to Socrata process for
+        ease of understanding in future.
+        :return:
+        """
+        if self.maintenance_frequency_code is None:
+            return
+        else:
+            code_conversion_dict = {"000": "Empty",  # Guessing at this
+                                    "001": "Continual",
+                                    "002": "Daily",
+                                    "003": "Weekly",
+                                    "004": "FortNightly",
+                                    "005": "Monthly",
+                                    "006": "Quarterly",
+                                    "007": "Biannually",
+                                    "008": "Annually",
+                                    "009": "As Needed",
+                                    "010": "Irregular",
+                                    "011": "Not Planned",
+                                    "012": "Unknown",
+                                    }
+            self.maintenance_frequency_word = code_conversion_dict.get(self.maintenance_frequency_code, "-9999")
 
     @staticmethod
     def request_all_data_catalog_results() -> list:

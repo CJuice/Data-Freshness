@@ -77,7 +77,7 @@ def main():
         agol_dataset.extract_and_assign_organization_name(element=metadata_xml_element)
 
         #   MaintFreqCd tag (Maintenance Update Frequency)
-        agol_dataset.extract_and_assign_maintenance_frequency(element=metadata_xml_element)
+        agol_dataset.extract_and_assign_maintenance_frequency_code(element=metadata_xml_element)
 
         agol_dataset.convert_milliseconds_attributes_to_datetime()
         agol_dataset.parse_date_like_string_attributes()
