@@ -269,7 +269,8 @@ class DatasetAGOL:
         res_maintenance_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="resMaint") if data_id_info_element is not None else None
         maint_freq_element = Utility.extract_first_immediate_child_feature_from_element(element=res_maintenance_element, tag_name="maintFreq") if res_maintenance_element is not None else None
         maint_freq_code_element = Utility.extract_first_immediate_child_feature_from_element(element=maint_freq_element, tag_name="maintFreqCd") if maint_freq_element is not None else None
-        self.maintenance_frequency_code = maint_freq_code_element.text if maint_freq_code_element is not None else None
+        self.maintenance_frequency_code = maint_freq_code_element.attrib if maint_freq_code_element is not None else None
+        # TODO: If the attrib extraction works, then need to convert the code (eg 001) to a meaningful string or just preserve current key:value relationships for future developers to understand
 
     def extract_and_assign_organization_name(self, element):
         """
@@ -302,6 +303,7 @@ class DatasetAGOL:
         self.publication_date = pub_date_element.text if pub_date_element is not None else None
 
     def is_up_to_date(self):
+        # FIXME: Power Outage layers test is still not generating a freshness yes. Days since update is -1. The update freq code is still NULL
         """
         Determine if a dataset is up to date according to its update frequency.
         Created two dictionaries, instead of one, to hold integer comparison value snd string values. The integer
@@ -359,7 +361,7 @@ class DatasetAGOL:
             #   Since that is not a datetime we need to check and convert. This is necessary for later steps when we
             #   determine the freshness of the data.
             if value == "Continual":
-                return datetime.datetime.now(datetime.timezone.utc)
+                return var.process_initiation_datetime
 
             try:
                 return date_parser.parse(value)
