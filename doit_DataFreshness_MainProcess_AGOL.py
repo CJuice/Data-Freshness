@@ -98,6 +98,7 @@ def main():
     master_agol_df = pd.DataFrame(data=df_data,
                                   dtype=None,
                                   copy=False)
+    master_agol_df = master_agol_df.reindex(sorted(master_agol_df.columns), axis=1)
     print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_agol_df.info())
 
