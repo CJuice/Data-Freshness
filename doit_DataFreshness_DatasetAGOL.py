@@ -141,6 +141,7 @@ class DatasetAGOL:
         self.days_since_last_data_update = None
         self.description_text = None
         self.license_info_text = None
+        self.maintenance_frequency_word = None
         self.meta_creation_date_dt = None
         self.meta_creation_time_dt = None
         self.meta_modification_date_dt = None
@@ -150,7 +151,6 @@ class DatasetAGOL:
         self.publication_date_dt = None
         self.standardized_url = None
         self.updated_recently_enough = None
-        self.maintenance_frequency_word = None
 
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
@@ -272,7 +272,7 @@ class DatasetAGOL:
         maint_freq_element = Utility.extract_first_immediate_child_feature_from_element(element=res_maintenance_element, tag_name="maintFreq") if res_maintenance_element is not None else None
         maint_freq_code_element = Utility.extract_first_immediate_child_feature_from_element(element=maint_freq_element, tag_name="MaintFreqCd") if maint_freq_element is not None else None
         maint_freq_code_dict = maint_freq_code_element.attrib if maint_freq_code_element is not None else None
-        self.maintenance_frequency_code = maint_freq_code_dict.get("Value", None) if maint_freq_code_dict is not None else None
+        self.maintenance_frequency_code = maint_freq_code_dict.get("value", None) if maint_freq_code_dict is not None else None
 
     def extract_and_assign_organization_name(self, element):
         """
@@ -333,8 +333,8 @@ class DatasetAGOL:
                                   "-9999": "DoIT ERROR"}
 
         answer = None
-        int_check = updated_enough_ints.get(self.maintenance_frequency_code, None)
-        string_check = updated_enough_strings.get(self.maintenance_frequency_code, None)
+        int_check = updated_enough_ints.get(self.maintenance_frequency_word, None)
+        string_check = updated_enough_strings.get(self.maintenance_frequency_word, None)
 
         if int_check is not None and self.days_since_last_data_update is not None:
             answer = var.updated_enough_yes if self.days_since_last_data_update <= int_check else var.updated_enough_no
