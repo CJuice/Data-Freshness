@@ -48,6 +48,12 @@ def main():
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
         agol_dataset.build_standardized_item_url()
 
+
+        # # TESTING
+        # items_of_interest = ["e108937848a3467292971c61c905c358", "b0dbba215755439ab4fb9741ce83b15b", "f6eb3680c6134348a3ab351f44cb6de3"]
+        # if agol_dataset.id not in items_of_interest:
+        #     continue
+
         # Store the objects for use
         agol_class_objects_dict[agol_dataset.id] = agol_dataset
 
@@ -78,6 +84,7 @@ def main():
 
         #   MaintFreqCd tag (Maintenance Update Frequency)
         agol_dataset.extract_and_assign_maintenance_frequency_code(element=metadata_xml_element)
+        agol_dataset.process_maintenance_frequency_code()
 
         agol_dataset.convert_milliseconds_attributes_to_datetime()
         agol_dataset.parse_date_like_string_attributes()
