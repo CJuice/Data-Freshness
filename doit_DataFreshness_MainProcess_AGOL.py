@@ -66,7 +66,7 @@ def main():
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
 
         if 300 <= metadata_response.status_code:
-            print(f"ISSUE: AGOL Item {agol_dataset.standardized_url} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
+            print(f"ISSUE: AGOL Item {agol_dataset.url_agol_item_id} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
 
         # Need to handle sml and parse to usable form

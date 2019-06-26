@@ -94,7 +94,7 @@ class DatasetAGOL:
         self.content_status = None
         self.created = None
         # self.culture = None
-        self.description = None
+        self.description_raw = None
         # self.documentation = None
         self.extent = None
         # self.group_designations = None
@@ -103,7 +103,7 @@ class DatasetAGOL:
         # self.industries = None
         # self.languages = None
         # self.large_thumbnail = None
-        self.license_info = None
+        self.license_info_raw = None
         # self.listed = None
         self.modified = None
         self.name = None
@@ -149,7 +149,7 @@ class DatasetAGOL:
         self.metadata_url = None
         self.modified_dt = None
         self.publication_date_dt = None
-        self.standardized_url = None
+        self.url_agol_item_id = None
         self.updated_recently_enough = None
 
 
@@ -163,7 +163,7 @@ class DatasetAGOL:
         self.content_status = data_json.get("contentStatus", None)
         self.created = data_json.get("created", None)
         # self.culture = data_json.get("culture", None)
-        self.description = data_json.get("description", None)
+        self.description_raw = data_json.get("description", None)
         # self.documentation = data_json.get("documentation", None)
         self.extent = data_json.get("extent", None)
         # self.group_designations = data_json.get("groupDesignations", None)
@@ -172,7 +172,7 @@ class DatasetAGOL:
         # self.industries = data_json.get("industries", None)
         # self.languages = data_json.get("languages", None)
         # self.large_thumbnail = data_json.get("largeThumbnail", None)
-        self.license_info = data_json.get("licenseInfo", None)
+        self.license_info_raw = data_json.get("licenseInfo", None)
         # self.listed = data_json.get("listed", None)
         self.modified = data_json.get("modified", None)
         self.name = data_json.get("name", None)
@@ -197,7 +197,7 @@ class DatasetAGOL:
 
     def build_standardized_item_url(self):
         # Spoke with Matt, this is what we are going with.
-        self.standardized_url = var.arcgis_item_url.format(item_id=self.id)
+        self.url_agol_item_id = var.arcgis_item_url.format(item_id=self.id)
 
     def build_metadata_xml_url(self):
         self.metadata_url = var.arcgis_metadata_url.format(arcgis_sharing_rest_url=var.arcgis_sharing_rest_url,
@@ -212,7 +212,7 @@ class DatasetAGOL:
             try:
                 self.days_since_last_data_update = (var.process_initiation_datetime - self.publication_date_dt).days
             except TypeError as te:
-                print(f"TypeError: {te}. pub tz:{self.publication_date_dt.tzinfo}, process tz: {var.process_initiation_datetime.tzinfo}, {self.standardized_url}")
+                print(f"TypeError: {te}. pub tz:{self.publication_date_dt.tzinfo}, process tz: {var.process_initiation_datetime.tzinfo}, {self.url_agol_item_id}")
                 self.days_since_last_data_update = None
 
     def convert_milliseconds_attributes_to_datetime(self):
@@ -237,7 +237,7 @@ class DatasetAGOL:
             tag_name="Esri")
 
         if esri_metadata_xml_element is None:
-            print(f"ESRI XML Tag is None. Asset: {self.standardized_url}")
+            print(f"ESRI XML Tag is None. Asset: {self.url_agol_item_id}")
             return
 
         esri_xml_tags_and_values = {"CreaDate": None,
@@ -251,7 +251,7 @@ class DatasetAGOL:
                     element=esri_metadata_xml_element,
                     tag_name=tag_name).text
             except AttributeError as ae:
-                print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.standardized_url}")
+                print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.url_agol_item_id}")
 
         self.meta_creation_date_str = esri_xml_tags_and_values.get("CreaDate")
         self.meta_creation_time_str = esri_xml_tags_and_values.get("CreaTime")
@@ -395,13 +395,13 @@ class DatasetAGOL:
             :return:
             """
             try:
-                soup = BeautifulSoup(self.license_info, "html.parser")
+                soup = BeautifulSoup(self.license_info_raw, "html.parser")
                 return soup.get_text()
             except Exception as e:
-                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, item: {self.standardized_url}")
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, item: {self.url_agol_item_id}")
                 return None
-        self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info)
-        self.description_text = local_inner_function(attribute_name="description", value=self.description)
+        self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info_raw)
+        self.description_text = local_inner_function(attribute_name="description", value=self.description_raw)
 
     def process_maintenance_frequency_code(self):
         """
