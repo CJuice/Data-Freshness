@@ -86,6 +86,7 @@ def main():
         agol_dataset.extract_and_assign_maintenance_frequency_code(element=metadata_xml_element)
         agol_dataset.process_maintenance_frequency_code()
 
+        # Perform processing, conversions, and eavaluations
         agol_dataset.convert_milliseconds_attributes_to_datetime()
         agol_dataset.parse_date_like_string_attributes()
         agol_dataset.parse_html_attribute_values_to_soup_get_text()

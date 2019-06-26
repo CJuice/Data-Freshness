@@ -129,12 +129,12 @@ class DatasetAGOL:
         # Metadata XML sourced attributes
         # self.esri_metadata_xml_element = None
         self.maintenance_frequency_code = None
-        self.meta_creation_date = None
-        self.meta_creation_time = None
-        self.meta_modification_date = None
-        self.meta_modification_time = None
+        self.meta_creation_date_str = None
+        self.meta_creation_time_str = None
+        self.meta_modification_date_str = None
+        self.meta_modification_time_str = None
         self.organization_name = None
-        self.publication_date = None
+        self.publication_date_str = None
 
         # DERIVED
         self.created_dt = None
@@ -253,10 +253,10 @@ class DatasetAGOL:
             except AttributeError as ae:
                 print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.standardized_url}")
 
-        self.meta_creation_date = esri_xml_tags_and_values.get("CreaDate")
-        self.meta_creation_time = esri_xml_tags_and_values.get("CreaTime")
-        self.meta_modification_date = esri_xml_tags_and_values.get("ModDate")
-        self.meta_modification_time = esri_xml_tags_and_values.get("ModTime")
+        self.meta_creation_date_str = esri_xml_tags_and_values.get("CreaDate")
+        self.meta_creation_time_str = esri_xml_tags_and_values.get("CreaTime")
+        self.meta_modification_date_str = esri_xml_tags_and_values.get("ModDate")
+        self.meta_modification_time_str = esri_xml_tags_and_values.get("ModTime")
 
         return
 
@@ -302,7 +302,7 @@ class DatasetAGOL:
         id_citation_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="idCitation") if data_id_info_element is not None else None
         date_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element, tag_name="date") if id_citation_element is not None else None
         pub_date_element = Utility.extract_first_immediate_child_feature_from_element(element=date_element, tag_name="pubDate") if date_element is not None else None
-        self.publication_date = pub_date_element.text if pub_date_element is not None else None
+        self.publication_date_str = pub_date_element.text if pub_date_element is not None else None
 
     def is_up_to_date(self):
         # FIXME: Power Outage layers test is still not generating a freshness yes. Days since update is -1. The update freq code is still NULL
@@ -373,14 +373,14 @@ class DatasetAGOL:
                 return None
 
         self.meta_creation_date_dt = local_inner_function(attribute_name="meta_creation_date",
-                                                          value=self.meta_creation_date)
+                                                          value=self.meta_creation_date_str)
         self.meta_creation_time_dt = local_inner_function(attribute_name="meta_creation_time",
-                                                          value=self.meta_creation_time)
+                                                          value=self.meta_creation_time_str)
         self.meta_modification_date_dt = local_inner_function(attribute_name="meta_modification_date",
-                                                              value=self.meta_modification_date)
+                                                              value=self.meta_modification_date_str)
         self.meta_modification_time_dt = local_inner_function(attribute_name="meta_modification_time",
-                                                              value=self.meta_modification_time)
-        self.publication_date_dt = local_inner_function(attribute_name="publication_date", value=self.publication_date)
+                                                              value=self.meta_modification_time_str)
+        self.publication_date_dt = local_inner_function(attribute_name="publication_date", value=self.publication_date_str)
 
     def parse_html_attribute_values_to_soup_get_text(self):
         """
