@@ -138,6 +138,10 @@ class DatasetAGOL:
         self.organization_name = None
         self.publication_date_str = None
 
+        # Source URL Query
+        self.number_of_rows = None  # TODO: Have not determined this yet. Need to develop new functionality. Old process did not do this.
+        self.columns = None
+
         # DERIVED
         self.category = None  # TODO: Need to develop this part of the process
         self.column_names_string = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
@@ -153,7 +157,6 @@ class DatasetAGOL:
         self.metadata_url = None
         self.missing_metadata_fields = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
         self.modified_dt = None
-        self.number_of_rows = None  # TODO: Have not determined this yet. Need to develop new functionality. Old process did not do this.
         self.publication_date_dt = None
         self.url_agol_item_id = None
         self.updated_recently_enough = None
@@ -264,6 +267,17 @@ class DatasetAGOL:
         self.meta_modification_time_str = esri_xml_tags_and_values.get("ModTime")
 
         return
+
+    def extract_and_assign_field_names(self, response):
+        try:
+            fields_list = response.json().get("fields", None)
+        except Exception as e:
+            print(f"Unanticipated Exception while extracting field names from response. {e}. {self.url_agol_item_id}")
+        else:
+            accumulated_field_names_list = []
+            for field in fields_list:
+                accumulated_field_names_list.append(field.get("name", "ERROR_DoIT"))
+            self.column_names_string = ", ".join(accumulated_field_names_list)
 
     def extract_and_assign_maintenance_frequency_code(self, element):
         """

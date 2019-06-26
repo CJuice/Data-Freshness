@@ -56,6 +56,15 @@ def main():
             next(skipped_assets_counter_dict.get(agol_dataset.type_, agol_other_counter))
             continue
 
+
+
+        # TESTING
+        if agol_dataset.id != "c8b282aed4c84bb5a8c991e1a9b7b30e":
+            continue
+
+
+
+
         # Store the objects for use
         agol_class_objects_dict[agol_dataset.id] = agol_dataset
         next(agol_dataset_counter)
@@ -106,7 +115,15 @@ def main():
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
     # TODO: Need to make the requests to the Groups url to gather that value for processing
-
+    # TODO: Need to get the number of rows in each dataset, and the column names for each dataset
+    for item_id, agol_dataset in agol_class_objects_dict.items():
+        record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
+        field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
+        agol_dataset.number_of_rows = record_count_response.json().get("count", -9999)
+        agol_dataset.extract_and_assign_field_names(response=field_query_response)
+        print(agol_dataset.number_of_rows)
+        print(agol_dataset.column_names_string)
+        exit()
 
     # Need a master pandas dataframe from all agol datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]

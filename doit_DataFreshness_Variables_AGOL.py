@@ -25,6 +25,7 @@ dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link":
                                                 "Category": "category"}
 metadata_missing = "Metadata on update frequency are missing. Dataset owner should provide this information to resolve this issue."
 null_string = "NULL"
+number_of_seconds_in_a_day = 86400
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
 output_excel_file_path_data_freshness_AGOL = r"Docs\AGOL_data_freshness.xlsx"
 output_excel_sheetname = "The Data Nasty"
@@ -43,5 +44,8 @@ arcgis_metadata_url = "{arcgis_sharing_rest_url}/content/items/{item_id}/info/me
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 output_excel_file_path_full_dataframe = r"Docs\{date}AGOL_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
 process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
-number_of_seconds_in_a_day = 86400
-
+# record_count_query_url = r"{data_source_rest_url}/query?where=1%3D1&returnGeometry=false&returnCountOnly=true&f=pjson"
+# record_count_query_url = r"{data_source_rest_url}/query?where=1=1&returnGeometry=false&returnCountOnly=true&f=pjson"
+root_service_query_url = r"{data_source_rest_url}/query"
+record_count_params = {"where": "1=1", "returnGeometry": False, "returnCountOnly": True, "f": "pjson"}
+fields_query_params = {"where": "1=1", "outFields":"*", "returnGeometry": False, "resultRecordCount": 1, "f": "pjson"}
