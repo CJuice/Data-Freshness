@@ -205,25 +205,26 @@ def main():
     master_socrata_df = pd.DataFrame(data=df_data,
                                      dtype=None,
                                      copy=False)
-    print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-    print(master_socrata_df.info())
-    print(master_socrata_df.head())
+    master_socrata_df = master_socrata_df.reindex(sorted(master_socrata_df.columns), axis=1)
 
     # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
     master_socrata_df.fillna(value=var.null_string, inplace=True)
 
-    # TODO: Need to match existing data freshness output and write json and excel files for all objects
-    # For full production version can write Socrata and AGOL at same time but for testing can just output Socrata now
-    master_socrata_df.to_excel(excel_writer=var.output_excel_file_path,
+    print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(master_socrata_df.info())
+    # print(master_socrata_df.head())
+
+    # Need to output a dataframe that matches the existing data freshness report
+    master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_AGOL,
                                sheet_name=var.output_excel_sheetname,
                                na_rep=np.NaN,
                                float_format=None,
-                               columns=list(var.dataframe_to_header_mapping_for_output.values()),
-                               header=list(var.dataframe_to_header_mapping_for_output.keys()),
+                               columns=list(var.dataframe_to_header_mapping_for_excel_output.values()),
+                               header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                                index=False)
 
     # #quick write of full frame for pat
-    # master_socrata_df.to_excel(excel_writer=r"Docs\Socrata_data_output_FULL.xlsx",
+    # master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
     #                            sheet_name="Pat is a data pimp",
     #                            na_rep=np.NaN,
     #                            index=False)

@@ -10,10 +10,8 @@ def main():
 
     # IMPORTS
     import itertools
-    import json
     import numpy as np
     import pandas as pd
-    import pprint
     import requests
 
     from DataFreshness.doit_DataFreshness_Utility import Utility
@@ -24,8 +22,13 @@ def main():
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
-    agol_counter = itertools.count()
-    agol_data_catalog_responses = []
+    agol_dataset_counter = itertools.count()
+    agol_webmap_counter = itertools.count()
+    agol_webapp_counter = itertools.count()
+    agol_other_counter = itertools.count()
+    agol_metadata_counter = itertools.count()
+    skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
+    # agol_data_catalog_responses = []
     agol_class_objects_dict = {}
 
     # CLASSES
@@ -48,17 +51,21 @@ def main():
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
         agol_dataset.build_standardized_item_url()
 
-
-        # # TESTING
-        # items_of_interest = ["e108937848a3467292971c61c905c358", "b0dbba215755439ab4fb9741ce83b15b", "f6eb3680c6134348a3ab351f44cb6de3"]
-        # if agol_dataset.id not in items_of_interest:
-        #     continue
+        # Check type_ to eliminate those we are not interested in evaluating
+        if agol_dataset.type_ not in var.types_to_evaluate:
+            next(skipped_assets_counter_dict.get(agol_dataset.type_, agol_other_counter))
+            continue
 
         # Store the objects for use
         agol_class_objects_dict[agol_dataset.id] = agol_dataset
+        next(agol_dataset_counter)
 
-        # if 100 < next(test_limiter):
-        #     break
+    # Print outs for general understanding of data catalog process
+    print(f"\nData Catalog Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(f"Number of data layers handled: {agol_dataset_counter}")
+    print(f"Number of web maps encountered: {agol_webmap_counter}")
+    print(f"Number of web apps encountered: {agol_webapp_counter}")
+    print(f"Number of other items encountered: {agol_other_counter}")
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
     for item_id, agol_dataset in agol_class_objects_dict.items():
@@ -92,6 +99,14 @@ def main():
         agol_dataset.parse_html_attribute_values_to_soup_get_text()
         agol_dataset.calculate_days_since_last_data_update()
         agol_dataset.is_up_to_date()
+        next(agol_metadata_counter)
+
+    # Print outs for general understanding of metadata process
+    print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(f"Number of metadata requests handled: {agol_metadata_counter}")
+
+    # TODO: Need to make the requests to the Groups url to gather that value for processing
+
 
     # Need a master pandas dataframe from all agol datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]
@@ -99,20 +114,28 @@ def main():
                                   dtype=None,
                                   copy=False)
     master_agol_df = master_agol_df.reindex(sorted(master_agol_df.columns), axis=1)
-    print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-    print(master_agol_df.info())
 
     # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
     master_agol_df.fillna(value=var.null_string, inplace=True)
 
-    # TODO: Need to match existing data freshness output and write json and excel files for all objects
-    master_agol_df.to_excel(excel_writer=var.output_excel_file_path,
+    print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(master_agol_df.info())
+
+    # Need to output a dataframe that matches the existing data freshness report
+    master_agol_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_AGOL,
                             sheet_name=var.output_excel_sheetname,
                             na_rep=np.NaN,
                             float_format=None,
+                            columns=list(var.dataframe_to_header_mapping_for_excel_output.values()),
+                            header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                             index=False)
 
-
+    # For outputting the full dataframe
+    # master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
+    #                         sheet_name=var.output_excel_sheetname,
+    #                         na_rep=np.NaN,
+    #                         float_format=None,
+    #                         index=False)
 
     # ===================================================
 

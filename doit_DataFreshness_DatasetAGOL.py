@@ -84,6 +84,8 @@ class DatasetAGOL:
         """
 
         # NON-DERIVED
+        self.portal = "Data Catalog"  # Would make a constant but mapping to pandas dataframe field becomes more cumbersome.
+
         # Data Catalog sourced attributes
         self.access = None
         self.access_information = None
@@ -137,6 +139,8 @@ class DatasetAGOL:
         self.publication_date_str = None
 
         # DERIVED
+        self.category = None  # TODO: Need to develop this part of the process
+        self.column_names_string = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
         self.created_dt = None
         self.days_since_last_data_update = None
         self.description_text = None
@@ -147,11 +151,12 @@ class DatasetAGOL:
         self.meta_modification_date_dt = None
         self.meta_modification_time_dt = None
         self.metadata_url = None
+        self.missing_metadata_fields = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
         self.modified_dt = None
+        self.number_of_rows = None  # TODO: Have not determined this yet. Need to develop new functionality. Old process did not do this.
         self.publication_date_dt = None
         self.url_agol_item_id = None
         self.updated_recently_enough = None
-
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
         self.access = data_json.get("access", None)
@@ -398,7 +403,7 @@ class DatasetAGOL:
                 soup = BeautifulSoup(self.license_info_raw, "html.parser")
                 return soup.get_text()
             except Exception as e:
-                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, item: {self.url_agol_item_id}")
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, Asset: {self.url_agol_item_id}")
                 return None
         self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info_raw)
         self.description_text = local_inner_function(attribute_name="description", value=self.description_raw)

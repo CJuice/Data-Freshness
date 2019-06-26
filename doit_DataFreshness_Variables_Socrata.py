@@ -2,26 +2,27 @@
 File designated for process variables in order to centralize variables, and de-clutter main script.
 """
 import time
+import datetime
 
 # NOT DERIVED
 all_map_layers = "All map layers from MD iMAP are in the process of being surveyed to determine this information."
 better_metadata_needed = "Better Metadata Needed."
 credentials_config_file_path = r"doit_DataFreshness_Credentials/doit_DataFreshness_Credentials.cfg"
-dataframe_to_header_mapping_for_output = {"Dataset Name": "title", "Link": "landing_page",
+dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link": "landing_page",
                                           "Agency Performing Data Updates": "state_agency_performing_data_updates",
                                           "Owner": "owner",
                                           "Data Provided By": "data_provided_by",
                                           "Source URL": "source_link",
                                           "Update Frequency": "update_frequency",
-                                          "Date of Most Recent Data Change": "date_of_most_recent_data_change",
-                                          "Days Since Last Data Update": "days_since_last_data_update",
-                                          "Date of Most Recent View Change in Data or Metadata": "date_of_most_recent_view_change",
-                                          "Days Since Last View Update": "days_since_last_view_update",
-                                          "Updated Recently Enough": "updated_recently_enough",
-                                          "Number of Rows": "number_of_rows_in_dataset",
-                                          "Tags Keywords": "keyword_tags_string", "Column Names": "column_names_string",
-                                          "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
-                                          "Category": "category_string"}
+                                                "Date of Most Recent Data Change": "date_of_most_recent_data_change",
+                                                "Days Since Last Data Update": "days_since_last_data_update",
+                                                "Date of Most Recent View Change in Data or Metadata": "date_of_most_recent_view_change",
+                                                "Days Since Last View Update": "days_since_last_view_update",
+                                                "Updated Recently Enough": "updated_recently_enough",
+                                                "Number of Rows": "number_of_rows_in_dataset",
+                                                "Tags Keywords": "keyword_tags_string", "Column Names": "column_names_string",
+                                                "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
+                                                "Category": "category_string"}
 expected_socrata_asset_inventory_json_keys_dict = {'api_endpoint': 'API Endpoint',
                                                    'category': 'Category',
                                                    'contactemail': 'Contact Email',
@@ -57,7 +58,7 @@ metadata_missing = "Metadata on update frequency are missing. Dataset owner shou
 null_string = "NULL"
 number_of_seconds_in_a_day = 86400
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
-output_excel_file_path = r"Docs\Socrata_data_output.xlsx"
+output_excel_file_path_data_freshness_AGOL = r"Docs\SOCRATA_data_freshness.xlsx"
 output_excel_sheetname = "The Data Nasty"
 please_describe_below = "Other (Please Describe Below)"
 process_initiation_datetime_in_seconds = float(round(time.time()))
@@ -70,6 +71,8 @@ whether_dataset = "Whether dataset is up to date cannot be calculated until the 
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
+output_excel_file_path_full_dataframe = r"Docs\{date}SOCRATA_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
+
 
 # TODO: dictionary of columns and their types for pandas. Does this matter?
 # output_report_headers_column_types = {"Dataset Name": str, "Link": str, "Agency Performing Data Updates": str,
