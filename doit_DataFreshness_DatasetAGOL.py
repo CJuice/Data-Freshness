@@ -369,7 +369,7 @@ class DatasetAGOL:
             try:
                 return date_parser.parse(value)
             except (ValueError, TypeError) as err:
-                print(f"Unable to parse {attribute_name} value: {value}, {err}")
+                # print(f"Unable to parse {attribute_name} value: {value}, {err}")
                 return None
 
         self.meta_creation_date_dt = local_inner_function(attribute_name="meta_creation_date",
@@ -398,7 +398,7 @@ class DatasetAGOL:
                 soup = BeautifulSoup(self.license_info, "html.parser")
                 return soup.get_text()
             except Exception as e:
-                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup {e}")
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, item: {self.standardized_url}")
                 return None
         self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info)
         self.description_text = local_inner_function(attribute_name="description", value=self.description)
