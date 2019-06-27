@@ -24,17 +24,19 @@ class GroupAGOL:
             itemTypes - not stored
         """
 
+        # NOT DERIVED
         self.admin = None
         self.member = None
-        self.other = None
+        self.other_list = None
+        self.other_dict = None  # An assumption has been made that the list is only len = 1. From existing data freshness only ever saw one group.
 
-        # From within 'other'
+        #   From within 'other'
         self.group_id = None
         self.group_title = None
         self.is_invitation_only = None
         self.group_owner = None
-        self.group_description = None
-        self.group_snippet = None
+        self.group_description_raw = None
+        self.group_snippet_raw = None
         self.group_tags = None
         self.is_view_only = None
         self.is_open_data = None
@@ -43,22 +45,30 @@ class GroupAGOL:
         self.group_access = None
         self.group_capabilities = None
 
+        # DERIVED
+        self.group_description_text = None
+        self.group_created_dt = None
+        self.group_modified_dt = None
+
     def assign_group_json_to_class_values(self, group_json: dict):
         self.admin = group_json.get("admin", None)
         self.member = group_json.get("member", None)
-        self.other = group_json.get("other", None)
-        if self.other is not None:
-            self.group_id = group_json.get("id", None)
-            self.group_title = group_json.get("title", None)
-            self.is_invitation_only = group_json.get("isInvitationOnly", None)
-            self.group_owner = group_json.get("owner", None)
-            self.group_description = group_json.get("description", None)
-            self.group_snippet = group_json.get("snippet", None)
-            self.group_tags = group_json.get("tags", None)
-            self.is_view_only = group_json.get("isViewOnly", None)
-            self.is_open_data = group_json.get("isOpenData", None)
-            self.group_created = group_json.get("created", None)
-            self.group_modified = group_json.get("modified", None)
-            self.group_access = group_json.get("access", None)
-            self.group_capabilities = group_json.get("capabilities", None)
+        self.other_list = group_json.get("other", None)
+
+        if self.other_list is not None:
+            print(f"len of other_list: {len(self.other_list)}")
+            self.other_dict = self.other_list[0]
+            self.group_id = self.other_dict.get("id", None)
+            self.group_title = self.other_dict.get("title", None)
+            self.is_invitation_only = self.other_dict.get("isInvitationOnly", None)
+            self.group_owner = self.other_dict.get("owner", None)
+            self.group_description_raw = self.other_dict.get("description", None)
+            self.group_snippet_raw = self.other_dict.get("snippet", None)
+            self.group_tags = self.other_dict.get("tags", None)
+            self.is_view_only = self.other_dict.get("isViewOnly", None)
+            self.is_open_data = self.other_dict.get("isOpenData", None)
+            self.group_created = self.other_dict.get("created", None)
+            self.group_modified = self.other_dict.get("modified", None)
+            self.group_access = self.other_dict.get("access", None)
+            self.group_capabilities = self.other_dict.get("capabilities", None)
 

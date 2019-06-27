@@ -17,6 +17,8 @@ def main():
     from DataFreshness.doit_DataFreshness_Utility import Utility
     import DataFreshness.doit_DataFreshness_Variables_AGOL as var
     from DataFreshness.doit_DataFreshness_DatasetAGOL import DatasetAGOL
+    from DataFreshness.doit_DataFreshness_GroupAGOL import GroupAGOL
+
     # Disable the security warnings for https from data.maryland.gov
     requests.packages.urllib3.disable_warnings()
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
@@ -58,9 +60,9 @@ def main():
 
 
 
-        # TESTING
-        if agol_dataset.id != "c8b282aed4c84bb5a8c991e1a9b7b30e":
-            continue
+        # # TESTING
+        # if agol_dataset.id != "c8b282aed4c84bb5a8c991e1a9b7b30e":
+        #     continue
 
 
 
@@ -115,15 +117,22 @@ def main():
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
     # TODO: Need to make the requests to the Groups url to gather that value for processing
+    agol_group_objects_dict = {}
+    test_set = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
         # TODO: It appears that these groups warrant an independent object/class. They are not part of the asset but something
         #   to which the asset can belong.
         groups_response = Utility.request_GET(url=var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url, item_id=agol_dataset.id),
                                               params=var.json_param_for_request)
+        group_dataset = GroupAGOL()
+        group_dataset.assign_group_json_to_class_values(group_json=groups_response.json())
+        agol_group_objects_dict[group_dataset.group_id] = group_dataset
+        test_set.update((group_dataset.group_id, group_dataset.group_title))
         # print(groups_response.json())
         # print(agol_dataset.url_agol_item_id)
         # print(agol_dataset.id)
-        exit()
+    print(test_set)
+    exit()
 
 
     # TODO: Need to get the number of rows in each dataset, and the column names for each dataset
