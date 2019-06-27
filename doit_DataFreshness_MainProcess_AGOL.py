@@ -169,6 +169,8 @@ def main():
                             header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                             index=False)
 
+    # TODO: Need to output json for the DataCompiled.json build
+
     # For outputting the full dataframe
     # master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
     #                         sheet_name=var.output_excel_sheetname,
