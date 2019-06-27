@@ -18,8 +18,9 @@ class Utility:
         try:
             response = requests.get(url=url, params=params)
         except Exception as e:
-            print(f"Error with request to {url}. Code {response.status_code}. Error:{e}")
-            exit()
+            print(f"Error with request to {url}. Error:{e}")
+            return requests.models.Response()
+            # exit()
         else:
             return response
 

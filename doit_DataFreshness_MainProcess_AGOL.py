@@ -46,12 +46,12 @@ def main():
     # Print outs for general understanding of data.json level process
     print(f"Data Catalog Results Requests Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"{len(master_list_of_results)} results collected")
-    test_limiter = itertools.count()
 
     for result in master_list_of_results:
         agol_dataset = DatasetAGOL()
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
         agol_dataset.build_standardized_item_url()
+        agol_dataset.create_tags_string()
 
         # Check type_ to eliminate those we are not interested in evaluating
         if agol_dataset.type_ not in var.types_to_evaluate:

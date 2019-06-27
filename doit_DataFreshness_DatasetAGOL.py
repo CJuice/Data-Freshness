@@ -159,6 +159,7 @@ class DatasetAGOL:
         self.missing_metadata_fields = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
         self.modified_dt = None
         self.publication_date_dt = None
+        self.tags_string = None
         self.url_agol_item_id = None
         self.updated_recently_enough = None
 
@@ -235,6 +236,9 @@ class DatasetAGOL:
         except TypeError as te:
             print(f"TypeError during convert_milliseconds_to_datetime(). millis value:{self.modified}, {te}")
 
+    def create_tags_string(self):
+        self.tags_string = ", ".join(self.tags) if self.tags is not None else None
+
     def extract_and_assign_esri_date_time_values(self, element):
         """
 
@@ -270,15 +274,15 @@ class DatasetAGOL:
         return
 
     def extract_and_assign_field_names(self, response):
-        if response is None:
-            return
-
         try:
             fields_list = response.json().get("fields", None)
         except Exception as e:
             print(f"Unanticipated Exception while extracting field names from response. {e}. {self.url_agol_item_id}")
         else:
             accumulated_field_names_list = []
+            if fields_list is None:
+                return
+
             for field in fields_list:
                 accumulated_field_names_list.append(field.get("name", "ERROR_DoIT"))
             self.column_names_string = ", ".join(accumulated_field_names_list)

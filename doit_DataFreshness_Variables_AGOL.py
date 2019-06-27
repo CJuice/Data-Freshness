@@ -20,7 +20,7 @@ dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link":
                                                 "Days Since Last View Update": "days_since_last_data_update",
                                                 "Updated Recently Enough": "updated_recently_enough",
                                                 "Number of Rows": "number_of_rows",
-                                                "Tags Keywords": "tags", "Column Names": "column_names_string",
+                                                "Tags Keywords": "tags_string", "Column Names": "column_names_string",
                                                 "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
                                                 "Category": "category"}
 json_param_for_request = {'f': 'json'}
