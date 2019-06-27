@@ -39,9 +39,8 @@ def main():
     # FUNCTIONALITY
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
-    # ===================================================
     # ARCGIS ONLINE
-    print(f"\nBeginning ArcGIS Online Process...")
+    print(f"\nArcGIS Online Process Initiating...")
     master_list_of_results = DatasetAGOL.request_all_data_catalog_results()
 
     # Print outs for general understanding of data.json level process
@@ -80,6 +79,7 @@ def main():
     print(f"Number of other items encountered: {agol_other_counter}")
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
+    print(f"\nMetadata Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
@@ -118,6 +118,7 @@ def main():
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
     # TODO: Need to make the requests to the Groups url to gather that value for processing
+    print(f"\nGroups Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         # these groups warrant an independent object/class. They are not part of the asset but something
         #   to which the asset can belong.
@@ -134,15 +135,19 @@ def main():
 
         # Process the title string to extract the category value per the old data freshness design
         agol_dataset.process_category_from_group_object(group_object_title=group_dataset.group_title)
+    print(f"\nGroups Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need to get the number of rows in each dataset, and the column names for each dataset
+    print(f"\nNumber of Rows Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
         agol_dataset.number_of_rows = record_count_response.json().get("count", -9999)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
+    print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need a master pandas dataframe from all agol datasets
+    print(f"\nAGOL Dataframe Creation Process Initiating...")
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]
     master_agol_df = pd.DataFrame(data=df_data,
                                   dtype=None,
@@ -172,8 +177,6 @@ def main():
     #                         index=False)
 
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-
-    # ===================================================
 
 
 if __name__ == "__main__":

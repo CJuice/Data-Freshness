@@ -59,7 +59,6 @@ class GroupAGOL:
         self.other_list = group_json.get("other", None)
 
         if self.other_list is not None and 0 < len(self.other_list):
-            print(f"len of other_list: {len(self.other_list)}")
             self.other_dict = self.other_list[0]
             self.group_id = self.other_dict.get("id", None)
             self.group_title = self.other_dict.get("title", None)

@@ -270,6 +270,9 @@ class DatasetAGOL:
         return
 
     def extract_and_assign_field_names(self, response):
+        if response is None:
+            return
+
         try:
             fields_list = response.json().get("fields", None)
         except Exception as e:
