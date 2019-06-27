@@ -10,14 +10,12 @@ def main():
     import json
 
     agol_dataframe_excel = None
-    agol_dataframe_json = None
     agol_excel_file_name = "AGOL_data_freshness.xlsx"
     agol_json_file_name = "AGOL_data_freshness.json"
     compiled_json_file_name = "DataCompiled.json"
     data_file_dir = r"Docs\DataFreshnessOutputs"
     null_string = "NULL"
     socrata_dataframe_excel = None
-    socrata_dataframe_json = None
     socrata_excel_file_name = "SOCRATA_data_freshness.xlsx"
     socrata_json_file_name = "SOCRATA_data_freshness.json"
 
@@ -49,8 +47,7 @@ def main():
             elif file == socrata_json_file_name:
                 with open(os.path.join(dirname, file), 'r') as socrata_handler:
                     socrata_json = json.loads(socrata_handler.read())
-                # socrata_dataframe_json = pd.read_json(os.path.join(dirname, file), orient="records")
-        break
+        break # Just making sure
     combined_json_contents = agol_json + socrata_json
     with open(combined_data_file_name_json, 'w') as compiled_handler:
         compiled_handler.write(json.dumps(combined_json_contents))
