@@ -32,6 +32,7 @@ def main():
     skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
     # agol_data_catalog_responses = []
     agol_class_objects_dict = {}
+    agol_group_objects_dict = {}
 
     # CLASSES
     # FUNCTIONS
@@ -117,33 +118,29 @@ def main():
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
     # TODO: Need to make the requests to the Groups url to gather that value for processing
-    agol_group_objects_dict = {}
-    test_set = set()
     for item_id, agol_dataset in agol_class_objects_dict.items():
-        # TODO: It appears that these groups warrant an independent object/class. They are not part of the asset but something
+        # these groups warrant an independent object/class. They are not part of the asset but something
         #   to which the asset can belong.
         groups_response = Utility.request_GET(url=var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url, item_id=agol_dataset.id),
                                               params=var.json_param_for_request)
         group_dataset = GroupAGOL()
         group_dataset.assign_group_json_to_class_values(group_json=groups_response.json())
+
+        # Appear to be about 23 unique groups 20190625 CJuice. little bit of waste rebuilding and overwriting but meh
         agol_group_objects_dict[group_dataset.group_id] = group_dataset
-        test_set.update((group_dataset.group_id, group_dataset.group_title))
-        # print(groups_response.json())
-        # print(agol_dataset.url_agol_item_id)
-        # print(agol_dataset.id)
-    print(test_set)
-    exit()
 
+        # Store the group_id in the agol_dataset attributes so can retrieve information from appropriate group based off id if necessary
+        agol_dataset.group_id = group_dataset.group_id
 
-    # TODO: Need to get the number of rows in each dataset, and the column names for each dataset
+        # Process the title string to extract the category value per the old data freshness design
+        agol_dataset.process_category_from_group_object(group_object_title=group_dataset.group_title)
+
+    # Need to get the number of rows in each dataset, and the column names for each dataset
     for item_id, agol_dataset in agol_class_objects_dict.items():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
         agol_dataset.number_of_rows = record_count_response.json().get("count", -9999)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
-        # print(agol_dataset.number_of_rows)
-        # print(agol_dataset.column_names_string)
-        # exit()
 
     # Need a master pandas dataframe from all agol datasets
     df_data = [pd.Series(data=data_obj.__dict__) for data_obj in agol_class_objects_dict.values()]
@@ -173,6 +170,8 @@ def main():
     #                         na_rep=np.NaN,
     #                         float_format=None,
     #                         index=False)
+
+    print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # ===================================================
 

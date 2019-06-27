@@ -85,6 +85,7 @@ class DatasetAGOL:
 
         # NON-DERIVED
         self.portal = "Data Catalog"  # Would make a constant but mapping to pandas dataframe field becomes more cumbersome.
+        self.group_id = None
 
         # Data Catalog sourced attributes
         self.access = None
@@ -448,6 +449,9 @@ class DatasetAGOL:
                                     "012": "Unknown",
                                     }
             self.maintenance_frequency_word = code_conversion_dict.get(self.maintenance_frequency_code, "-9999")
+
+    def process_category_from_group_object(self, group_object_title):
+        self.category = group_object_title.replace("Maryland GIS Data Catalog: ", "") if group_object_title is not None else None
 
     @staticmethod
     def request_all_data_catalog_results() -> list:

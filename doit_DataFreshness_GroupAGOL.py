@@ -28,7 +28,10 @@ class GroupAGOL:
         self.admin = None
         self.member = None
         self.other_list = None
-        self.other_dict = None  # An assumption has been made that the list is only len = 1. From existing data freshness only ever saw one group.
+        # An assumption has been made that the list is only len = 1.
+        #   From existing data freshness only ever saw one group.
+        #   From inspection of 900+ datasets was only ever len = 1. 20190626 CJuice
+        self.other_dict = None
 
         #   From within 'other'
         self.group_id = None
@@ -55,7 +58,7 @@ class GroupAGOL:
         self.member = group_json.get("member", None)
         self.other_list = group_json.get("other", None)
 
-        if self.other_list is not None:
+        if self.other_list is not None and 0 < len(self.other_list):
             print(f"len of other_list: {len(self.other_list)}")
             self.other_dict = self.other_list[0]
             self.group_id = self.other_dict.get("id", None)
