@@ -208,7 +208,7 @@ class DatasetAGOL:
         self.url_agol_item_id = var.arcgis_item_url.format(item_id=self.id)
 
     def build_metadata_xml_url(self):
-        self.metadata_url = var.arcgis_metadata_url.format(arcgis_sharing_rest_url=var.arcgis_sharing_rest_url,
+        self.metadata_url = var.arcgis_metadata_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
                                                            item_id=self.id)
 
     def calculate_days_since_last_data_update(self):

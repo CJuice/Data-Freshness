@@ -23,6 +23,7 @@ dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link":
                                                 "Tags Keywords": "tags", "Column Names": "column_names_string",
                                                 "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
                                                 "Category": "category"}
+json_param_for_request = {'f': 'json'}
 metadata_missing = "Metadata on update frequency are missing. Dataset owner should provide this information to resolve this issue."
 null_string = "NULL"
 number_of_seconds_in_a_day = 86400
@@ -40,7 +41,9 @@ whether_dataset = "Whether dataset is up to date cannot be calculated until the 
 # DERIVED
 arcgis_sharing_rest_url = f"{arcgis_root_url}/sharing/rest"
 arcgis_data_catalog_url = f"{arcgis_sharing_rest_url}/search"
-arcgis_metadata_url = "{arcgis_sharing_rest_url}/content/items/{item_id}/info/metadata/metadata.xml"
+arcgis_items_root_url = f"{arcgis_sharing_rest_url}/content/items"
+arcgis_group_url = "{arcgis_items_root_url}/{item_id}/groups/"
+arcgis_metadata_url = "{arcgis_items_root_url}/{item_id}/info/metadata/metadata.xml"
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 output_excel_file_path_full_dataframe = r"Docs\{date}AGOL_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
 process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
