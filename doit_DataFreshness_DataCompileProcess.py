@@ -20,7 +20,7 @@ def main():
     socrata_excel_file_name = "SOCRATA_data_freshness.xlsx"
     socrata_json_file_name = "SOCRATA_data_freshness.json"
 
-    combined_data_file_name_excel = f"{data_file_dir}\dataFreshness{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
+    combined_data_file_name_excel = f"{data_file_dir}\dataFreshness_{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
     combined_data_file_name_json = f"{data_file_dir}\{compiled_json_file_name}"
 
     # Excel Portion
