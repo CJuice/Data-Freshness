@@ -311,6 +311,9 @@ class DatasetSocrata:
         # TODO: For datasets that don't supply a non_null count then may need to make requests to actual dataset and count
         #   the number of records. This is more efficient than doing so for every single dataet. Only make costly web requests for subset of all datasets.
 
+    def check_for_null_source_url_and_replace(self):
+        self.source_link = "https://" if self.source_link is None else self.source_link
+
     def determine_date_of_most_recent_data_change(self):
         """
         Determine the date of the most recent data change, based off of the rows_update_at value.

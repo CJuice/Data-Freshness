@@ -143,7 +143,8 @@ def main():
             continue
         else:
             socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
-
+            socrata_data_obj.check_for_null_source_url_and_replace()
+            
             # while the full asset json is still available, determine missing fields from expected set of fields
             socrata_data_obj.determine_missing_metadata_fields(asset_json=asset_json_obj)
 

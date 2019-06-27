@@ -9,19 +9,20 @@ arcgis_item_url = "https://maryland.maps.arcgis.com/home/item.html?id={item_id}"
 arcgis_root_url = r"https://www.arcgis.com"
 better_metadata_needed = "Better Metadata Needed."
 dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link": "url_agol_item_id",
-                                          "Agency Performing Data Updates": "organization_name",
-                                          "Owner": "owner",
-                                          "Data Provided By": "organization_name",
-                                          "Source URL": "url",
-                                          "Update Frequency": "maintenance_frequency_word",
-                                          "Date of Most Recent Data Change": "publication_date_dt",
+                                                "Agency Performing Data Updates": "organization_name",
+                                                "Owner": "owner",
+                                                "Data Provided By": "organization_name",
+                                                "Source URL": "url",
+                                                "Update Frequency": "maintenance_frequency_word",
+                                                "Date of Most Recent Data Change": "publication_date_dt",
                                                 "Days Since Last Data Update": "days_since_last_data_update",
                                                 "Date of Most Recent View Change in Data or Metadata": "publication_date_dt",
                                                 "Days Since Last View Update": "days_since_last_data_update",
                                                 "Updated Recently Enough": "updated_recently_enough",
                                                 "Number of Rows": "number_of_rows",
                                                 "Tags Keywords": "tags_string", "Column Names": "column_names_string",
-                                                "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
+                                                "Missing Metadata Fields": "missing_metadata_fields",
+                                                "Portal": "portal",
                                                 "Category": "category"}
 json_output_columns_list = ["category", "description_text", "id", "publication_date_dt", "portal", "organization_name", "url", "tags", "title", "type_", "url_agol_item_id"]
 json_param_for_request = {'f': 'json'}

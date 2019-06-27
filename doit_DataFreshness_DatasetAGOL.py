@@ -225,6 +225,9 @@ class DatasetAGOL:
                 print(f"TypeError: {te}. pub tz:{self.publication_date_dt.tzinfo}, process tz: {var.process_initiation_datetime.tzinfo}, {self.url_agol_item_id}")
                 self.days_since_last_data_update = None
 
+    def check_for_null_source_url_and_replace(self):
+        self.url = "https://" if self.url is None else self.url
+
     def convert_milliseconds_attributes_to_datetime(self):
 
         try:

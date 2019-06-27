@@ -52,6 +52,7 @@ def main():
         agol_dataset.assign_data_catalog_json_to_class_values(data_json=result)
         agol_dataset.build_standardized_item_url()
         agol_dataset.create_tags_string()
+        agol_dataset.check_for_null_source_url_and_replace()
 
         # Check type_ to eliminate those we are not interested in evaluating
         if agol_dataset.type_ not in var.types_to_evaluate:
