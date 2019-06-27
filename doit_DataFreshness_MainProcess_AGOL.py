@@ -61,16 +61,16 @@ def main():
 
 
         # # TESTING
-        test_list = ["c8b282aed4c84bb5a8c991e1a9b7b30e",
-                     "994056da227a44a9a525ee71a9db47ec",
-                     "1f7af0c9fa2c4d168f3f3b8ca21feba1",
-                     "2e934685306d43a094f642c8dfb8e986",
-                     "dfb1e5eade3743b0b697e77f57116d6e",
-                     "7eaa7eae084548d0b24c40323b23554e",
-                     "052945270da7408fbcfec431518519c5",
-                     "22e4569f85e94d49b9333bad0b27bb84"]
-        if agol_dataset.id not in test_list:
-            continue
+        # test_list = ["c8b282aed4c84bb5a8c991e1a9b7b30e",
+        #              "994056da227a44a9a525ee71a9db47ec",
+        #              "1f7af0c9fa2c4d168f3f3b8ca21feba1",
+        #              "2e934685306d43a094f642c8dfb8e986",
+        #              "dfb1e5eade3743b0b697e77f57116d6e",
+        #              "7eaa7eae084548d0b24c40323b23554e",
+        #              "052945270da7408fbcfec431518519c5",
+        #              "22e4569f85e94d49b9333bad0b27bb84"]
+        # if agol_dataset.id not in test_list:
+        #     continue
 
 
 
