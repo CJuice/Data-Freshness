@@ -215,7 +215,7 @@ def main():
     # print(master_socrata_df.head())
 
     # Need to output a dataframe that matches the existing data freshness report
-    master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_AGOL,
+    master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_SOCRATA,
                                sheet_name=var.output_excel_sheetname,
                                na_rep=np.NaN,
                                float_format=None,
@@ -224,6 +224,8 @@ def main():
                                index=False)
 
     # TODO: Need to output json for the DataCompiled.json build
+    json_output_df = master_socrata_df[var.json_output_columns_list]
+    json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_SOCRATA, orient="records")
 
     # #quick write of full frame for pat
     # master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,

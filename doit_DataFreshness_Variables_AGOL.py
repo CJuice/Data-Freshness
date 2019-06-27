@@ -23,12 +23,14 @@ dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link":
                                                 "Tags Keywords": "tags_string", "Column Names": "column_names_string",
                                                 "Missing Metadata Fields": "missing_metadata_fields", "Portal": "portal",
                                                 "Category": "category"}
+json_output_columns_list = ["category", "description_text", "id", "publication_date_dt", "portal", "organization_name", "url", "tags", "title", "type_", "url_agol_item_id"]
 json_param_for_request = {'f': 'json'}
 metadata_missing = "Metadata on update frequency are missing. Dataset owner should provide this information to resolve this issue."
 null_string = "NULL"
 number_of_seconds_in_a_day = 86400
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
 output_excel_file_path_data_freshness_AGOL = r"Docs\DataFreshnessOutputs\AGOL_data_freshness.xlsx"
+output_json_file_path_data_freshness_AGOL = r"Docs\DataFreshnessOutputs\AGOL_data_freshness.json"
 output_excel_sheetname = "The Data Nasty"
 types_to_evaluate = ("Feature Service", "Image Service", "Map Service") # Currently ignored types: Code Attachment, Web Map, Web Mapping Application
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."

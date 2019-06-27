@@ -106,7 +106,7 @@ class DatasetSocrata:
         self.resource_url = None
         self.theme_list = None
         self.title = None
-        self.type = None
+        self.type_ = None
 
         # ASSET INVENTORY SOURCED VALUES
         self.contact_email = None
@@ -231,7 +231,7 @@ class DatasetSocrata:
         self.keyword_list = dataset_json.get("keyword", None)
         self.landing_page = dataset_json.get("landingPage", None)
         self.publisher_dict = dataset_json.get("publisher", None)
-        self.type = dataset_json.get("@type", None)
+        self.type_ = dataset_json.get("@type", None)
         self.theme_list = dataset_json.get("theme", None)
         self.title = dataset_json.get("title", None)
 

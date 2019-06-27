@@ -61,8 +61,16 @@ def main():
 
 
         # # TESTING
-        # if agol_dataset.id != "c8b282aed4c84bb5a8c991e1a9b7b30e":
-        #     continue
+        test_list = ["c8b282aed4c84bb5a8c991e1a9b7b30e",
+                     "994056da227a44a9a525ee71a9db47ec",
+                     "1f7af0c9fa2c4d168f3f3b8ca21feba1",
+                     "2e934685306d43a094f642c8dfb8e986",
+                     "dfb1e5eade3743b0b697e77f57116d6e",
+                     "7eaa7eae084548d0b24c40323b23554e",
+                     "052945270da7408fbcfec431518519c5",
+                     "22e4569f85e94d49b9333bad0b27bb84"]
+        if agol_dataset.id not in test_list:
+            continue
 
 
 
@@ -170,6 +178,9 @@ def main():
                             index=False)
 
     # TODO: Need to output json for the DataCompiled.json build
+    json_output_df = master_agol_df[var.json_output_columns_list]
+    json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_AGOL, orient="records")
+
 
     # For outputting the full dataframe
     # master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
