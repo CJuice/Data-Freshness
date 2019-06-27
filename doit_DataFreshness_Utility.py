@@ -20,7 +20,6 @@ class Utility:
         except Exception as e:
             print(f"Error with request to {url}. Error:{e}")
             return requests.models.Response()
-            # exit()
         else:
             return response
 
