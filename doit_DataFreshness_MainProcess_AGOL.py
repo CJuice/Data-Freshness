@@ -110,7 +110,7 @@ def main():
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
-    # TODO: Need to make the requests to the Groups url to gather that value for processing
+    # Need to make the requests to the Groups url to gather that value for processing
     print(f"\nGroups Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         # these groups warrant an independent object/class. They are not part of the asset but something
@@ -165,7 +165,7 @@ def main():
                             header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                             index=False)
 
-    # TODO: Need to output json for the DataCompiled.json build
+    # Need to output json for the DataCompiled.json build
     json_output_df = master_agol_df[var.json_output_columns_list]
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_AGOL, orient="records")
 

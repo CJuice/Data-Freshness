@@ -143,7 +143,7 @@ def main():
             continue
         else:
             socrata_data_obj.assign_asset_inventory_json_to_class_values(asset_json=asset_json_obj)
-            socrata_data_obj.check_for_null_source_url_and_replace() # FIXME: added this to both worlds. tried https:// but wasnt' sufficient
+            socrata_data_obj.check_for_null_source_url_and_replace()
 
             # while the full asset json is still available, determine missing fields from expected set of fields
             socrata_data_obj.determine_missing_metadata_fields(asset_json=asset_json_obj)
@@ -183,11 +183,11 @@ def main():
     print(f"Number of GIS Datasets encountered has been updated: {socrata_gis_dataset_counter}")
     print(f"Number of remaining public Socrata dataset objects: {len(socrata_class_objects_dict)}")
 
-    # TODO: Need to perform conversions, calculations, and derivations that must occur prior to dataframe
-    #  creation but after losing source json
+    # Need to perform conversions, calculations, and derivations that must occur prior to dataframe
+    #  creation but after dumping source json
     for key, obj in socrata_class_objects_dict.items():
         try:
-            obj.determine_date_of_most_recent_data_change()  # TODO: Output string format may need revising. Ask Pat.
+            obj.determine_date_of_most_recent_data_change()
         except TypeError as te:
             print(obj.four_by_four, te)
         else:
@@ -224,7 +224,6 @@ def main():
                                header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                                index=False)
 
-    # TODO: Need to output json for the DataCompiled.json build
     json_output_df = master_socrata_df[var.json_output_columns_list]
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_SOCRATA, orient="records")
 

@@ -140,12 +140,12 @@ class DatasetAGOL:
         self.publication_date_str = None
 
         # Source URL Query
-        self.number_of_rows = None  # TODO: Have not determined this yet. Need to develop new functionality. Old process did not do this.
+        self.number_of_rows = None  # Old process did not do this.
         self.columns = None
 
         # DERIVED
-        self.category = None  # TODO: Need to develop this part of the process
-        self.column_names_string = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
+        self.category = None
+        self.column_names_string = None
         self.created_dt = None
         self.days_since_last_data_update = None
         self.description_text = None
@@ -156,7 +156,7 @@ class DatasetAGOL:
         self.meta_modification_date_dt = None
         self.meta_modification_time_dt = None
         self.metadata_url = None
-        self.missing_metadata_fields = None  # TODO: Socrata process output generates these values. Need matching value so dataframes match
+        self.missing_metadata_fields = None  # Socrata output contains these values but too many to do for agol
         self.modified_dt = None
         self.publication_date_dt = None
         self.tags_string = None
