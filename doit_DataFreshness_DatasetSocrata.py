@@ -87,7 +87,7 @@ class DatasetSocrata:
         viewType - Not stored, did not appear to be useful
         """
 
-        # FIXME: Resolve differences between, and need of or value of, issued (d) vs last_update_date_data (a) publicationDate (m) vs rowsUpdatedAt (m) vs indexUpdatedAt (m)
+        # TODO: Resolve differences between, and need of or value of, issued (d) vs last_update_date_data (a) publicationDate (m) vs rowsUpdatedAt (m) vs indexUpdatedAt (m)
         # NOTES: issued is most generic and only accurate to the day.
 
         self.portal = "Socrata"  # Would make a constant but mapping to pandas dataframe field becomes more cumbersome.
@@ -312,7 +312,7 @@ class DatasetSocrata:
         #   the number of records. This is more efficient than doing so for every single dataet. Only make costly web requests for subset of all datasets.
 
     def check_for_null_source_url_and_replace(self):
-        self.source_link = "https://" if self.source_link is None else self.source_link
+        self.source_link = "https://N.U.LL" if self.source_link is None else self.source_link
 
     def determine_date_of_most_recent_data_change(self):
         """

@@ -226,7 +226,7 @@ class DatasetAGOL:
                 self.days_since_last_data_update = None
 
     def check_for_null_source_url_and_replace(self):
-        self.url = "https://" if self.url is None else self.url
+        self.url = "https://N.U.LL" if self.url is None else self.url
 
     def convert_milliseconds_attributes_to_datetime(self):
 
@@ -335,7 +335,6 @@ class DatasetAGOL:
         self.publication_date_str = pub_date_element.text if pub_date_element is not None else None
 
     def is_up_to_date(self):
-        # FIXME: Power Outage layers test is still not generating a freshness yes. Days since update is -1. The update freq code is still NULL
         """
         Determine if a dataset is up to date according to its update frequency.
         Created two dictionaries, instead of one, to hold integer comparison value snd string values. The integer
