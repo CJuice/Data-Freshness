@@ -1,21 +1,24 @@
 """
-
+Contains the DatasetAGOL class that is for storing dataset values as class attributes and for providing functionality
+necessary to get/process the values.
 """
-import DataFreshness.doit_DataFreshness_Variables_AGOL as var
-from DataFreshness.doit_DataFreshness_Utility import Utility
-import json
 import datetime
-from dateutil import parser as date_parser
+import json
+import xml.etree.ElementTree as ET
+import requests
+import DataFreshness.doit_DataFreshness_Variables_AGOL as var
 from bs4 import BeautifulSoup
+from dateutil import parser as date_parser
+from DataFreshness.doit_DataFreshness_Utility import Utility
 
 
 class DatasetAGOL:
     """
-
+    AGOL Dataset class designed to store values and provide functionality specific to ArcGIS Online datasets.
     """
 
     OWNER = 'owner:mdimapdatacatalog'
-    RECORD_LIMIT = '100' # When changed from 100 the return quanity doesn't actually change. Unsure why ineffective.
+    RECORD_LIMIT = '100'  # When changed from 100 the return quantity doesn't actually change. Unsure why ineffective.
     SORT_FIELD = 'title'
 
     def __init__(self):
@@ -84,7 +87,7 @@ class DatasetAGOL:
         """
 
         # NON-DERIVED
-        self.portal = "Data Catalog"  # Would make a constant but mapping to pandas dataframe field becomes more cumbersome.
+        self.portal = "Data Catalog"  # Would make a constant but mapping to pandas df field becomes more cumbersome.
         self.group_id = None
 
         # Data Catalog sourced attributes
@@ -164,6 +167,13 @@ class DatasetAGOL:
         self.updated_recently_enough = None
 
     def assign_data_catalog_json_to_class_values(self, data_json: dict):
+        """
+        Get values from json and assign to class attributes
+        Some of these are commented out because they were not deemed useful after inspection. The functionality was
+        kept so that in the future it could be easily turned on if needed.
+        :param data_json:
+        :return:
+        """
         self.access = data_json.get("access", None)
         self.access_information = data_json.get("accessInformation", None)
         # self.app_categories = data_json.get("appCategories", None)
@@ -206,10 +216,17 @@ class DatasetAGOL:
         self.url = data_json.get("url", None)
 
     def build_standardized_item_url(self):
-        # Spoke with Matt, this is what we are going with.
+        """
+        Build the standard dataset url based on the unique item id value and store.
+        :return:
+        """
         self.url_agol_item_id = var.arcgis_item_url.format(item_id=self.id)
 
     def build_metadata_xml_url(self):
+        """
+        Build the url for requesting the metadata for a dataset and assign to attribute
+        :return:
+        """
         self.metadata_url = var.arcgis_metadata_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
                                                            item_id=self.id)
 
@@ -226,41 +243,58 @@ class DatasetAGOL:
                 self.days_since_last_data_update = None
 
     def check_for_null_source_url_and_replace(self):
+        """
+        Check the url attribute for null and replace with a value identified by socrata as a valid url.
+        :return:
+        """
         self.url = "https://N.U.LL" if self.url is None else self.url
 
     def convert_milliseconds_attributes_to_datetime(self):
-
-        try:
-            self.created_dt = datetime.datetime.fromtimestamp(self.created/1000)
-        except TypeError as te:
-            print(f"TypeError during convert_milliseconds_to_datetime(). millis value:{self.created}, {te}")
-        try:
-            self.modified_dt = datetime.datetime.fromtimestamp(self.modified/1000)
-        except TypeError as te:
-            print(f"TypeError during convert_milliseconds_to_datetime(). millis value:{self.modified}, {te}")
-
-    def create_tags_string(self):
-        self.tags_string = ", ".join(self.tags) if self.tags is not None else None
-
-    def extract_and_assign_esri_date_time_values(self, element):
         """
-
-        :param element:
+        Convert milliseconds value to datetime values and assign to attributes.
+        At time of design this applied to the created value and the modified value.
         :return:
         """
+        def local_inner_function(id_for_error, value_in_millis):
+            try:
+                return datetime.datetime.fromtimestamp(value_in_millis/1000)
+            except TypeError as te:
+                print(f"TypeError during convert_milliseconds_to_datetime(). value:{value_in_millis}, Asset: {id_for_error}. {te}")
+                return None
+
+        self.created_dt = local_inner_function(id_for_error=self.id, value_in_millis=self.created)
+        self.modified_dt = local_inner_function(id_for_error=self.id, value_in_millis=self.modified)
+
+    def create_tags_string(self):
+        """
+        Join list of strings together to make commas separated string for output.
+        :return:
+        """
+        self.tags_string = ", ".join(self.tags) if self.tags is not None else None
+
+    def extract_and_assign_esri_date_time_values(self, element: ET.Element):
+        """
+        Extract values from esri xml element and assign to instance attributes.
+        :param element: xml element to examine
+        :return:
+        """
+        # Extract ESRI xml value/section
         esri_metadata_xml_element = Utility.extract_first_immediate_child_feature_from_element(
             element=element,
             tag_name="Esri")
 
+        # Safeguard against None and return
         if esri_metadata_xml_element is None:
             print(f"ESRI XML Tag is None. Asset: {self.url_agol_item_id}")
             return
 
+        # Setup of the tags to be extracted
         esri_xml_tags_and_values = {"CreaDate": None,
                                     "CreaTime": None,
                                     "ModDate": None,
                                     "ModTime": None}
 
+        # search for and extract the items, then store in dict
         for tag_name, value in esri_xml_tags_and_values.items():
             try:
                 esri_xml_tags_and_values[tag_name] = Utility.extract_first_immediate_child_feature_from_element(
@@ -269,6 +303,7 @@ class DatasetAGOL:
             except AttributeError as ae:
                 print(f"ESRI XML Tag '{tag_name}' NOT FOUND. Call to .text raised Attribute Error: {ae}. Asset: {self.url_agol_item_id}")
 
+        # Assign the values in the dict to the relevant attribute
         self.meta_creation_date_str = esri_xml_tags_and_values.get("CreaDate")
         self.meta_creation_time_str = esri_xml_tags_and_values.get("CreaTime")
         self.meta_modification_date_str = esri_xml_tags_and_values.get("ModDate")
@@ -276,27 +311,41 @@ class DatasetAGOL:
 
         return
 
-    def extract_and_assign_field_names(self, response):
+    def extract_and_assign_field_names(self, response: requests.models.Response):
+        """
+        Extract values from response json and assign to attributes
+        :param response: response from request
+        :return:
+        """
         try:
+
+            # Need the response json
             fields_list = response.json().get("fields", None)
         except Exception as e:
             print(f"Unanticipated Exception while extracting field names from response. {e}. {self.url_agol_item_id}")
         else:
-            accumulated_field_names_list = []
+
+            # Protect against None and return
             if fields_list is None:
                 return
 
+            # for field in the fields list get the name or substitute a string indicating an error/issue.
+            accumulated_field_names_list = []
             for field in fields_list:
                 accumulated_field_names_list.append(field.get("name", "ERROR_DoIT"))
+
+            # make a comma separated string of list items and assign
             self.column_names_string = ", ".join(accumulated_field_names_list)
 
-    def extract_and_assign_maintenance_frequency_code(self, element):
+    def extract_and_assign_maintenance_frequency_code(self, element: ET.Element):
         """
+        Extract and assign values from xml element.
 
-        After the following dataIdInfo/resMaint/maintFreq/MaintFreqCd
-        :param element:
+        Specific to maintenance frequency code. After the following dataIdInfo/resMaint/maintFreq/MaintFreqCd
+        :param element: xml element
         :return:
         """
+
         data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element, tag_name="dataIdInfo") if element is not None else None
         res_maintenance_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="resMaint") if data_id_info_element is not None else None
         maint_freq_element = Utility.extract_first_immediate_child_feature_from_element(element=res_maintenance_element, tag_name="maintFreq") if res_maintenance_element is not None else None
@@ -306,11 +355,13 @@ class DatasetAGOL:
 
     def extract_and_assign_organization_name(self, element):
         """
+        Extract and assign values from xml element.
 
-        After the following dataIdInfo/idCitation/citRespParty/rpOrgName
-        :param element:
+        Specific to organization name. After the following dataIdInfo/idCitation/citRespParty/rpOrgName
+        :param element: xml element
         :return:
         """
+
         data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element,
                                                                                           tag_name="dataIdInfo") if element is not None else None
         id_citation_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element,
@@ -323,11 +374,13 @@ class DatasetAGOL:
 
     def extract_and_assign_publication_date(self, element):
         """
+        Extract and assign values from xml element.
 
-        After the following dataIdInfo/idCitation/date/pubDate
+        Specific to publication date. After the following dataIdInfo/idCitation/date/pubDate
         :param element:
         :return:
         """
+
         data_id_info_element = Utility.extract_first_immediate_child_feature_from_element(element=element, tag_name="dataIdInfo") if element is not None else None
         id_citation_element = Utility.extract_first_immediate_child_feature_from_element(element=data_id_info_element, tag_name="idCitation") if data_id_info_element is not None else None
         date_element = Utility.extract_first_immediate_child_feature_from_element(element=id_citation_element, tag_name="date") if id_citation_element is not None else None
@@ -377,16 +430,16 @@ class DatasetAGOL:
 
     def parse_date_like_string_attributes(self):
         """
+        Parse date like strings into datetime objects and assign.
 
         NOTE: The attributes of interest at the time of design were esri's creation date and time, esri's modification
         date and time, and the publication date that is auto-populated unless we manually enter a value
         :return:
         """
-        def local_inner_function(attribute_name, value):
+        def local_inner_function(value: str):
             """
-
-            :param attribute_name:
-            :param value:
+            Parse the string date and time value and return all while protected with try/except.
+            :param value: string value to be parsed
             :return:
             """
             # For real time or continual update data we have used "Continual" in the publication date metadata field.
@@ -398,48 +451,48 @@ class DatasetAGOL:
             try:
                 return date_parser.parse(value)
             except (ValueError, TypeError) as err:
-                # print(f"Unable to parse {attribute_name} value: {value}, {err}")
+                print(f"Exception during parsing of date like string {value}. {err}")
                 return None
 
-        self.meta_creation_date_dt = local_inner_function(attribute_name="meta_creation_date",
-                                                          value=self.meta_creation_date_str)
-        self.meta_creation_time_dt = local_inner_function(attribute_name="meta_creation_time",
-                                                          value=self.meta_creation_time_str)
-        self.meta_modification_date_dt = local_inner_function(attribute_name="meta_modification_date",
-                                                              value=self.meta_modification_date_str)
-        self.meta_modification_time_dt = local_inner_function(attribute_name="meta_modification_time",
-                                                              value=self.meta_modification_time_str)
-        self.publication_date_dt = local_inner_function(attribute_name="publication_date", value=self.publication_date_str)
+        self.meta_creation_date_dt = local_inner_function(value=self.meta_creation_date_str)
+        self.meta_creation_time_dt = local_inner_function(value=self.meta_creation_time_str)
+        self.meta_modification_date_dt = local_inner_function(value=self.meta_modification_date_str)
+        self.meta_modification_time_dt = local_inner_function(value=self.meta_modification_time_str)
+        self.publication_date_dt = local_inner_function(value=self.publication_date_str)
 
     def parse_html_attribute_values_to_soup_get_text(self):
         """
-
+        Parse html like strings to isolate the text and remove html code, and assign to attribute
         :return:
         """
-        def local_inner_function(attribute_name, value):
+        def local_inner_function(id_for_error, value):
             """
-
-            :param attribute_name:
-            :param value:
+            Parse string using BeautifulSoup to isolate meaningful text (sans html code characters)
+            :param id_for_error: asset id for meaningful printout
+            :param value: string to be souped
             :return:
             """
             try:
-                soup = BeautifulSoup(self.license_info_raw, "html.parser")
+                soup = BeautifulSoup(value, "html.parser")
                 return soup.get_text()
             except Exception as e:
-                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. {e}, Asset: {self.url_agol_item_id}")
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. Asset: {id_for_error}. {e}")
                 return None
-        self.license_info_text = local_inner_function(attribute_name="license_info", value=self.license_info_raw)
-        self.description_text = local_inner_function(attribute_name="description", value=self.description_raw)
+
+        self.license_info_text = local_inner_function(id_for_error=self.id, value=self.license_info_raw)
+        self.description_text = local_inner_function(id_for_error=self.id, value=self.description_raw)
 
     def process_maintenance_frequency_code(self):
         """
+        Determine, based on code value, which maintenance frequency string to assign.
 
         Note: To keep AGOL process similar to socrata process we will convert the code to a word and then use the word
         to check if is up to date. Could just use these codes instead but wanted to keep similar to Socrata process for
         ease of understanding in future.
         :return:
         """
+
+        # Protect against None
         if self.maintenance_frequency_code is None:
             return
         else:
@@ -459,7 +512,12 @@ class DatasetAGOL:
                                     }
             self.maintenance_frequency_word = code_conversion_dict.get(self.maintenance_frequency_code, "-9999")
 
-    def process_category_from_group_object(self, group_object_title):
+    def process_category_from_group_object(self, group_object_title: str):
+        """
+        Remove a default string value from the group object title and assign
+        :param group_object_title:  title of group
+        :return:
+        """
         self.category = group_object_title.replace("Maryland GIS Data Catalog: ", "") if group_object_title is not None else None
 
     @staticmethod
