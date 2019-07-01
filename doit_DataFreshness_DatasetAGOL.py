@@ -8,6 +8,7 @@ import json
 import xml.etree.ElementTree as ET
 import requests
 import DataFreshness.doit_DataFreshness_Variables_AGOL as var
+
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 from DataFreshness.doit_DataFreshness_Utility import Utility
@@ -21,8 +22,8 @@ class DatasetAGOL:
     Attributes are organized by their original source or into derived values. Three resources are consulted and these
     are the data catalog json, the metadata xml for each dataset, and the group to which the asset is assigned.
     The values in the response are extracted, assigned, and stored as attributes but the original is not saved.
-    The attributes have been organized alphabetically within their source groups. The derived values group are attributes that are derived from
-    processing raw values from the json and involve decision making or conversions.
+    The attributes have been organized alphabetically within their source groups. The derived values category
+    comes from processing raw values and involve decision making or conversions.
     """
 
     OWNER = 'owner:mdimapdatacatalog'
