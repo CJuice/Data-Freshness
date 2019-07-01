@@ -4,43 +4,40 @@
 
 
 def main():
+
     import time
     start_time = time.time()
     print(f"Start Time: {start_time} seconds since Epoch")
 
     # IMPORTS
     import itertools
-    import json
     import numpy as np
     import pandas as pd
     import requests
-
-    from DataFreshness.doit_DataFreshness_Utility import Utility
     import DataFreshness.doit_DataFreshness_Variables_AGOL as var
+
     from DataFreshness.doit_DataFreshness_DatasetAGOL import DatasetAGOL
     from DataFreshness.doit_DataFreshness_GroupAGOL import GroupAGOL
+    from DataFreshness.doit_DataFreshness_Utility import Utility
 
     # Disable the security warnings for https from data.maryland.gov
     requests.packages.urllib3.disable_warnings()
+
     print(f"\nImports Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # VARIABLES
-    agol_dataset_counter = itertools.count()
-    agol_webmap_counter = itertools.count()
-    agol_webapp_counter = itertools.count()
-    agol_other_counter = itertools.count()
-    agol_metadata_counter = itertools.count()
-    skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
-    # agol_data_catalog_responses = []
     agol_class_objects_dict = {}
+    agol_dataset_counter = itertools.count()
     agol_group_objects_dict = {}
-
-    # CLASSES
-    # FUNCTIONS
-    # FUNCTIONALITY
+    agol_metadata_counter = itertools.count()
+    agol_other_counter = itertools.count()
+    agol_webapp_counter = itertools.count()
+    agol_webmap_counter = itertools.count()
+    output_full_dataframe = True
+    skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
-    # ARCGIS ONLINE
+    # FUNCTIONALITY
     print(f"\nArcGIS Online Process Initiating...")
     master_list_of_results = DatasetAGOL.request_all_data_catalog_results()
 
@@ -167,13 +164,13 @@ def main():
     json_output_df = master_agol_df[var.json_output_columns_list]
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_AGOL, orient="records")
 
-
     # For outputting the full dataframe
-    master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
-                            sheet_name=var.output_excel_sheetname,
-                            na_rep=np.NaN,
-                            float_format=None,
-                            index=False)
+    if output_full_dataframe:
+        master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
+                                sheet_name=var.output_excel_sheetname,
+                                na_rep=np.NaN,
+                                float_format=None,
+                                index=False)
 
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
