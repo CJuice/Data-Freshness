@@ -2,6 +2,7 @@
 Contains the DatasetAGOL class that is for storing dataset values as class attributes and for providing functionality
 necessary to get/process the values.
 """
+
 import datetime
 import json
 import xml.etree.ElementTree as ET
@@ -14,7 +15,14 @@ from DataFreshness.doit_DataFreshness_Utility import Utility
 
 class DatasetAGOL:
     """
-    AGOL Dataset class designed to store values and provide functionality specific to ArcGIS Online datasets.
+    Class for storing information on a arcgis online datasets and for processing values for output needs.
+    An object is instantiated to None for all attributes and then the values are assigned after extraction from json or
+        after processing.
+    Attributes are organized by their original source or into derived values. Three resources are consulted and these
+    are the data catalog json, the metadata xml for each dataset, and the group to which the asset is assigned.
+    The values in the response are extracted, assigned, and stored as attributes but the original is not saved.
+    The attributes have been organized alphabetically within their source groups. The derived values group are attributes that are derived from
+    processing raw values from the json and involve decision making or conversions.
     """
 
     OWNER = 'owner:mdimapdatacatalog'
@@ -83,6 +91,11 @@ class DatasetAGOL:
                         {'date', 'citRespParty', 'resTitle', 'collTitle'}
                     set of children xml elements under date -
                         {'reviseDate', 'pubDate'}
+
+                GROUP NOTES:
+                The category attribute comes from inspection of the group to which the asset is assigned. A Group has
+                substantial data available on it and this prompted the design of a Group class. See the group class for
+                more details on what could be extracted.
 
         """
 
