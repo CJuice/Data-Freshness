@@ -136,9 +136,6 @@ def main():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
         agol_dataset.number_of_rows = record_count_response.json().get("count", -9999) if field_query_response is not None else -9999
-        # except json.JSONDecodeError as jde:
-        #     print(f"JSONDecodeError during row count query: {jde}. {agol_dataset.url} {record_count_response.url}")
-        #     agol_dataset.number_of_rows = -9999
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
