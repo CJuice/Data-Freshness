@@ -31,8 +31,8 @@ null_string = "NULL"
 number_of_seconds_in_a_day = 86400
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
 output_excel_file_path_data_freshness_AGOL = r"Docs\DataFreshnessOutputs\AGOL_data_freshness.xlsx"
-output_json_file_path_data_freshness_AGOL = r"Docs\DataFreshnessOutputs\AGOL_data_freshness.json"
 output_excel_sheetname = "The Data Nasty"
+output_json_file_path_data_freshness_AGOL = r"Docs\DataFreshnessOutputs\AGOL_data_freshness.json"
 types_to_evaluate = ("Feature Service", "Image Service", "Map Service") # Currently ignored types: Code Attachment, Web Map, Web Mapping Application
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
 update_frequency_unknown = "Update frequency metadata is Unknown. Dataset owner should add metadata to resolve this issue."
@@ -40,18 +40,15 @@ updated_enough_no = "No"
 updated_enough_yes = "Yes"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
 
-
 # DERIVED
-arcgis_sharing_rest_url = f"{arcgis_root_url}/sharing/rest"
-arcgis_data_catalog_url = f"{arcgis_sharing_rest_url}/search"
-arcgis_items_root_url = f"{arcgis_sharing_rest_url}/content/items"
 arcgis_group_url = "{arcgis_items_root_url}/{item_id}/groups/"
+arcgis_sharing_rest_url = f"{arcgis_root_url}/sharing/rest"
+arcgis_data_catalog_url = f"{arcgis_sharing_rest_url}/search"  # Dependent so out of alphabetic order
+arcgis_items_root_url = f"{arcgis_sharing_rest_url}/content/items"  # Dependent so out of alphabetic order
 arcgis_metadata_url = "{arcgis_items_root_url}/{item_id}/info/metadata/metadata.xml"
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
+fields_query_params = {"where": "1=1", "outFields":"*", "returnGeometry": False, "resultRecordCount": 1, "f": "pjson"}
 output_excel_file_path_full_dataframe = r"Docs\{date}AGOL_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
 process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
-# record_count_query_url = r"{data_source_rest_url}/query?where=1%3D1&returnGeometry=false&returnCountOnly=true&f=pjson"
-# record_count_query_url = r"{data_source_rest_url}/query?where=1=1&returnGeometry=false&returnCountOnly=true&f=pjson"
-root_service_query_url = r"{data_source_rest_url}/query"
 record_count_params = {"where": "1=1", "returnGeometry": False, "returnCountOnly": True, "f": "pjson"}
-fields_query_params = {"where": "1=1", "outFields":"*", "returnGeometry": False, "resultRecordCount": 1, "f": "pjson"}
+root_service_query_url = r"{data_source_rest_url}/query"

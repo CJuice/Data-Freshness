@@ -68,8 +68,8 @@ output_json_file_path_data_freshness_SOCRATA = r"Docs\DataFreshnessOutputs\SOCRA
 please_describe_below = "Other (Please Describe Below)"
 process_initiation_datetime_in_seconds = float(round(time.time()))
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
-updated_enough_yes = "Yes"
 updated_enough_no = "No"
+updated_enough_yes = "Yes"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
 
 # DERIVED
