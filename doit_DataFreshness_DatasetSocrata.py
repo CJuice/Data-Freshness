@@ -6,6 +6,7 @@ import itertools
 import os
 import time
 import DataFreshness.doit_DataFreshness_Variables_Socrata as var
+
 from sodapy import Socrata
 
 
@@ -312,6 +313,10 @@ class DatasetSocrata:
         #   the number of records. This is more efficient than doing so for every single dataet. Only make costly web requests for subset of all datasets.
 
     def check_for_null_source_url_and_replace(self):
+        """
+        Replace null source link values with a value Socrata recognizes as a valid url
+        :return:
+        """
         self.source_link = "https://N.U.LL" if self.source_link is None else self.source_link
 
     def determine_date_of_most_recent_data_change(self):
