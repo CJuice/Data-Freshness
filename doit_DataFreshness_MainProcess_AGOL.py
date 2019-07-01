@@ -63,7 +63,7 @@ def main():
 
     # Print outs for general understanding of data catalog process
     print(f"\nData Catalog Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-    print(f"Number of data layers handled: {agol_dataset_counter}")
+    print(f"Number of data layers encountered: {agol_dataset_counter}")
     print(f"Number of web maps encountered: {agol_webmap_counter}")
     print(f"Number of web apps encountered: {agol_webapp_counter}")
     print(f"Number of other items encountered: {agol_other_counter}")
