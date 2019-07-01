@@ -144,10 +144,7 @@ def main():
                                   dtype=None,
                                   copy=False)
     master_agol_df = master_agol_df.reindex(sorted(master_agol_df.columns), axis=1)
-
-    # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
     master_agol_df.fillna(value=var.null_string, inplace=True)
-
     print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_agol_df.info())
 
@@ -171,6 +168,7 @@ def main():
                                 na_rep=np.NaN,
                                 float_format=None,
                                 index=False)
+        print(f"Full dataframe output to {var.output_excel_file_path_full_dataframe}")
 
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 

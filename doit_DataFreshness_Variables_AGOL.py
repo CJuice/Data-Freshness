@@ -48,7 +48,7 @@ arcgis_items_root_url = f"{arcgis_sharing_rest_url}/content/items"  # Dependent 
 arcgis_metadata_url = "{arcgis_items_root_url}/{item_id}/info/metadata/metadata.xml"
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 fields_query_params = {"where": "1=1", "outFields":"*", "returnGeometry": False, "resultRecordCount": 1, "f": "pjson"}
-output_excel_file_path_full_dataframe = r"Docs\{date}AGOL_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
+output_excel_file_path_full_dataframe = r"Docs\AGOL_data_output.xlsx"
 process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
 record_count_params = {"where": "1=1", "returnGeometry": False, "returnCountOnly": True, "f": "pjson"}
 root_service_query_url = r"{data_source_rest_url}/query"
