@@ -445,7 +445,11 @@ class DatasetAGOL:
             # For real time or continual update data we have used "Continual" in the publication date metadata field.
             #   Since that is not a datetime we need to check and convert. This is necessary for later steps when we
             #   determine the freshness of the data.
-            if value == "Continual":
+            if value is None:
+
+                # Normally just try to parse and catch exception but so many None that print outs get excessive.
+                return None
+            elif value == "Continual":
                 return var.process_initiation_datetime
 
             try:

@@ -134,8 +134,9 @@ def main():
     print(f"\nNumber of Rows Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
+        agol_dataset.number_of_rows = record_count_response.json().get("count", -9999) if record_count_response is not None else -9999
+
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
-        agol_dataset.number_of_rows = record_count_response.json().get("count", -9999) if field_query_response is not None else -9999
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
@@ -168,11 +169,11 @@ def main():
 
 
     # For outputting the full dataframe
-    # master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
-    #                         sheet_name=var.output_excel_sheetname,
-    #                         na_rep=np.NaN,
-    #                         float_format=None,
-    #                         index=False)
+    master_agol_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
+                            sheet_name=var.output_excel_sheetname,
+                            na_rep=np.NaN,
+                            float_format=None,
+                            index=False)
 
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
