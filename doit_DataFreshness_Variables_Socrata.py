@@ -81,4 +81,3 @@ evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, w
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
 output_excel_file_path_full_dataframe = r"Docs\{date}SOCRATA_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
-
