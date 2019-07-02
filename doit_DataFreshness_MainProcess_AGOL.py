@@ -170,6 +170,8 @@ def main():
                                 index=False)
         print(f"Full dataframe output to {var.output_excel_file_path_full_dataframe}")
 
+    # TODO: Write out the tally of asset types for dashboard use
+
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
 

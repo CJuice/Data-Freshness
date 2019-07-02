@@ -1,9 +1,18 @@
 """
+Process for compiling Socrata results with ArcGIS Online results to make a single resource for upload to Socrata.
 
+There are two outputs. An excel file is generated. This file is used to refresh the Socrata open data portal Data
+Freshness dataset. A json file is generated for a search portal feature that was being developed by JCahoon but fell
+into dormancy when she left.
+Two files are necessary for this to work. The first is the Socrata results from the DataFreshness process and the
+second is the AGOL results. These two files have the same columns. The records are mashed/compiled together to make
+a single dataset.
 """
 
 
 def main():
+
+    # IMPORTS
     import datetime
     import json
     import os
@@ -17,9 +26,6 @@ def main():
     compiled_json_file_name = "DataCompiled.json"
     data_file_dir = r"Docs\DataFreshnessOutputs"
     null_string = "NULL"
-    socrata_dataframe_excel = None
-    socrata_excel_file_name = "SOCRATA_data_freshness.xlsx"
-    socrata_json_file_name = "SOCRATA_data_freshness.json"
     null_datetime_value = datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     null_integer_value = -9999
     null_url_value = "https://N.U.LL"
@@ -30,6 +36,9 @@ def main():
                                       "Date of Most Recent View Change in Data or Metadata": null_datetime_value,
                                       "Days Since Last View Update": null_integer_value,
                                       "Number of Rows": null_integer_value}
+    socrata_dataframe_excel = None
+    socrata_excel_file_name = "SOCRATA_data_freshness.xlsx"
+    socrata_json_file_name = "SOCRATA_data_freshness.json"
 
     # DERIVED
     combined_data_file_name_excel = f"{data_file_dir}\dataFreshness_{datetime.datetime.now().strftime('%Y_%m_%d')}.xlsx"
@@ -55,7 +64,7 @@ def main():
                                             index=False)
     print(master_data_freshness_df_excel.info())
 
-    # JSON Portion of the process
+    # JSON Portion of the process. For a search portal that is under development.
     for dirname, dirs, files in os.walk(data_file_dir):
         for file in files:
             if file == agol_json_file_name:
