@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 
 class Utility:
     """
-
+    Class of utility static methods for use in processing.
     """
 
     @staticmethod

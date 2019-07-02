@@ -19,6 +19,7 @@ def main():
     start_time = time.time()
     print(f"Start Time: {start_time} seconds since Epoch")
 
+    import datetime
     import itertools
     import json
     import numpy as np
@@ -231,13 +232,12 @@ def main():
     json_output_df = master_socrata_df[var.json_output_columns_list]
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_SOCRATA, orient="records")
 
-    # #quick write of full frame for pat
+    # write full frame
     if output_full_dataframe:
         master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
-                                   sheet_name="Pat is a data pimp",
+                                   sheet_name=datetime.datetime.now().strftime('%Y%m%d'),
                                    na_rep=np.NaN,
                                    index=False)
-        # actually.... according to https://www.urbandictionary.com/define.php?term=Data%20Pimp he is not a data pimp.
 
 
 if __name__ == "__main__":
