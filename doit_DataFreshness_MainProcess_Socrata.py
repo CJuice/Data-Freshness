@@ -1,14 +1,24 @@
 """
-Main processing script coordinating all functionality for completing data freshness process.
+Main process coordinating all Socrata asset attribute extraction and output for completing data freshness evaluation.
+Three resources are accessed in this process. The first is an openly available data.json containing information on
+all assets in Maryland Socraata based open data portal. This data json is used to instantiate dataset objects that
+are then used to launch into other requests. Each of the three sources provides some unique information that is stored
+in the class attributes. The second resource accessed is the asset inventory for the portal. This resource is protected.
+The third resource is the metadata on each asset.
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 
 
 def main():
+
+    # IMPORTS
     import time
     start_time = time.time()
     print(f"Start Time: {start_time} seconds since Epoch")
 
-    # IMPORTS
     import itertools
     import json
     import numpy as np
@@ -24,6 +34,7 @@ def main():
     boolean_string_replacement_dict = {"true": True, "false": False}
     credentials_parser = Utility.setup_config(cfg_file=var.credentials_config_file_path)
     dataset_freshness_dataset_counter = itertools.count()
+    output_full_dataframe = True
     socrata_assetinventory_counter = itertools.count()
     socrata_assetinventory_non_public_dataset_counter = itertools.count()
     socrata_assetinventory_public_dataset_counter = itertools.count()
@@ -36,12 +47,7 @@ def main():
 
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
-    # CLASSES
-    # FUNCTIONS
     # FUNCTIONALITY
-
-    # ===================================================
-    # SOCRATA
     print(f"\nBeginning Socrata Process...")
 
     # Need a socrata client for making requests for protected information
@@ -55,7 +61,7 @@ def main():
 
     # Get the data.json from Socrata so have an inventory of all public datasets
     #   Did not design to handle iterative requests for record count greater than limit. Socrata response for data.json
-    #   appears to send all datasets in initial request so not necessary for now.
+    #   appears to send all datasets in initial request so not necessary for now.20190610
     response_socrata = Utility.request_GET(url=var.md_socrata_data_json_url)
 
     try:
@@ -67,7 +73,8 @@ def main():
         socrata_data_json = response_socrata_json.get("dataset", {})
 
     # Create Socrata Dataset class objects from the datasets json, and store objects in list for use.
-    # Filter for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories"
+    # Filter for 'MD iMAP:', 'Dataset Freshness', 'Homepage Categories". Do not understand Homepage Categories but
+    #   preserved from original design. May be an old situation that no longer exists but was cheap to implement so meh
     for json_obj in socrata_data_json:
         next(socrata_datajson_counter)
 
@@ -207,13 +214,10 @@ def main():
                                      dtype=None,
                                      copy=False)
     master_socrata_df = master_socrata_df.reindex(sorted(master_socrata_df.columns), axis=1)
-
-    # TODO: Need to convert field types, process values such as dates, calculate values, build attributes, etc
     master_socrata_df.fillna(value=var.null_string, inplace=True)
 
-    print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_socrata_df.info())
-    # print(master_socrata_df.head())
+    print(f"\nSocrata DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need to output a dataframe that matches the existing data freshness report
     master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_SOCRATA,
@@ -228,10 +232,12 @@ def main():
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_SOCRATA, orient="records")
 
     # #quick write of full frame for pat
-    # master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
-    #                            sheet_name="Pat is a data pimp",
-    #                            na_rep=np.NaN,
-    #                            index=False)
+    if output_full_dataframe:
+        master_socrata_df.to_excel(excel_writer=var.output_excel_file_path_full_dataframe,
+                                   sheet_name="Pat is a data pimp",
+                                   na_rep=np.NaN,
+                                   index=False)
+        # actually.... according to https://www.urbandictionary.com/define.php?term=Data%20Pimp he is not a data pimp.
 
 
 if __name__ == "__main__":

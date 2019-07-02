@@ -1,5 +1,9 @@
 """
 Contains a single class for socrata dataset representation per MD DoIT needs.
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 import datetime
 import itertools

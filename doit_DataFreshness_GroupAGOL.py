@@ -1,9 +1,16 @@
 """
+An ArcGIS Online asset belongs to a Group and this class GroupAGOL stores the group info as attributes.
+Author: CJuice
+Date: 20190702
+Modifications:
 
 """
 
 
 class GroupAGOL:
+    """
+    Attributes and functionality for an ArcGIS Online Group
+    """
 
     def __init__(self):
         """
@@ -54,10 +61,18 @@ class GroupAGOL:
         self.group_modified_dt = None
 
     def assign_group_json_to_class_values(self, group_json: dict):
+        """
+        Assign values from json to the class attributes, for an AGOL Group
+        :param group_json: json for AGOL Group
+        :return:
+        """
+
+        # These appear to be everpresent
         self.admin = group_json.get("admin", None)
         self.member = group_json.get("member", None)
         self.other_list = group_json.get("other", None)
 
+        # Protect against None and an empty list, but then extract and assign values
         if self.other_list is not None and 0 < len(self.other_list):
             self.other_dict = self.other_list[0]
             self.group_id = self.other_dict.get("id", None)
@@ -73,4 +88,6 @@ class GroupAGOL:
             self.group_modified = self.other_dict.get("modified", None)
             self.group_access = self.other_dict.get("access", None)
             self.group_capabilities = self.other_dict.get("capabilities", None)
+        else:
+            return
 

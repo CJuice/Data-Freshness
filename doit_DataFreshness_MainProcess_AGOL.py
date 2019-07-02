@@ -1,15 +1,24 @@
 """
+Main process for ArcGIS Online asset examinations.
+This process makes requests to the Maryland ArcGIS online organizational account for all assets. This information
+is processed and assigned to attributes in a class. The dataset objects are then used to store data extracted from
+a metadata xml request and a agol groups request. Not all of the attributes that are stored are used at this time. In
+addition, there are attributes and extraction functionality that are commented out. The idea was to build a cadillac
+now and grow into the abundancy of features rather than have to come back later and add features onto a pinto.
+Author: CJuice
+Date: 20190702
+Modifications:
 
 """
 
 
 def main():
 
+    # IMPORTS
     import time
     start_time = time.time()
     print(f"Start Time: {start_time} seconds since Epoch")
 
-    # IMPORTS
     import itertools
     import numpy as np
     import pandas as pd
@@ -33,6 +42,7 @@ def main():
     agol_other_counter = itertools.count()
     agol_webapp_counter = itertools.count()
     agol_webmap_counter = itertools.count()
+    output_for_dashboard = True
     output_full_dataframe = True
     skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
@@ -78,7 +88,7 @@ def main():
             print(f"ISSUE: AGOL Item {agol_dataset.url_agol_item_id} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
 
-        # Need to handle sml and parse to usable form
+        # Need to handle xml and parse to usable form
         metadata_xml_element = Utility.parse_xml_response_to_element(response_xml_str=metadata_response.text)
 
         # Need to extract values from xml and assign to attributes in class objects.
@@ -111,30 +121,36 @@ def main():
     print(f"\nGroups Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
         # these groups warrant an independent object/class. They are not part of the asset but something
-        #   to which the asset can belong.
-        groups_response = Utility.request_GET(url=var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url, item_id=agol_dataset.id),
+        #   to which the asset can belong. Currently only use one value but in future may want to exploit more.
+        groups_response = Utility.request_GET(url=var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
+                                                                              item_id=agol_dataset.id),
                                               params=var.json_param_for_request)
         group_dataset = GroupAGOL()
         group_dataset.assign_group_json_to_class_values(group_json=groups_response.json())
 
-        # Appear to be about 23 unique groups 20190625 CJuice. little bit of waste rebuilding and overwriting but meh
+        # Appear to be about 23 unique groups 20190625 CJuice. little bit of waste rebuilding and overwriting but meh.
+        #   Had done a test using a set to see how many unique ones there were at time of design.
         agol_group_objects_dict[group_dataset.group_id] = group_dataset
 
-        # Store the group_id in the agol_dataset attributes so can retrieve information from appropriate group based off id if necessary
+        # Store group_id in the agol_dataset attributes so can retrieve info from approp group based off id if necessary
         agol_dataset.group_id = group_dataset.group_id
 
         # Process the title string to extract the category value per the old data freshness design
         agol_dataset.process_category_from_group_object(group_object_title=group_dataset.group_title)
+
     print(f"\nGroups Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need to get the number of rows in each dataset, and the column names for each dataset
     print(f"\nNumber of Rows Process Initiating...")
     for item_id, agol_dataset in agol_class_objects_dict.items():
-        record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.record_count_params)
+        record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
+                                                    params=var.record_count_params)
         agol_dataset.number_of_rows = record_count_response.json().get("count", -9999) if record_count_response is not None else -9999
 
-        field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), params=var.fields_query_params)
+        field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
+                                                   params=var.fields_query_params)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
+
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need a master pandas dataframe from all agol datasets
@@ -171,6 +187,8 @@ def main():
         print(f"Full dataframe output to {var.output_excel_file_path_full_dataframe}")
 
     # TODO: Write out the tally of asset types for dashboard use
+    # if output_for_dashboard:
+    #
 
     print(f"\nProcess Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 

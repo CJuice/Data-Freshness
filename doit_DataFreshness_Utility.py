@@ -1,5 +1,9 @@
 """
 A class of static utility methods independent of the process type (socrata or agol).
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 
 import configparser

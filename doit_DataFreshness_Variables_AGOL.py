@@ -1,5 +1,9 @@
 """
 File designated for process variables in order to centralize variables, and de-clutter main script.
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 import datetime
 

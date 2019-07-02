@@ -1,6 +1,10 @@
 """
 Contains the DatasetAGOL class that is for storing dataset values as class attributes and for providing functionality
 necessary to get/process the values.
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 
 import datetime

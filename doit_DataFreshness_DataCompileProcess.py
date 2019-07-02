@@ -7,6 +7,10 @@ into dormancy when she left.
 Two files are necessary for this to work. The first is the Socrata results from the DataFreshness process and the
 second is the AGOL results. These two files have the same columns. The records are mashed/compiled together to make
 a single dataset.
+Author: CJuice
+Date: 20190702
+Modifications:
+
 """
 
 
