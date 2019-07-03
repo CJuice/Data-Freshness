@@ -5,13 +5,14 @@ Date: 20190702
 Modifications:
 
 """
-import time
 import datetime
+import os
+import time
 
 # NOT DERIVED
+_root_file_path = os.path.dirname(__file__)
 all_map_layers = "All map layers from MD iMAP are in the process of being surveyed to determine this information."
 better_metadata_needed = "Better Metadata Needed."
-credentials_config_file_path = r"doit_DataFreshness_Credentials/doit_DataFreshness_Credentials.cfg"
 dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title",
                                                 "Link": "landing_page",
                                                 "Agency Performing Data Updates": "state_agency_performing_data_updates",
@@ -66,9 +67,7 @@ metadata_missing = "Metadata on update frequency are missing. Dataset owner shou
 null_string = "NULL"
 number_of_seconds_in_a_day = 86400
 other_update_frequency = "Other Update Frequency - If frequency isn't included in list above, please describe it here."
-output_excel_file_path_data_freshness_SOCRATA = r"DataFreshnessOutputs\SOCRATA_data_freshness.xlsx"
 output_excel_sheetname = "The Data Nasty"
-output_json_file_path_data_freshness_SOCRATA = r"DataFreshnessOutputs\SOCRATA_data_freshness.json"
 please_describe_below = "Other (Please Describe Below)"
 process_initiation_datetime_in_seconds = float(round(time.time()))
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
@@ -77,7 +76,12 @@ updated_enough_yes = "Yes"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
 
 # DERIVED
+credentials_config_file_path = f"{_root_file_path}/doit_DataFreshness_Credentials/doit_DataFreshness_Credentials.cfg"
+
 evaluation_difficult = f"{updated_enough_yes}. The data are updated as needed, which makes evaluation difficult. As an approximate measure, this dataset is evaluated as updated recently enough because it has been updated in the past month."
 md_open_data_url = f"https://{md_open_data_domain}"
 md_socrata_data_json_url = f"{md_open_data_url}/data.json"
-output_excel_file_path_full_dataframe = r"Docs\{date}SOCRATA_data_output.xlsx".format(date=datetime.datetime.now().strftime('%Y%m%d'))
+output_excel_file_path_data_freshness_SOCRATA = f"{_root_file_path}/DataFreshnessOutputs/SOCRATA_data_freshness.xlsx"
+output_excel_file_path_full_dataframe = r"{_root_file_path}/Docs/{date}SOCRATA_data_output.xlsx".format(_root_file_path=_root_file_path, date=datetime.datetime.now().strftime('%Y%m%d'))
+output_json_file_path_data_freshness_SOCRATA = f"{_root_file_path}/DataFreshnessOutputs/SOCRATA_data_freshness.json"
+

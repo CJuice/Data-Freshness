@@ -11,7 +11,7 @@ Modifications:
 
 """
 
-
+# TODO: Explore multithreading to reduce time it takes to complete
 def main():
 
     # IMPORTS

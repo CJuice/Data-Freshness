@@ -24,11 +24,12 @@ def main():
 
     # VARIABLES
     # NOT-DERIVED
+    _root_file_path = os.path.dirname(__file__)
     agol_dataframe_excel = None
     agol_excel_file_name = "AGOL_data_freshness.xlsx"
     agol_json_file_name = "AGOL_data_freshness.json"
     compiled_json_file_name = "DataCompiled.json"
-    data_file_dir = r"Docs\DataFreshnessOutputs"
+    data_file_dir = f"{_root_file_path}/DataFreshnessOutputs"
     null_string = "NULL"
     null_datetime_value = datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     null_integer_value = -9999
@@ -70,11 +71,14 @@ def main():
 
     # JSON Portion of the process. For a search portal that is under development.
     for dirname, dirs, files in os.walk(data_file_dir):
+        print(files)
         for file in files:
-            if file == agol_json_file_name:
+            file_path = os.path.join(dirname, file)
+            exists = os.path.exists(file_path)
+            if file == agol_json_file_name and exists:
                 with open(os.path.join(dirname, file), 'r') as agol_handler:
                     agol_json = json.loads(agol_handler.read())
-            elif file == socrata_json_file_name:
+            elif file == socrata_json_file_name and exists:
                 with open(os.path.join(dirname, file), 'r') as socrata_handler:
                     socrata_json = json.loads(socrata_handler.read())
         break  # Just making sure
