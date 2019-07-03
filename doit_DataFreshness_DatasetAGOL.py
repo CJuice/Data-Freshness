@@ -490,10 +490,10 @@ class DatasetAGOL:
         Parse html like strings to isolate the text and remove html code, and assign to attribute
         :return:
         """
-        def local_inner_function(id_for_error, value):
+        def local_inner_function(asset_url_for_error, value):
             """
             Parse string using BeautifulSoup to isolate meaningful text (sans html code characters)
-            :param id_for_error: asset id for meaningful printout
+            :param asset_url_for_error: asset id for meaningful printout
             :param value: string to be souped
             :return:
             """
@@ -501,11 +501,13 @@ class DatasetAGOL:
                 soup = BeautifulSoup(value, "html.parser")
                 return soup.get_text()
             except Exception as e:
-                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. Asset: {id_for_error}. {e}")
+                print(f"Unanticipated Exception raised in parsing license_info using BeautifulSoup. Asset: {asset_url_for_error}. {e}")
                 return None
 
-        self.license_info_text = local_inner_function(id_for_error=self.id, value=self.license_info_raw)
-        self.description_text = local_inner_function(id_for_error=self.id, value=self.description_raw)
+        self.license_info_text = local_inner_function(asset_url_for_error=self.url_agol_item_id,
+                                                      value=self.license_info_raw)
+        self.description_text = local_inner_function(asset_url_for_error=self.url_agol_item_id,
+                                                     value=self.description_raw)
 
     def process_maintenance_frequency_code(self):
         """
