@@ -454,9 +454,10 @@ class DatasetAGOL:
         date and time, and the publication date that is auto-populated unless we manually enter a value
         :return:
         """
-        def local_inner_function(value: str):
+        def local_inner_function(value: str, asset_url_for_error: str):
             """
             Parse the string date and time value and return all while protected with try/except.
+            :param asset_url_for_error: agol asset url for navigating to resource when error encountered in value
             :param value: string value to be parsed
             :return:
             """
@@ -473,14 +474,16 @@ class DatasetAGOL:
             try:
                 return date_parser.parse(value)
             except (ValueError, TypeError) as err:
-                print(f"Exception during parsing of date like string {value}. {err}")
+                print(f"Exception during parsing of date like string {value}. {err}. {asset_url_for_error}")
                 return None
 
-        self.meta_creation_date_dt = local_inner_function(value=self.meta_creation_date_str)
-        self.meta_creation_time_dt = local_inner_function(value=self.meta_creation_time_str)
-        self.meta_modification_date_dt = local_inner_function(value=self.meta_modification_date_str)
-        self.meta_modification_time_dt = local_inner_function(value=self.meta_modification_time_str)
-        self.publication_date_dt = local_inner_function(value=self.publication_date_str)
+        self.meta_creation_date_dt = local_inner_function(value=self.meta_creation_date_str, asset_url_for_error=self.url_agol_item_id)
+        self.meta_creation_time_dt = local_inner_function(value=self.meta_creation_time_str, asset_url_for_error=self.url_agol_item_id)
+        self.meta_modification_date_dt = local_inner_function(value=self.meta_modification_date_str,
+                                                              asset_url_for_error=self.url_agol_item_id)
+        self.meta_modification_time_dt = local_inner_function(value=self.meta_modification_time_str,
+                                                              asset_url_for_error=self.url_agol_item_id)
+        self.publication_date_dt = local_inner_function(value=self.publication_date_str, asset_url_for_error=self.url_agol_item_id)
 
     def parse_html_attribute_values_to_soup_get_text(self):
         """
