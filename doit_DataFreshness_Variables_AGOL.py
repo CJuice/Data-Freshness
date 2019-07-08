@@ -2,7 +2,8 @@
 File designated for process variables in order to centralize variables, and de-clutter main script.
 Author: CJuice
 Date: 20190702
-Modifications:
+Revisions:
+    20190708, CJuice: Altered the fields output to excel. Including the unique id in output excel.
 
 """
 import datetime
@@ -14,7 +15,8 @@ all_map_layers = "All map layers from MD iMAP are in the process of being survey
 arcgis_item_url = "https://maryland.maps.arcgis.com/home/item.html?id={item_id}"
 arcgis_root_url = r"https://www.arcgis.com"
 better_metadata_needed = "Better Metadata Needed."
-dataframe_to_header_mapping_for_excel_output = {"Dataset Name": "title", "Link": "url_agol_item_id",
+dataframe_to_header_mapping_for_excel_output = {"Unique Identifier": "id",
+                                                "Dataset Name": "title", "Link": "url_agol_item_id",
                                                 "Agency Performing Data Updates": "organization_name",
                                                 "Owner": "owner",
                                                 "Data Provided By": "organization_name",
