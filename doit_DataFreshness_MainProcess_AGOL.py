@@ -7,11 +7,16 @@ addition, there are attributes and extraction functionality that are commented o
 now and grow into the abundancy of features rather than have to come back later and add features onto a pinto.
 Author: CJuice
 Date: 20190702
-Modifications:
+Revisions:
+20190708, CJuice, Changed handling of response. Was making request and calling .json() on it and then chained a .get().
+    Sometimes the response was None and the .json() raised exception. Undid the chaining and made separate calls with
+    tertiary statement check for None
 
 """
 
 # TODO: Explore multithreading to reduce time it takes to complete
+
+
 def main():
 
     # IMPORTS
@@ -20,6 +25,7 @@ def main():
     print(f"Start Time: {start_time} seconds since Epoch")
 
     import itertools
+    import json
     import numpy as np
     import pandas as pd
     import requests
@@ -145,8 +151,8 @@ def main():
     for item_id, agol_dataset in agol_class_objects_dict.items():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
                                                     params=var.record_count_params)
-        agol_dataset.number_of_rows = record_count_response.json().get("count", -9999) if record_count_response is not None else -9999
-
+        response_json = record_count_response.json() if record_count_response is not None else None
+        agol_dataset.number_of_rows = response_json.get("count", -9999) if record_count_response is not None else -9999
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
                                                    params=var.fields_query_params)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
