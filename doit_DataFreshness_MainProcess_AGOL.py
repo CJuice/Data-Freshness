@@ -25,6 +25,7 @@ def main():
     print(f"Start Time: {start_time} seconds since Epoch")
 
     import itertools
+    import json
     import numpy as np
     import pandas as pd
     import requests
@@ -44,10 +45,10 @@ def main():
     agol_dataset_counter = itertools.count()
     agol_group_objects_dict = {}
     agol_metadata_counter = itertools.count()
+    agol_number_of_rows_counter = itertools.count()
     agol_other_counter = itertools.count()
     agol_webapp_counter = itertools.count()
     agol_webmap_counter = itertools.count()
-    output_for_dashboard = True
     output_full_dataframe = True
     skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
     print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
@@ -150,11 +151,19 @@ def main():
     for item_id, agol_dataset in agol_class_objects_dict.items():
         record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
                                                     params=var.record_count_params)
-        response_json = record_count_response.json() if record_count_response is not None else None
-        agol_dataset.number_of_rows = response_json.get("count", -9999) if record_count_response is not None else -9999
+        try:
+            response_json = record_count_response.json()
+        except json.decoder.JSONDecodeError as jde:
+            print(f"JSONDecodeError Exception raised during .json() call on number of rows query response: {agol_dataset.url_agol_item_id}")
+            agol_dataset.number_of_rows = -9999
+        else:
+            agol_dataset.number_of_rows = response_json.get("count", -9999)
+
         field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
                                                    params=var.fields_query_params)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
+        if next(agol_number_of_rows_counter) % 100 == 0:
+            print(f"\tProcess Insight. Rounds of requests: {agol_number_of_rows_counter}. {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
