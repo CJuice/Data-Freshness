@@ -163,7 +163,7 @@ def main():
                                                    params=var.fields_query_params)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
         if next(agol_number_of_rows_counter) % 100 == 0:
-            print(f"\tProcess Insight. Rounds of requests: {agol_number_of_rows_counter}. {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+            print(f"\tRounds of requests: {agol_number_of_rows_counter}. {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
