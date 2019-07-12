@@ -86,8 +86,16 @@ def main():
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
     print(f"\nMetadata Process Initiating...")
-    for item_id, agol_dataset in agol_class_objects_dict.items():
-        break
+    print("Entering threading tests")
+
+    # Need a list of tuples that can be iterated over by map function in download all sites
+    metadata_details_tuples_list = [(item_id,
+                                   var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
+                                                               item_id=agol_dataset.id),
+                                   var.json_param_for_request) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
+    metadata_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=metadata_details_tuples_list,
+                                                                      func=Utility.download_site_groups)
+    for item_id, metadata_response in metadata_threading_results_generator:
         agol_dataset.build_metadata_xml_url()
         metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
 
@@ -124,15 +132,23 @@ def main():
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
+    exit()
+
+    
     # Need to make the requests to the Groups url to gather that value for processing
     print(f"\nGroups Process Initiating...")
-    for item_id, agol_dataset in agol_class_objects_dict.items():
-        break
+
+    # Need a list of tuples that can be iterated over by map function in download all sites
+    groups_details_tuples_list = [(item_id,
+                                   var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
+                                                               item_id=agol_dataset.id),
+                                   var.json_param_for_request) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
+    groups_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=groups_details_tuples_list,
+                                                                    func=Utility.download_site_groups)
+    for item_id, groups_response in groups_threading_results_generator:
+        # break
         # these groups warrant an independent object/class. They are not part of the asset but something
         #   to which the asset can belong. Currently only use one value but in future may want to exploit more.
-        groups_response = Utility.request_GET(url=var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
-                                                                              item_id=agol_dataset.id),
-                                              params=var.json_param_for_request)
         group_dataset = GroupAGOL()
         group_dataset.assign_group_json_to_class_values(group_json=groups_response.json())
 
@@ -150,19 +166,15 @@ def main():
 
     # Need to get the number of rows in each dataset, and the column names for each dataset
     print(f"\nNumber of Rows Process Initiating...")
-    print("Entering threading tests")
 
     # Need a list of tuples that can be iterated over by map function in download all sites
-    all_sites_details_tuples_list = [(item_id,
-                                      var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
-                                      var.record_count_params,
-                                      var.fields_query_params) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
-    threading_results_tuples_generator = Utility.download_all_sites(site_detail_tuples_list=all_sites_details_tuples_list,
+    rowcount_fields_details_tuples_list = [(item_id,
+                                            var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
+                                            var.record_count_params,
+                                            var.fields_query_params) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
+    threading_results_tuples_generator = Utility.download_all_sites(site_detail_tuples_list=rowcount_fields_details_tuples_list,
                                                                     func=Utility.download_site_rows_columns)
-    # for item in threading_results_tuples_generator:
-    #     print(item)
 
-    # exit()
     # Need to iterate over results and assign to objects
     for item_id, record_count_response, field_query_response in threading_results_tuples_generator:
         agol_dataset = agol_class_objects_dict.get(item_id)
@@ -179,10 +191,6 @@ def main():
             print(f"\tRounds of requests: {agol_number_of_rows_counter}. {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-
-
-    # exit()
-
 
     # Need a master pandas dataframe from all agol datasets
     print(f"\nAGOL Dataframe Creation Process Initiating...")

@@ -129,8 +129,6 @@ class Utility:
 
     @staticmethod
     def download_site_rows_columns(site_detail_tuple):
-        # count_results_list = []
-        # fields_results_list = []
         agol_item_id, service_query_url, record_count_params, field_query_params = site_detail_tuple
 
         if not hasattr(Utility.thread_local, "session"):
@@ -147,14 +145,33 @@ class Utility:
         return agol_item_id, count_result, fields_result
 
     @staticmethod
-    def download_site_metadata(url):
+    def download_site_groups(site_detail_tuple):
+        agol_item_id, url, params = site_detail_tuple
+
         if not hasattr(Utility.thread_local, "session"):
             Utility.thread_local.session = requests.Session()
 
         session = Utility.thread_local.session
 
-        with session.get(url) as response:
-            print(f"Read {len(response.content)} from {url}")
+        with session.get(url=url, params=params) as response:
+            result = response
+
+        return agol_item_id, result
+
+    @staticmethod
+    def download_site_metadata(site_detail_tuple):
+        agol_item_id, url, params = site_detail_tuple
+
+        if not hasattr(Utility.thread_local, "session"):
+            Utility.thread_local.session = requests.Session()
+
+        session = Utility.thread_local.session
+        with session.post(url=url, data=params, json=None) as response:
+        # with session.get(url=url, params=params) as response:
+            result = response
+
+        return agol_item_id, result
+
 
     @staticmethod
     def download_all_sites(site_detail_tuples_list, func):
