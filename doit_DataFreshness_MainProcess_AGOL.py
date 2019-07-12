@@ -51,7 +51,7 @@ def main():
     agol_webmap_counter = itertools.count()
     output_full_dataframe = True
     skipped_assets_counter_dict = {"Web Map": agol_webmap_counter, "Web Mapping Application": agol_webapp_counter}
-    print(f"\nVariablss Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
+    print(f"\nVariables Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # FUNCTIONALITY
     print(f"\nArcGIS Online Process Initiating...")
@@ -67,6 +67,7 @@ def main():
         agol_dataset.build_standardized_item_url()
         agol_dataset.create_tags_string()
         agol_dataset.check_for_null_source_url_and_replace()
+        agol_dataset.build_metadata_xml_url()
 
         # Check type_ to eliminate those we are not interested in evaluating
         if agol_dataset.type_ not in var.types_to_evaluate:
@@ -86,21 +87,24 @@ def main():
 
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
     print(f"\nMetadata Process Initiating...")
-    print("Entering threading tests")
 
     # Need a list of tuples that can be iterated over by map function in download all sites
     metadata_details_tuples_list = [(item_id,
-                                   var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
-                                                               item_id=agol_dataset.id),
-                                   var.json_param_for_request) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
+                                     agol_dataset.metadata_url,
+                                     None) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:100]
     metadata_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=metadata_details_tuples_list,
-                                                                      func=Utility.download_site_groups)
+                                                                      func=Utility.download_site)
+    # for item in metadata_threading_results_generator:
+    #     print(item)
+
     for item_id, metadata_response in metadata_threading_results_generator:
-        agol_dataset.build_metadata_xml_url()
-        metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
+        agol_dataset = agol_class_objects_dict.get(item_id)
+
+        # agol_dataset.build_metadata_xml_url()
+        # metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
 
         if 300 <= metadata_response.status_code:
-            print(f"ISSUE: AGOL Item {agol_dataset.url_agol_item_id} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
+            print(f"ISSUE: AGOL Item {item_id} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
             continue
 
         # Need to handle xml and parse to usable form
@@ -132,9 +136,6 @@ def main():
     print(f"\nMetadata Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(f"Number of metadata requests handled: {agol_metadata_counter}")
 
-    exit()
-
-    
     # Need to make the requests to the Groups url to gather that value for processing
     print(f"\nGroups Process Initiating...")
 
@@ -144,9 +145,10 @@ def main():
                                                                item_id=agol_dataset.id),
                                    var.json_param_for_request) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
     groups_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=groups_details_tuples_list,
-                                                                    func=Utility.download_site_groups)
+                                                                    func=Utility.download_site)
     for item_id, groups_response in groups_threading_results_generator:
-        # break
+        agol_dataset = agol_class_objects_dict.get(item_id)
+
         # these groups warrant an independent object/class. They are not part of the asset but something
         #   to which the asset can belong. Currently only use one value but in future may want to exploit more.
         group_dataset = GroupAGOL()

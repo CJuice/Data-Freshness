@@ -247,6 +247,7 @@ class DatasetAGOL:
         """
         self.metadata_url = var.arcgis_metadata_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
                                                            item_id=self.id)
+        # return self.metadata_url
 
     def calculate_days_since_last_data_update(self):
         """
