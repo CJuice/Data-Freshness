@@ -128,20 +128,37 @@ class Utility:
             exit()
 
     @staticmethod
-    def download_site(site_detail_tuple):
-        results_list = []
-        agol_item_id, url, params = site_detail_tuple
+    def download_site_rows_columns(site_detail_tuple):
+        # count_results_list = []
+        # fields_results_list = []
+        agol_item_id, service_query_url, record_count_params, field_query_params = site_detail_tuple
+
         if not hasattr(Utility.thread_local, "session"):
             Utility.thread_local.session = requests.Session()
+
         session = Utility.thread_local.session
-        with session.get(url=url, params=params) as response:
-            # print(f"Read {len(response.content)} from {url}")
-            results_list.append((agol_item_id, response))
-        return results_list
+
+        with session.get(url=service_query_url, params=record_count_params) as count_response:
+            count_result = count_response
+
+        with session.get(url=service_query_url, params=field_query_params) as fields_response:
+            fields_result = fields_response
+
+        return agol_item_id, count_result, fields_result
 
     @staticmethod
-    def download_all_sites(site_detail_tuples_list):
+    def download_site_metadata(url):
+        if not hasattr(Utility.thread_local, "session"):
+            Utility.thread_local.session = requests.Session()
+
+        session = Utility.thread_local.session
+
+        with session.get(url) as response:
+            print(f"Read {len(response.content)} from {url}")
+
+    @staticmethod
+    def download_all_sites(site_detail_tuples_list, func):
         import concurrent.futures
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            result = executor.map(Utility.download_site, site_detail_tuples_list)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=7) as executor:  # tested between 5 and 10, ~7 seem best
+            result = executor.map(func, site_detail_tuples_list)
         return result

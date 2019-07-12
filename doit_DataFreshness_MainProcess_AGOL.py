@@ -151,47 +151,21 @@ def main():
     # Need to get the number of rows in each dataset, and the column names for each dataset
     print(f"\nNumber of Rows Process Initiating...")
     print("Entering threading tests")
-    # TODO: url requests step
-    # import concurrent.futures
-    # import requests
-    # import threading
-    #
-    # thread_local = threading.local()
-
-    # Need a list to hold result tuples from threading requests
-    # threading_results_tuples_list = []
-
-    # def download_site(site_detail_tuple):
-    #     agol_item_id, url, params = site_detail_tuple
-    #     if not hasattr(thread_local, "session"):
-    #         thread_local.session = requests.Session()
-    #     session = thread_local.session
-    #     with session.get(url=url, params=params) as response:
-    #         # print(f"Read {len(response.content)} from {url}")
-    #         threading_results_tuples_list.append((agol_item_id, response))
-    #
-    # def download_all_sites(site_detail_tuples_list):
-    #     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-    #         executor.map(download_site, site_detail_tuples_list)
 
     # Need a list of tuples that can be iterated over by map function in download all sites
-    all_sites_details_tuples_list = [(item_id, var.root_service_query_url.format(data_source_rest_url=agol_dataset.url), var.record_count_params) for item_id, agol_dataset in agol_class_objects_dict.items()]
-    print(f"len of all_sites_details_tuples_list is {len(all_sites_details_tuples_list)}")
-    all_sites_details_tuples_list = all_sites_details_tuples_list[0:50]
-    print(f"len of all_sites_details_tuples_list is {len(all_sites_details_tuples_list)}")
-    threading_results_tuples_generator = Utility.download_all_sites(site_detail_tuples_list=all_sites_details_tuples_list)
-    print(f"Downloaded all sites. Len = {len(list(threading_results_tuples_generator))}")
-    exit()
+    all_sites_details_tuples_list = [(item_id,
+                                      var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
+                                      var.record_count_params,
+                                      var.fields_query_params) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:5]
+    threading_results_tuples_generator = Utility.download_all_sites(site_detail_tuples_list=all_sites_details_tuples_list,
+                                                                    func=Utility.download_site_rows_columns)
+    # for item in threading_results_tuples_generator:
+    #     print(item)
+
+    # exit()
     # Need to iterate over results and assign to objects
-    #   First convert tuples to dict so can get by id
-    # threading_results_dict = dict(threading_results_tuples_list)
-
-    # TODO: response processing step
-    for item_id, record_count_response in threading_results_tuples_generator:
-        # record_count_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
-        #                                             params=var.record_count_params)
+    for item_id, record_count_response, field_query_response in threading_results_tuples_generator:
         agol_dataset = agol_class_objects_dict.get(item_id)
-
         try:
             response_json = record_count_response.json()
         except json.decoder.JSONDecodeError as jde:
@@ -200,15 +174,14 @@ def main():
         else:
             agol_dataset.number_of_rows = response_json.get("count", -9999)
 
-    # TODO: Extract this to a separate round of processing using multithreading
-        field_query_response = Utility.request_GET(url=var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
-                                                   params=var.fields_query_params)
         agol_dataset.extract_and_assign_field_names(response=field_query_response)
         if next(agol_number_of_rows_counter) % 100 == 0:
             print(f"\tRounds of requests: {agol_number_of_rows_counter}. {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     print(f"\nNumber of Rows Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
-    exit()
+
+
+    # exit()
 
 
     # Need a master pandas dataframe from all agol datasets
