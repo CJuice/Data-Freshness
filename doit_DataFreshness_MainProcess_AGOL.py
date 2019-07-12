@@ -11,10 +11,10 @@ Revisions:
 20190708, CJuice, Changed handling of response. Was making request and calling .json() on it and then chained a .get().
     Sometimes the response was None and the .json() raised exception. Undid the chaining and made separate calls with
     tertiary statement check for None
+20190712, CJuice: Implemented multi-threading for metadata, groups, record count and dataset fields web requests
+    process. Reduced time significantly. deployed to server and ran successfully.
 
 """
-
-# TODO: Explore multithreading to reduce time it takes to complete
 
 
 def main():
@@ -88,20 +88,16 @@ def main():
     # Need to request the metadata xml for each object, handle the xml, extract values and assign them to the object
     print(f"\nMetadata Process Initiating...")
 
-    # Need a list of tuples that can be iterated over by map function in download all sites
+    # Multi-threading implementation:
+    #   Need a list of tuples that can be iterated over by map function in download all sites
     metadata_details_tuples_list = [(item_id,
                                      agol_dataset.metadata_url,
                                      None) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:100]
     metadata_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=metadata_details_tuples_list,
                                                                       func=Utility.download_site)
-    # for item in metadata_threading_results_generator:
-    #     print(item)
 
     for item_id, metadata_response in metadata_threading_results_generator:
         agol_dataset = agol_class_objects_dict.get(item_id)
-
-        # agol_dataset.build_metadata_xml_url()
-        # metadata_response = Utility.request_POST(url=agol_dataset.metadata_url)
 
         if 300 <= metadata_response.status_code:
             print(f"ISSUE: AGOL Item {item_id} metadata url request response is {metadata_response.status_code}. Resource skipped. Solution has been to go to AGOL and publish the metadata.")
@@ -139,7 +135,8 @@ def main():
     # Need to make the requests to the Groups url to gather that value for processing
     print(f"\nGroups Process Initiating...")
 
-    # Need a list of tuples that can be iterated over by map function in download all sites
+    # Multi-threading implementation:
+    #   Need a list of tuples that can be iterated over by map function in download all sites
     groups_details_tuples_list = [(item_id,
                                    var.arcgis_group_url.format(arcgis_items_root_url=var.arcgis_items_root_url,
                                                                item_id=agol_dataset.id),
@@ -169,7 +166,8 @@ def main():
     # Need to get the number of rows in each dataset, and the column names for each dataset
     print(f"\nNumber of Rows Process Initiating...")
 
-    # Need a list of tuples that can be iterated over by map function in download all sites
+    # Multi-threading implementation:
+    #   Need a list of tuples that can be iterated over by map function in download all sites
     rowcount_fields_details_tuples_list = [(item_id,
                                             var.root_service_query_url.format(data_source_rest_url=agol_dataset.url),
                                             var.record_count_params,
