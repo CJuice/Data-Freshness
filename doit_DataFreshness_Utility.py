@@ -17,6 +17,12 @@ class Utility:
     Class of utility static methods for use in processing.
     """
 
+    import concurrent.futures
+    import requests
+    import threading
+
+    thread_local = threading.local()
+
     @staticmethod
     def request_GET(url: str, params: dict = None) -> requests.models.Response:
         """
@@ -121,3 +127,21 @@ class Utility:
             print(f"Unable to process xml response to Element using ET.fromstring(): {e}")
             exit()
 
+    @staticmethod
+    def download_site(site_detail_tuple):
+        results_list = []
+        agol_item_id, url, params = site_detail_tuple
+        if not hasattr(Utility.thread_local, "session"):
+            Utility.thread_local.session = requests.Session()
+        session = Utility.thread_local.session
+        with session.get(url=url, params=params) as response:
+            # print(f"Read {len(response.content)} from {url}")
+            results_list.append((agol_item_id, response))
+        return results_list
+
+    @staticmethod
+    def download_all_sites(site_detail_tuples_list):
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            result = executor.map(Utility.download_site, site_detail_tuples_list)
+        return result
