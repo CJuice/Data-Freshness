@@ -41,7 +41,7 @@ def main():
                                       "Source URL": null_url_value,
                                       "Date of Most Recent Data Change": null_datetime_value,
                                       "Days Since Most Recent Data Change": null_integer_value,
-                                      "Date of Most Recent Change (Data Change or Metadata)": null_datetime_value,
+                                      "Date of Most Recent Change (Data Change or Metadata Change)": null_datetime_value,
                                       "Days Since Last View Update": null_integer_value,
                                       "Number of Rows": null_integer_value}
     socrata_dataframe_excel = None
