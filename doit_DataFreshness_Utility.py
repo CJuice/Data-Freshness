@@ -4,6 +4,7 @@ Author: CJuice
 Date: 20190702
 Revisions:
     20190712, CJuice: Added multi-threading methods and supporting imports and vars
+    20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
 
 """
 
@@ -90,46 +91,6 @@ class Utility:
         return agol_item_id, count_result, fields_result
 
     @staticmethod
-    def request_GET(url: str, params: dict = None) -> requests.models.Response:
-        """
-        Make a GET request to a web resource and return response.
-        :param url: the url to which to make the request
-        :param params: params to pass in the request
-        :return:
-        """
-        if params is None:
-            params = {}
-
-        try:
-            response = requests.get(url=url, params=params)
-        except Exception as e:
-            print(f"Error with request to {url}. Error:{e}")
-            return requests.models.Response()
-        else:
-            return response
-
-    @staticmethod
-    def request_POST(url: str, data: dict = None, verify: bool = False) -> requests.models.Response:
-        """
-        Make a POST request for a web resource and return response
-        :param url: the url to which to make the request
-        :param data: data to be passed in request
-        :param verify:
-        :return:
-        """
-        if data is None:
-            data = {}
-
-        try:
-            response = requests.post(url=url, data=data, verify=verify)
-        except Exception as e:
-            # TODO: Refine exception handling
-            print(f"Error during post request to url:{url}, data:{data}: {e}")
-            exit()
-        else:
-            return response
-
-    @staticmethod
     def extract_all_immediate_child_features_from_element(element: ET.Element, tag_name: str):
         """
         Extract all immediate children of the element provided to the method.
@@ -184,6 +145,57 @@ class Utility:
             exit()
 
     @staticmethod
+    def request_GET(url: str, params: dict = None) -> requests.models.Response:
+        """
+        Make a GET request to a web resource and return response.
+        :param url: the url to which to make the request
+        :param params: params to pass in the request
+        :return:
+        """
+        if params is None:
+            params = {}
+
+        try:
+            response = requests.get(url=url, params=params)
+        except Exception as e:
+            print(f"Error with request to {url}. Error:{e}")
+            return requests.models.Response()
+        else:
+            return response
+
+    @staticmethod
+    def request_POST(url: str, data: dict = None, verify: bool = False) -> requests.models.Response:
+        """
+        Make a POST request for a web resource and return response
+        :param url: the url to which to make the request
+        :param data: data to be passed in request
+        :param verify:
+        :return:
+        """
+        if data is None:
+            data = {}
+
+        try:
+            response = requests.post(url=url, data=data, verify=verify)
+        except Exception as e:
+            # TODO: Refine exception handling
+            print(f"Error during post request to url:{url}, data:{data}: {e}")
+            exit()
+        else:
+            return response
+
+    @staticmethod
+    def setup_config(cfg_file: str) -> configparser.ConfigParser:
+        """
+        Instantiate the parser for accessing a config file.
+        :param cfg_file: config file to access
+        :return:
+        """
+        cfg_parser = configparser.ConfigParser()
+        cfg_parser.read(filenames=cfg_file)
+        return cfg_parser
+
+    @staticmethod
     def upsert_to_socrata(client: Socrata, dataset_identifier: str, zipper: dict) -> None:
         """
         Upsert data to Socrata dataset.
@@ -198,14 +210,3 @@ class Utility:
         except Exception as e:
             print("Error upserting to Socrata: {}. {}".format(dataset_identifier, e))
         return
-
-    @staticmethod
-    def setup_config(cfg_file: str) -> configparser.ConfigParser:
-        """
-        Instantiate the parser for accessing a config file.
-        :param cfg_file: config file to access
-        :return:
-        """
-        cfg_parser = configparser.ConfigParser()
-        cfg_parser.read(filenames=cfg_file)
-        return cfg_parser

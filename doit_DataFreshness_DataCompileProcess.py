@@ -9,7 +9,7 @@ second is the AGOL results. These two files have the same columns. The records a
 a single dataset.
 Author: CJuice
 Date: 20190702
-Modifications:
+Revisions: 20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
 
 """
 
@@ -86,14 +86,13 @@ def main():
                                                                    copy=True)
 
     # SOCRATA UPSERT OF DATA
-    # Due to problems with FME upsert process, or Socrata receiving data, we are implementing sodapy functionality
     # TODO: May want to extract this to a separate process at some point just for clarity
     records_dict_list = socrata_upsert_version.to_dict(orient="records")
 
-    # Utility.upsert_to_socrata(client=DatasetSocrata.SOCRATA_CLIENT,
-    #                           dataset_identifier=credentials_parser["SOCRATA"]["data_freshness_fourbyfour"],
-    #                           zipper=records_dict_list)
-    # print("\tUpserted to Socrata")
+    Utility.upsert_to_socrata(client=DatasetSocrata.SOCRATA_CLIENT,
+                              dataset_identifier=credentials_parser["SOCRATA"]["data_freshness_fourbyfour"],
+                              zipper=records_dict_list)
+    print("\tUpserted to Socrata")
 
     # JSON Portion of the process. For a search portal that is under development.
     for dirname, dirs, files in os.walk(data_file_dir):
