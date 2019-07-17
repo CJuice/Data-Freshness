@@ -230,8 +230,6 @@ def main():
                                columns=list(var.dataframe_to_header_mapping_for_excel_output.values()),
                                header=list(var.dataframe_to_header_mapping_for_excel_output.keys()),
                                index=False)
-    exit()
-
 
     json_output_df = master_socrata_df[var.json_output_columns_list]
     json_output_df.to_json(path_or_buf=var.output_json_file_path_data_freshness_SOCRATA, orient="records")

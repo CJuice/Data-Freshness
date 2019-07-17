@@ -37,6 +37,7 @@ def main():
     null_datetime_value = datetime.datetime.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     null_integer_value = -9999
     null_url_value = "https://N.U.LL"
+    # TODO: Too many hard coded references to these fields. Extract to single location as variables and then reference
     null_value_column_fillna_specs = {"Link": null_url_value,
                                       "Source URL": null_url_value,
                                       "Date of Most Recent Data Change": null_datetime_value,
@@ -89,10 +90,10 @@ def main():
     # TODO: May want to extract this to a separate process at some point just for clarity
     records_dict_list = socrata_upsert_version.to_dict(orient="records")
 
-    Utility.upsert_to_socrata(client=DatasetSocrata.SOCRATA_CLIENT,
-                              dataset_identifier=credentials_parser["SOCRATA"]["data_freshness_fourbyfour"],
-                              zipper=records_dict_list)
-    print("\tUpserted to Socrata")
+    # Utility.upsert_to_socrata(client=DatasetSocrata.SOCRATA_CLIENT,
+    #                           dataset_identifier=credentials_parser["SOCRATA"]["data_freshness_fourbyfour"],
+    #                           zipper=records_dict_list)
+    # print("\tUpserted to Socrata")
 
     # JSON Portion of the process. For a search portal that is under development.
     for dirname, dirs, files in os.walk(data_file_dir):
@@ -100,6 +101,7 @@ def main():
         for file in files:
             file_path = os.path.join(dirname, file)
             exists = os.path.exists(file_path)
+            print(file_path, exists)
             if file == agol_json_file_name and exists:
                 with open(os.path.join(dirname, file), 'r') as agol_handler:
                     agol_json = json.loads(agol_handler.read())
