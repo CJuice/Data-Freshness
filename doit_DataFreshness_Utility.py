@@ -21,6 +21,7 @@ class Utility:
     import concurrent.futures
     import requests
     import threading
+    from sodapy import Socrata
 
     THREAD_LOCAL = threading.local()
 
@@ -159,6 +160,17 @@ class Utility:
             return None
 
     @staticmethod
+    def make_zipper(dataset_headers_list: list, record_list: list) -> dict:
+        """
+        Zip headers and data values and return a dictionary
+
+        :param dataset_headers_list: List of headers for dataset
+        :param record_list: List of values in the record
+        :return: dictionary of zip results
+        """
+        return dict(zip(dataset_headers_list, record_list))
+
+    @staticmethod
     def parse_xml_response_to_element(response_xml_str: str) -> ET.Element:
         """
         Process xml response content to xml ET.Element
@@ -171,7 +183,21 @@ class Utility:
             print(f"Unable to process xml response to Element using ET.fromstring(): {e}")
             exit()
 
+    @staticmethod
+    def upsert_to_socrata(client: Socrata, dataset_identifier: str, zipper: dict) -> None:
+        """
+        Upsert data to Socrata dataset.
 
+        :param client: Socrata connection client
+        :param dataset_identifier: Unique Socrata dataset identifier. Not the data page identifier but primary page id.
+        :param zipper: dictionary of zipped results (headers and data values)
+        :return: None
+        """
+        try:
+            client.upsert(dataset_identifier=dataset_identifier, payload=zipper, content_type='json')
+        except Exception as e:
+            print("Error upserting to Socrata: {}. {}".format(dataset_identifier, e))
+        return
 
     @staticmethod
     def setup_config(cfg_file: str) -> configparser.ConfigParser:

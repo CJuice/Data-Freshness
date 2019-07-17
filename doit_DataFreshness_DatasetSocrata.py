@@ -161,9 +161,9 @@ class DatasetSocrata:
         self.category_string = None
         self.column_names_string = None
         self.date_of_most_recent_data_change = None
-        self.date_of_most_recent_view_change = None
-        self.days_since_last_data_update = None
-        self.days_since_last_view_update = None
+        self.date_of_most_recent_view_change_data_or_metadata = None
+        self.days_since_most_recent_data_change = None
+        self.days_since_last_view_change = None
         self.keyword_tags_string = None
         self.missing_metadata_fields = None
         self.number_of_rows_in_dataset = None
@@ -286,7 +286,7 @@ class DatasetSocrata:
         Subtract rows updated date in seconds from process initiation time in seconds and convert to whole days.
         :return:
         """
-        self.days_since_last_data_update = int(round(
+        self.days_since_most_recent_data_change = int(round(
                 (var.process_initiation_datetime_in_seconds - self.rows_updated_at) / var.number_of_seconds_in_a_day))
 
     def calculate_days_since_last_view_change(self):
@@ -294,7 +294,7 @@ class DatasetSocrata:
         Subtract view updated date in seconds from process initiation time in seconds and convert to whole days.
         :return:
         """
-        self.days_since_last_view_update = int(round(
+        self.days_since_last_view_change = int(round(
             (var.process_initiation_datetime_in_seconds - self.view_last_modified) / var.number_of_seconds_in_a_day))
 
     def calculate_number_of_rows_in_dataset(self):
@@ -343,7 +343,7 @@ class DatasetSocrata:
         """
         if self.view_last_modified is None:
             self.view_last_modified = self.publication_date
-        self.date_of_most_recent_view_change = datetime.datetime.fromtimestamp(self.rows_updated_at)
+        self.date_of_most_recent_view_change_data_or_metadata = datetime.datetime.fromtimestamp(self.rows_updated_at)
 
     def determine_missing_metadata_fields(self, asset_json):
         """
@@ -395,7 +395,7 @@ class DatasetSocrata:
         string_check = updated_enough_strings.get(self.update_frequency, None)
 
         if int_check is not None:
-            answer = var.updated_enough_yes if self.days_since_last_data_update <= int_check else var.updated_enough_no
+            answer = var.updated_enough_yes if self.days_since_most_recent_data_change <= int_check else var.updated_enough_no
         elif string_check is not None:
             answer = string_check
         else:
