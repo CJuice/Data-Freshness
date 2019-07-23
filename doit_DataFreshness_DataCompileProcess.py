@@ -9,8 +9,8 @@ second is the AGOL results. These two files have the same columns. The records a
 a single dataset.
 Author: CJuice
 Date: 20190702
-Revisions: 20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
-
+Revision: 20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
+Revision: 20190723: CJuice - Refactoring and documentation. Also added switch for socrata upsert for Pat
 """
 
 
