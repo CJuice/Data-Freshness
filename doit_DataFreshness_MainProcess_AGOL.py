@@ -92,7 +92,7 @@ def main():
     #   Need a list of tuples that can be iterated over by map function in download all sites
     metadata_details_tuples_list = [(item_id,
                                      agol_dataset.metadata_url,
-                                     None) for item_id, agol_dataset in agol_class_objects_dict.items()]  #[0:100]
+                                     None) for item_id, agol_dataset in agol_class_objects_dict.items()]
     metadata_threading_results_generator = Utility.download_all_sites(site_detail_tuples_list=metadata_details_tuples_list,
                                                                       func=Utility.download_site)
 

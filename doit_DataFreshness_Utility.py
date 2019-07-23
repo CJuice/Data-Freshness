@@ -4,7 +4,6 @@ Author: CJuice
 Date: 20190702
 Revisions:
     20190712, CJuice: Added multi-threading methods and supporting imports and vars
-    20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
 
 """
 
@@ -22,7 +21,6 @@ class Utility:
     import concurrent.futures
     import requests
     import threading
-    from sodapy import Socrata
 
     THREAD_LOCAL = threading.local()
 
@@ -194,19 +192,3 @@ class Utility:
         cfg_parser = configparser.ConfigParser()
         cfg_parser.read(filenames=cfg_file)
         return cfg_parser
-
-    @staticmethod
-    def upsert_to_socrata(client: Socrata, dataset_identifier: str, zipper: dict) -> None:
-        """
-        Upsert data to Socrata dataset.
-
-        :param client: Socrata connection client
-        :param dataset_identifier: Unique Socrata dataset identifier. Not the data page identifier but primary page id.
-        :param zipper: dictionary of zipped results (headers and data values)
-        :return: None
-        """
-        try:
-            client.upsert(dataset_identifier=dataset_identifier, payload=zipper, content_type='json')
-        except Exception as e:
-            print("Error upserting to Socrata: {}. {}".format(dataset_identifier, e))
-        return

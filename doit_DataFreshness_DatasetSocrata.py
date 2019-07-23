@@ -2,7 +2,7 @@
 Contains a single class for socrata dataset representation per MD DoIT needs.
 Author: CJuice
 Date: 20190702
-Revisions:
+Revision: 20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
 
 """
 import datetime
@@ -10,7 +10,6 @@ import itertools
 import os
 import time
 import DataFreshness.doit_DataFreshness_Variables_Socrata as var
-
 from sodapy import Socrata
 
 
@@ -463,6 +462,22 @@ class DatasetSocrata:
         """
 
         return Socrata(domain=domain, app_token=app_token, username=username, password=password)
+
+    @staticmethod
+    def upsert_to_socrata(client: Socrata, dataset_identifier: str, zipper: dict) -> None:
+        """
+        Upsert data to Socrata dataset.
+
+        :param client: Socrata connection client
+        :param dataset_identifier: Unique Socrata dataset identifier. Not the data page identifier but primary page id.
+        :param zipper: dictionary of zipped results (headers and data values)
+        :return: None
+        """
+        try:
+            client.upsert(dataset_identifier=dataset_identifier, payload=zipper, content_type='json')
+        except Exception as e:
+            print("Error upserting to Socrata: {}. {}".format(dataset_identifier, e))
+        return
 
     @staticmethod
     def request_and_aggregate_all_socrata_records(client: Socrata, fourbyfour: str,

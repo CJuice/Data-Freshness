@@ -4,7 +4,7 @@ Author: CJuice
 Date: 20190702
 Revisions:
     20190708, CJuice: Altered the fields output to excel. Including the unique id in output excel.
-
+    20190717, CJuice: Changed header mappings to match Socrata field names or wouldn't upsert values properly
 """
 import datetime
 import os
