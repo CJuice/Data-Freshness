@@ -565,11 +565,12 @@ class DatasetAGOL:
                     'sortField': DatasetAGOL.SORT_FIELD,
                     'f': 'json'
                     }
-            response = Utility.request_POST(url=var.arcgis_data_catalog_url, data=data)
+            # response = Utility.request_POST(url=var.arcgis_data_catalog_url, data=data)
+            response = Utility.request_GET(url=var.arcgis_data_catalog_url, params=data)
             try:
                 resp_json = response.json()
             except json.JSONDecodeError as jse:
-                print(f"JSONDecodeError after making post request to arcgis online. url={var.arcgis_data_catalog_url}, data={data} {jse}")
+                print(f"JSONDecodeError after making request to arcgis online. url={var.arcgis_data_catalog_url}, data={data} {jse}")
                 exit()
             else:
                 results = resp_json.get("results", {})
