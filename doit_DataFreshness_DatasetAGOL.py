@@ -255,10 +255,10 @@ class DatasetAGOL:
         """
         if self.publication_date_dt is not None:
             try:
-                self.days_since_last_data_change = (var.process_initiation_datetime - self.publication_date_dt).days
+                self.days_since_most_recent_data_change = (var.process_initiation_datetime - self.publication_date_dt).days
             except TypeError as te:
                 print(f"TypeError: {te}. pub tz:{self.publication_date_dt.tzinfo}, process tz: {var.process_initiation_datetime.tzinfo}, {self.url_agol_item_id}")
-                self.days_since_last_data_change = None
+                self.days_since_most_recent_data_change = None
 
     def check_for_null_source_url_and_replace(self):
         """
@@ -436,8 +436,8 @@ class DatasetAGOL:
         int_check = updated_enough_ints.get(self.maintenance_frequency_word, None)
         string_check = updated_enough_strings.get(self.maintenance_frequency_word, None)
 
-        if int_check is not None and self.days_since_last_data_change is not None:
-            answer = var.updated_enough_yes if self.days_since_last_data_change <= int_check else var.updated_enough_no
+        if int_check is not None and self.days_since_most_recent_data_change is not None:
+            answer = var.updated_enough_yes if self.days_since_most_recent_data_change <= int_check else var.updated_enough_no
         elif string_check is not None:
             answer = string_check
         else:
