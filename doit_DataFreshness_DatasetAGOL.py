@@ -3,7 +3,9 @@ Contains the DatasetAGOL class that is for storing dataset values as class attri
 necessary to get/process the values.
 Author: CJuice
 Date: 20190702
-Modifications:
+Revision: 20190913 CJuice, outdated class attribute was still referenced in code. Script began failing due to some
+change in an agol asset which uncovered the issue. Refactored the outdated name to the new name which was defined as
+a class attribute. Specifically referencing days_since_most_recent_data_change
 
 """
 
