@@ -4,7 +4,7 @@ Author: CJuice
 Date: 20190702
 Revisions:
     20190708, CJuice: Altered the fields output to excel. Including the unique id in output excel.
-
+    20190920, CJuice: Brought two dictionaries in for up to date assessment from the dataset agol file.
 """
 import datetime
 import os
@@ -43,6 +43,14 @@ output_excel_sheetname = datetime.datetime.now().strftime('%Y%m%d')
 types_to_evaluate = ("Feature Service", "Image Service", "Map Service") # Currently ignored types: Code Attachment, Web Map, Web Mapping Application
 update_frequency_missing = "Update frequency metadata are missing. Dataset owner should add metadata to resolve this issue."
 update_frequency_unknown = "Update frequency metadata is Unknown. Dataset owner should add metadata to resolve this issue."
+updated_enough_ints = {"Continual": 0,
+                       "Daily": 1,
+                       "Weekly": 7,
+                       "Fortnightly": 14,
+                       "Monthly": 31,
+                       "Quarterly": 91,
+                       "Biannually": 730,
+                       "Annually": 365}
 updated_enough_no = "No"
 updated_enough_yes = "Yes"
 whether_dataset = "Whether dataset is up to date cannot be calculated until the Department of Information Technology collects metadata on update frequency."
@@ -59,5 +67,12 @@ output_excel_file_path_data_freshness_AGOL = f"{_root_file_path}/DataFreshnessOu
 output_excel_file_path_full_dataframe = r"{_root_file_path}/Docs/{date}AGOL_data_output.xlsx".format(_root_file_path=_root_file_path, date=datetime.datetime.now().strftime('%Y%m%d'))
 output_json_file_path_data_freshness_AGOL = f"{_root_file_path}/DataFreshnessOutputs/AGOL_data_freshness.json"
 process_initiation_datetime = datetime.datetime.now(datetime.timezone.utc)
+updated_enough_strings = {"As Needed": evaluation_difficult,
+                          "Irregular": evaluation_difficult,
+                          "Not Planned": updated_enough_yes,
+                          "Unknown": f"{better_metadata_needed} {update_frequency_missing}",
+                          "": f"{better_metadata_needed} {update_frequency_missing}",
+                          "Empty": f"{better_metadata_needed} {update_frequency_missing}",
+                          "-9999": "DoIT ERROR"}
 record_count_params = {"where": "1=1", "returnGeometry": False, "returnCountOnly": True, "f": "pjson"}
 root_service_query_url = r"{data_source_rest_url}/query"

@@ -3,9 +3,11 @@ Contains the DatasetAGOL class that is for storing dataset values as class attri
 necessary to get/process the values.
 Author: CJuice
 Date: 20190702
-Revision: 20190913 CJuice, outdated class attribute was still referenced in code. Script began failing due to some
-change in an agol asset which uncovered the issue. Refactored the outdated name to the new name which was defined as
-a class attribute. Specifically referencing days_since_most_recent_data_change
+Revision:
+    20190913 CJuice, outdated class attribute was still referenced in code. Script began failing due to some
+    change in an agol asset which uncovered the issue. Refactored the outdated name to the new name which was defined as
+    a class attribute. Specifically referencing days_since_most_recent_data_change
+    20190920 CJuice, extracted the dictionaries for evaluating is up to date to the agol variables file
 
 """
 
@@ -417,26 +419,9 @@ class DatasetAGOL:
         :return:
         """
 
-        updated_enough_ints = {"Continual": 0,
-                               "Daily": 1,
-                               "Weekly": 7,
-                               "Fortnightly": 14,
-                               "Monthly": 31,
-                               "Quarterly": 91,
-                               "Biannually": 730,
-                               "Annually": 365}
-
-        updated_enough_strings = {"As Needed": var.evaluation_difficult,
-                                  "Irregular": var.evaluation_difficult,
-                                  "Not Planned": var.updated_enough_yes,
-                                  "Unknown": f"{var.better_metadata_needed} {var.update_frequency_missing}",
-                                  "": f"{var.better_metadata_needed} {var.update_frequency_missing}",
-                                  "Empty": f"{var.better_metadata_needed} {var.update_frequency_missing}",
-                                  "-9999": "DoIT ERROR"}
-
         answer = None
-        int_check = updated_enough_ints.get(self.maintenance_frequency_word, None)
-        string_check = updated_enough_strings.get(self.maintenance_frequency_word, None)
+        int_check = var.updated_enough_ints.get(self.maintenance_frequency_word, None)
+        string_check = var.updated_enough_strings.get(self.maintenance_frequency_word, None)
 
         if int_check is not None and self.days_since_most_recent_data_change is not None:
             answer = var.updated_enough_yes if self.days_since_most_recent_data_change <= int_check else var.updated_enough_no
