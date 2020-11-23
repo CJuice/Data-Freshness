@@ -13,6 +13,8 @@ Revisions:
     tertiary statement check for None
 20190712, CJuice: Implemented multi-threading for metadata, groups, record count and dataset fields web requests
     process. Reduced time significantly. deployed to server and ran successfully.
+    20201123, CJuice, added conversion of pandas datetime with timezone awareness to date. Upgrade of pandas
+        produced the issue.
 
 """
 
@@ -199,9 +201,13 @@ def main():
                                   dtype=None,
                                   copy=False)
     master_agol_df = master_agol_df.reindex(sorted(master_agol_df.columns), axis=1)
+
+    # Need to address pandas issue with writing dates that are timezone aware to excel
+    master_agol_df["publication_date_dt"] = pd.to_datetime(master_agol_df["publication_date_dt"], utc=True).dt.date
+
     master_agol_df.fillna(value=var.null_string, inplace=True)
-    print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
     print(master_agol_df.info())
+    print(f"\nAGOL DataFrame Creation Process Completed... {Utility.calculate_time_taken(start_time=start_time)} seconds since start")
 
     # Need to output a dataframe that matches the existing data freshness report
     master_agol_df.to_excel(excel_writer=var.output_excel_file_path_data_freshness_AGOL,
