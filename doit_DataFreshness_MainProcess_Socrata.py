@@ -118,27 +118,32 @@ def main():
         next(socrata_assetinventory_counter)
 
         # exchange json 'true' & 'false' for python True & False
-        public_raw = asset_json_obj.get("public", None)
-        public = boolean_string_replacement_dict.get(public_raw, None)
+        # FIXME: public now appears to be audience
+        # public_raw = asset_json_obj.get("public", None)
+        # public = boolean_string_replacement_dict.get(public_raw, None)
+        public_raw = asset_json_obj.get("audience", None)
+        is_public = DatasetSocrata.process_audience_to_bool(audience_str=public_raw)
 
         # Filter out datasets where public is not True
-        if public is None:
-            pprint.pprint(f"Issue extracting 'public' from asset inventory json. Skipped: {asset_json_obj}")
+        if is_public is None:
+            pprint.pprint(f"Issue extracting 'audience' from asset inventory json. Skipped: {asset_json_obj}")
             continue
-        elif public is True:
+        elif is_public is True:
 
             # These are the datasets of interest
             next(socrata_assetinventory_public_dataset_counter)
             pass
-        elif public is False:
+        elif is_public is False:
             next(socrata_assetinventory_non_public_dataset_counter)
             continue
         else:
-            print(f"Unexpected 'public' value extracted from asset inventory json: {public}")
+            print(f"Unexpected 'public' value extracted from asset inventory json: {is_public}")
             exit()
 
         # For public datasets, extract u_id (four-by-four) and use that to get corresponding data.json based object
-        u_id = asset_json_obj.get("u_id", None)
+        # u_id = asset_json_obj.get("u_id", None) # FIXME
+        u_id = asset_json_obj.get("uid", None)
+
         if u_id is None:
             pprint.pprint(f"Issue extracting 'u_id'' from asset inventory json. Skipped: {asset_json_obj}")
             continue
@@ -161,7 +166,7 @@ def main():
     print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
     print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
-
+    exit()
     # Now that have all values from data.json and asset inventory, get and assign metadata info for every dataset
     for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
 
