@@ -199,27 +199,26 @@ class DatasetSocrata:
         :param asset_json: asset inventory json response
         :return:
         """
-        self.contact_email = asset_json.get("contactemail", None) # FIXME, value changed to 'contact_email'
+        self.contact_email = asset_json.get("contact_email", None)
         self.creation_date = asset_json.get("creation_date", None)
-        self.data_provided_by = asset_json.get("data_provided_by", None)  # FIXME: May have changed to 'attribution'
-        self.date_metadata_written = asset_json.get("date_metadata_written", None) # FIXME: may have changed to 'last_metadata_updated_date'
+        self.data_provided_by = asset_json.get("attribution", None)
+        self.date_metadata_written = asset_json.get("last_metadata_updated_date", None)
         self.derived_view = asset_json.get("derived_view", None)
         self.domain = asset_json.get("domain", None)
         self.downloads = asset_json.get("downloads", -9999)
-        self.jurisdiction = asset_json.get("jurisdiction", None) # FIXME: may have changed to 'jurisdiction_jurisdiction'
-        self.last_update_date_data = asset_json.get("last_update_date_data", None) # FIXME: May have changed to 'last_data_updated_date'
+        self.jurisdiction = asset_json.get("jurisdiction_jurisdiction", None)
+        self.last_update_date_data = asset_json.get("last_data_updated_date", None)
         self.license = asset_json.get("license", None)
         self.owner = asset_json.get("owner", None)
         self.owner_u_id = asset_json.get("owner_uid", None)
-        self.place_keywords = asset_json.get("place_keywords", None) # FIXME: may have changed to 'gisdownload_placekeywords'
+        self.place_keywords = asset_json.get("gisdownload_placekeywords", None)
         self.provenance = asset_json.get("provenance", None)
-        # self.public = asset_json.get("public", None) # FIXME, now 'audience'
         self.public = asset_json.get("audience", None)
         self.publication_stage = asset_json.get("publication_stage", None)
-        self.source_link = asset_json.get("source_link", None) # FIXME: may have become 'attribution_link'
-        self.state_agency_performing_data_updates = asset_json.get("state_agency_performing_data_updates", None) # FIXME: may have become 'agency_stateagencyperformingdataupdates'
-        self.time_period_of_content = asset_json.get("time_period_of_content", None) # FIXME: may have become 'timeperiod_timeperiodofcontent'
-        self.update_frequency = asset_json.get("update_frequency", None) # FIXME: may have become 'timeperiod_updatefrequency'
+        self.source_link = asset_json.get("attribution_link", None)
+        self.state_agency_performing_data_updates = asset_json.get("agency_stateagencyperformingdataupdates", None)
+        self.time_period_of_content = asset_json.get("timeperiod_timeperiodofcontent", None)
+        self.update_frequency = asset_json.get("timeperiod_updatefrequency", None)
         self.visits = asset_json.get("visits", -9999)
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
