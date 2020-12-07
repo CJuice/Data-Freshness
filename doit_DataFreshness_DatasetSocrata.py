@@ -56,8 +56,8 @@ class DatasetSocrata:
         u_id - four by four code extracted from landing page value (d) # FIXME
 
         METADATA NOTES:
-        attribution - data provided by (a)
-        attributionLink - sourceLink (a)
+        attribution - attribution (a)
+        attributionLink - attribution_link (a)
         category - theme (d)
         createdAt - creation_date (a)
         description - description (d)
@@ -70,22 +70,22 @@ class DatasetSocrata:
         license - Appears to be covered by license (a) or even licenseId (m)
         licenseId - license (a)
         metadata - Most if not all info is already captured. But update frequency parameter essential.
-            Jurisdiction - jurisdiction (a)
-            Agency - state_agency_performing_updates (a)
+            Jurisdiction - jurisdiction_jurisdiction (a)
+            Agency - agency_stateagencyperformingdataupdates (a)
             Time Period
-                Update Frequency - update_frequency (a)
-                Time Period of Content - time_period_of_content (a)
+                Update Frequency - timeperiod_updatefrequency (a)
+                Time Period of Content - timeperiod_timeperiodofcontent (a)
                 Date Metadata Written - date_metadata_written (a)
                 'Other Update Frequency - If frequency isn't included in list above, please describe it here.' - UNIQUE!
-            Place Keywords - place_keywords (a)
+            Place Keywords - gisdownload_placekeywords (a)
         name - title (d)
         newBackend - Not stored, did not appear to be useful
-        owner - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
+        owner - dict values covered elsewhere without need for extraction (owner_uid (a), owner (a))
         provenance - provenance (a)
         publicationStage - publication_stage (a)
         query - Not stored, did not appear to be useful
         rights - Not stored, did not appear to be useful
-        tableAuthor - dict values covered elsewhere without need for extraction (owner_u_id (a), owner (a))
+        tableAuthor - dict values covered elsewhere without need for extraction (owner_uid (a), owner (a))
         tags - keyword (d)
         viewCount - visits (a)
         viewType - Not stored, did not appear to be useful
@@ -113,26 +113,26 @@ class DatasetSocrata:
         self.type_ = None
 
         # ASSET INVENTORY SOURCED VALUES
+        self.agency_stateagencyperformingdataupdates = None
+        self.attribution = None
+        self.attribution_link = None
+        self.audience = None
         self.contact_email = None
         self.creation_date = None
-        self.data_provided_by = None
-        self.date_metadata_written = None
         self.derived_view = None
         self.domain = None
         self.downloads = None
-        self.jurisdiction = None
-        self.last_update_date_data = None
+        self.gisdownload_placekeywords = None
+        self.jurisdiction_jurisdiction = None
+        self.last_data_updated_date = None
+        self.last_metadata_updated_date = None
         self.license = None
         self.owner = None
-        self.owner_u_id = None
-        self.place_keywords = None
+        self.owner_uid = None
         self.provenance = None
-        self.public = None
         self.publication_stage = None
-        self.source_link = None
-        self.state_agency_performing_data_updates = None
-        self.time_period_of_content = None
-        self.update_frequency = None
+        self.timeperiod_timeperiodofcontent = None
+        self.timeperiod_updatefrequency = None
         self.visits = None
 
         # METADATA SOURCE VALUES
@@ -201,24 +201,24 @@ class DatasetSocrata:
         """
         self.contact_email = asset_json.get("contact_email", None)
         self.creation_date = asset_json.get("creation_date", None)
-        self.data_provided_by = asset_json.get("attribution", None)
-        self.date_metadata_written = asset_json.get("last_metadata_updated_date", None)
+        self.attribution = asset_json.get("attribution", None)
+        self.last_metadata_updated_date = asset_json.get("last_metadata_updated_date", None)
         self.derived_view = asset_json.get("derived_view", None)
         self.domain = asset_json.get("domain", None)
         self.downloads = asset_json.get("downloads", -9999)
-        self.jurisdiction = asset_json.get("jurisdiction_jurisdiction", None)
-        self.last_update_date_data = asset_json.get("last_data_updated_date", None)
+        self.jurisdiction_jurisdiction = asset_json.get("jurisdiction_jurisdiction", None)
+        self.last_data_updated_date = asset_json.get("last_data_updated_date", None)
         self.license = asset_json.get("license", None)
         self.owner = asset_json.get("owner", None)
-        self.owner_u_id = asset_json.get("owner_uid", None)
-        self.place_keywords = asset_json.get("gisdownload_placekeywords", None)
+        self.owner_uid = asset_json.get("owner_uid", None)
+        self.gisdownload_placekeywords = asset_json.get("gisdownload_placekeywords", None)
         self.provenance = asset_json.get("provenance", None)
-        self.public = asset_json.get("audience", None)
+        self.audience = asset_json.get("audience", None)
         self.publication_stage = asset_json.get("publication_stage", None)
-        self.source_link = asset_json.get("attribution_link", None)
-        self.state_agency_performing_data_updates = asset_json.get("agency_stateagencyperformingdataupdates", None)
-        self.time_period_of_content = asset_json.get("timeperiod_timeperiodofcontent", None)
-        self.update_frequency = asset_json.get("timeperiod_updatefrequency", None)
+        self.attribution_link = asset_json.get("attribution_link", None)
+        self.agency_stateagencyperformingdataupdates = asset_json.get("agency_stateagencyperformingdataupdates", None)
+        self.timeperiod_timeperiodofcontent = asset_json.get("timeperiod_timeperiodofcontent", None)
+        self.timeperiod_updatefrequency = asset_json.get("timeperiod_updatefrequency", None)
         self.visits = asset_json.get("visits", -9999)
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
@@ -320,7 +320,7 @@ class DatasetSocrata:
         Replace null source link values with a value Socrata recognizes as a valid url
         :return:
         """
-        self.source_link = "https://N.U.LL" if self.source_link is None else self.source_link
+        self.attribution_link = "https://N.U.LL" if self.attribution_link is None else self.attribution_link
 
     def determine_date_of_most_recent_data_change(self):
         """
@@ -390,8 +390,8 @@ class DatasetSocrata:
                                   "": f"{var.better_metadata_needed} {var.update_frequency_missing}"}
         answer = None
 
-        int_check = updated_enough_ints.get(self.update_frequency, None)
-        string_check = updated_enough_strings.get(self.update_frequency, None)
+        int_check = updated_enough_ints.get(self.timeperiod_updatefrequency, None)
+        string_check = updated_enough_strings.get(self.timeperiod_updatefrequency, None)
 
         if int_check is not None:
             answer = var.updated_enough_yes if self.days_since_most_recent_data_change <= int_check else var.updated_enough_no
@@ -438,10 +438,10 @@ class DatasetSocrata:
         Process the update frequency value if is equal to test condition and substitute appropriate value.
         :return:
         """
-        if self.update_frequency is None:
-            self.update_frequency = var.null_string
-        elif self.update_frequency == var.please_describe_below and self.other_update_frequency is not None:
-            self.update_frequency = self.other_update_frequency
+        if self.timeperiod_updatefrequency is None:
+            self.timeperiod_updatefrequency = var.null_string
+        elif self.timeperiod_updatefrequency == var.please_describe_below and self.other_update_frequency is not None:
+            self.timeperiod_updatefrequency = self.other_update_frequency
         else:
             pass
         return
