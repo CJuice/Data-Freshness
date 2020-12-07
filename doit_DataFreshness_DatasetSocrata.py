@@ -53,7 +53,7 @@ class DatasetSocrata:
         keywords - keyword (d)
         name- title (d)
         type - @type (d)
-        u_id - four by four code extracted from landing page value (d)
+        u_id - four by four code extracted from landing page value (d) # FIXME
 
         METADATA NOTES:
         attribution - data provided by (a)
@@ -199,26 +199,27 @@ class DatasetSocrata:
         :param asset_json: asset inventory json response
         :return:
         """
-        self.contact_email = asset_json.get("contactemail", None)
+        self.contact_email = asset_json.get("contactemail", None) # FIXME, value changed to 'contact_email'
         self.creation_date = asset_json.get("creation_date", None)
         self.data_provided_by = asset_json.get("data_provided_by", None)
-        self.date_metadata_written = asset_json.get("date_metadata_written", None)
+        self.date_metadata_written = asset_json.get("date_metadata_written", None) # FIXME: may have changed to 'last_metadata_updated_date'
         self.derived_view = asset_json.get("derived_view", None)
         self.domain = asset_json.get("domain", None)
         self.downloads = asset_json.get("downloads", -9999)
-        self.jurisdiction = asset_json.get("jurisdiction", None)
-        self.last_update_date_data = asset_json.get("last_update_date_data", None)
+        self.jurisdiction = asset_json.get("jurisdiction", None) # FIXME: may have changed to 'jurisdiction_jurisdiction'
+        self.last_update_date_data = asset_json.get("last_update_date_data", None) # FIXME: May have changed to 'last_data_updated_date'
         self.license = asset_json.get("license", None)
         self.owner = asset_json.get("owner", None)
         self.owner_u_id = asset_json.get("owner_uid", None)
-        self.place_keywords = asset_json.get("place_keywords", None)
+        self.place_keywords = asset_json.get("place_keywords", None) # FIXME: may have changed to 'gisdownload_placekeywords'
         self.provenance = asset_json.get("provenance", None)
-        self.public = asset_json.get("public", None)
+        # self.public = asset_json.get("public", None) # FIXME, now 'audience'
+        self.public = asset_json.get("audience", None)
         self.publication_stage = asset_json.get("publication_stage", None)
-        self.source_link = asset_json.get("source_link", None)
-        self.state_agency_performing_data_updates = asset_json.get("state_agency_performing_data_updates", None)
-        self.time_period_of_content = asset_json.get("time_period_of_content", None)
-        self.update_frequency = asset_json.get("update_frequency", None)
+        self.source_link = asset_json.get("source_link", None) # FIXME: Don't know what this is or became
+        self.state_agency_performing_data_updates = asset_json.get("state_agency_performing_data_updates", None) # FIXME: may have become 'agency_stateagencyperformingdataupdates'
+        self.time_period_of_content = asset_json.get("time_period_of_content", None) # FIXME: may have become 'timeperiod_timeperiodofcontent'
+        self.update_frequency = asset_json.get("update_frequency", None) # FIXME: may have become 'timeperiod_updatefrequency'
         self.visits = asset_json.get("visits", -9999)
 
     def assign_data_json_to_class_values(self, dataset_json: dict):
@@ -516,3 +517,13 @@ class DatasetSocrata:
             else:
                 more_records_exist_than_response_limit_allows = False
         return master_list_of_dicts
+
+    @staticmethod
+    def process_audience_to_bool(audience_str: str) -> bool:
+        """
+        TODO
+        :param audience_str:
+        :return:
+        """
+        audience_options_dict = {"public": True, "private": False, "internal": False}
+        return audience_options_dict.get(audience_str, None)
