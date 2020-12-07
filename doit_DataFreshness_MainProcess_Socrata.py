@@ -166,7 +166,7 @@ def main():
     print(f"Number of asset inventory datasets handled: {socrata_assetinventory_counter}")
     print(f"Number of public datasets encountered: {socrata_assetinventory_public_dataset_counter}")
     print(f"Number of non-public datasets encountered: {socrata_assetinventory_non_public_dataset_counter}")
-    exit()
+
     # Now that have all values from data.json and asset inventory, get and assign metadata info for every dataset
     for fourbyfour, dataset_obj in socrata_class_objects_dict.items():
 
