@@ -5,6 +5,7 @@ Date: 20190702
 Revisions:
     20190708, CJuice: Altered the fields output to excel. Including the unique id in output excel.
     20190717, CJuice: Changed header mappings to match Socrata field names or wouldn't upsert values properly
+    20201207, CJuice: Revised field names after Socrata Asset Inventory api was revised
 """
 import datetime
 import os

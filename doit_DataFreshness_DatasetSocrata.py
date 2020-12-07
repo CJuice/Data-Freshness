@@ -3,7 +3,7 @@ Contains a single class for socrata dataset representation per MD DoIT needs.
 Author: CJuice
 Date: 20190702
 Revision: 20190717, CJuice - Added Socrata upsert functionality to push the data directly to the data freshness dataset
-
+    20201207, CJuice: Revised functionality, and attribute names after Socrata Asset Inventory api was revised
 """
 import datetime
 import itertools
@@ -53,7 +53,7 @@ class DatasetSocrata:
         keywords - keyword (d)
         name- title (d)
         type - @type (d)
-        u_id - four by four code extracted from landing page value (d) # FIXME
+        u_id - four by four code extracted from landing page value (d) #
 
         METADATA NOTES:
         attribution - attribution (a)
@@ -520,9 +520,12 @@ class DatasetSocrata:
     @staticmethod
     def process_audience_to_bool(audience_str: str) -> bool:
         """
-        TODO
-        :param audience_str:
-        :return:
+        Process string values to boolean based on exchange dict
+
+        After Socrata changed the Asset Inventory 'public' became 'audience' and values changed from bool to string.
+        This function exchanges the string for a bool
+        :param audience_str: audience value extracted from asset inventory response
+        :return: bool
         """
         audience_options_dict = {"public": True, "private": False, "internal": False}
         return audience_options_dict.get(audience_str, None)

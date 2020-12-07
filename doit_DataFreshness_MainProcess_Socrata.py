@@ -7,8 +7,8 @@ in the class attributes. The second resource accessed is the asset inventory for
 The third resource is the metadata on each asset.
 Author: CJuice
 Date: 20190702
-Modifications:
-
+Revisions:
+    20201207, CJuice: Revised functionality and variable names after Socrata Asset Inventory api was revised
 """
 
 
@@ -117,12 +117,8 @@ def main():
         # track count
         next(socrata_assetinventory_counter)
 
-        # exchange json 'true' & 'false' for python True & False
-        # FIXME: public now appears to be audience
-        # public_raw = asset_json_obj.get("public", None)
-        # public = boolean_string_replacement_dict.get(public_raw, None)
-        public_raw = asset_json_obj.get("audience", None)
-        is_public = DatasetSocrata.process_audience_to_bool(audience_str=public_raw)
+        audience_str = asset_json_obj.get("audience", None)
+        is_public = DatasetSocrata.process_audience_to_bool(audience_str=audience_str)
 
         # Filter out datasets where public is not True
         if is_public is None:
