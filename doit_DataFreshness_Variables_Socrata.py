@@ -5,6 +5,7 @@ Date: 20190702
 Revisions:
     20190708, CJuice: Altered the fields output to excel. Including the unique id in output excel.
     20190717, CJuice: Changed header mappings to match Socrata field names or wouldn't upsert values properly
+    20201207, CJuice: Revised field names after Socrata Asset Inventory api was revised
 """
 import datetime
 import os
@@ -17,11 +18,11 @@ better_metadata_needed = "Better Metadata Needed."
 dataframe_to_header_mapping_for_excel_output = {"Unique Identifier": "four_by_four",
                                                 "Dataset Name": "title",
                                                 "Link": "landing_page",
-                                                "Agency Performing Data Updates": "state_agency_performing_data_updates",
+                                                "Agency Performing Data Updates": "agency_stateagencyperformingdataupdates",
                                                 "Owner": "owner",
-                                                "Data Provided By": "data_provided_by",
-                                                "Source URL": "source_link",
-                                                "Update Frequency": "update_frequency",
+                                                "Data Provided By": "attribution",
+                                                "Source URL": "attribution_link",
+                                                "Update Frequency": "timeperiod_updatefrequency",
                                                 "Date of Most Recent Data Change": "date_of_most_recent_data_change",
                                                 "Days Since Most Recent Data Change": "days_since_most_recent_data_change",
                                                 "Date of Most Recent Change (Data Change or Metadata Change)": "date_of_most_recent_view_change_data_or_metadata",
@@ -35,34 +36,34 @@ dataframe_to_header_mapping_for_excel_output = {"Unique Identifier": "four_by_fo
                                                 "Category": "category_string"}
 expected_socrata_asset_inventory_json_keys_dict = {'api_endpoint': 'API Endpoint',
                                                    'category': 'Category',
-                                                   'contactemail': 'Contact Email',
+                                                   'contact_email': 'Contact Email',
                                                    'creation_date': 'Creation Date',
-                                                   'data_provided_by': 'Data Provided By',
+                                                   'attribution': 'Data Provided By',
                                                    'dataset_link': 'Dataset Link',
                                                    'date_metadata_written': 'Date Metadata Written',
                                                    'derived_view': 'Derived View',
                                                    'description': 'Description',
                                                    'domain': 'Domain',
                                                    'downloads': 'Downloads',
-                                                   'jurisdiction': 'Jurisdiction',
+                                                   'jurisdiction_jurisdiction': 'Jurisdiction',
                                                    'keywords': 'Tags/Keywords',
-                                                   'last_update_date_data': 'Data Last Update Date',
+                                                   'last_data_updated_date': 'Data Last Update Date',
                                                    'license': 'License',
                                                    'name': 'Title/Name',
                                                    'owner': 'Owner',
                                                    'owner_uid': 'Owner ID',
-                                                   'place_keywords': 'Place Keywords',
+                                                   'gisdownload_placekeywords': 'Place Keywords',
                                                    'provenance': 'Provenance',
-                                                   'public': 'Public',
+                                                   'audience': 'Public',
                                                    'publication_stage': 'Publication Stage',
-                                                   'source_link': 'Source Link',
-                                                   'state_agency_performing_data_updates': 'State Agency Performing Updates',
-                                                   'time_period_of_content': 'Time Period of Content',
+                                                   'attribution_link': 'Source Link',
+                                                   'agency_stateagencyperformingdataupdates': 'State Agency Performing Updates',
+                                                   'timeperiod_timeperiodofcontent': 'Time Period of Content',
                                                    'type': 'Type',
                                                    'u_id': 'Dataset ID',
-                                                   'update_frequency': 'Update Frequency',
+                                                   'timeperiod_updatefrequency': 'Update Frequency',
                                                    'visits': 'Visits'}
-json_output_columns_list = ["category_string", "description", "four_by_four", "date_of_most_recent_data_change", "portal", "data_provided_by", "keyword_tags_string", "title", "type_", "landing_page"]
+json_output_columns_list = ["category_string", "description", "four_by_four", "date_of_most_recent_data_change", "portal", "attribution", "keyword_tags_string", "title", "type_", "landing_page"]
 md_open_data_domain = r"opendata.maryland.gov"
 md_socrata_profile_url = "{root}/profile/{user_four_by_four}"
 metadata_missing = "Metadata on update frequency are missing. Dataset owner should provide this information to resolve this issue."

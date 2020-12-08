@@ -7,8 +7,8 @@ in the class attributes. The second resource accessed is the asset inventory for
 The third resource is the metadata on each asset.
 Author: CJuice
 Date: 20190702
-Modifications:
-
+Revisions:
+    20201207, CJuice: Revised functionality and variable names after Socrata Asset Inventory api was revised
 """
 
 
@@ -117,28 +117,29 @@ def main():
         # track count
         next(socrata_assetinventory_counter)
 
-        # exchange json 'true' & 'false' for python True & False
-        public_raw = asset_json_obj.get("public", None)
-        public = boolean_string_replacement_dict.get(public_raw, None)
+        audience_str = asset_json_obj.get("audience", None)
+        is_public = DatasetSocrata.process_audience_to_bool(audience_str=audience_str)
 
         # Filter out datasets where public is not True
-        if public is None:
-            pprint.pprint(f"Issue extracting 'public' from asset inventory json. Skipped: {asset_json_obj}")
+        if is_public is None:
+            pprint.pprint(f"Issue extracting 'audience' from asset inventory json. Skipped: {asset_json_obj}")
             continue
-        elif public is True:
+        elif is_public is True:
 
             # These are the datasets of interest
             next(socrata_assetinventory_public_dataset_counter)
             pass
-        elif public is False:
+        elif is_public is False:
             next(socrata_assetinventory_non_public_dataset_counter)
             continue
         else:
-            print(f"Unexpected 'public' value extracted from asset inventory json: {public}")
+            print(f"Unexpected 'public' value extracted from asset inventory json: {is_public}")
             exit()
 
         # For public datasets, extract u_id (four-by-four) and use that to get corresponding data.json based object
-        u_id = asset_json_obj.get("u_id", None)
+        # u_id = asset_json_obj.get("u_id", None) # FIXME
+        u_id = asset_json_obj.get("uid", None)
+
         if u_id is None:
             pprint.pprint(f"Issue extracting 'u_id'' from asset inventory json. Skipped: {asset_json_obj}")
             continue
